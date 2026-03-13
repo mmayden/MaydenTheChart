@@ -35,15 +35,19 @@ import { DayTypeBanner } from './components/ui/DayTypeBanner'
 import { MacroStatusBar } from './components/ui/MacroStatusBar'
 import { IndicatorTabView } from './components/ui/IndicatorTabView'
 import { NotificationBell } from './components/ui/NotificationBell'
+import Logo from './components/ui/Logo'
+import { SettingsModal } from './components/ui/SettingsModal'
 
 export default function App() {
   const chartRef = useRef(null)
   const [chart, setChart]               = useState(null)
   const [candleSeries, setCandleSeries] = useState(null)
   const [sidebarOpen, setSidebarOpen]   = useState(true)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   const selectedTimeframe = useChartStore((s) => s.selectedTimeframe)
   const indicators        = useChartStore((s) => s.indicators)
+  const theme             = useChartStore((s) => s.theme)
 
   const { data: bars, isLoading, isError, error, dataUpdatedAt } = useAlpacaBars()
   const { data: dailyBars } = useDailyBars()
@@ -96,16 +100,22 @@ export default function App() {
   }, [dailyBars])
 
   return (
-    <div className="flex h-screen bg-[#0a0a0a] text-gray-100 overflow-hidden font-mono">
+    <div
+      data-theme={theme}
+      className="flex h-screen overflow-hidden font-mono"
+      style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}
+    >
+
+      {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
 
       {/* ══ SIDEBAR ══════════════════════════════════════════════════════════ */}
       <aside
-        className="flex flex-col shrink-0 border-r border-gray-800 bg-[#0d1117] transition-all duration-200 overflow-hidden"
-        style={{ width: sidebarOpen ? 192 : 40 }}
+        className="flex flex-col shrink-0 border-r border-gray-800 transition-all duration-200 overflow-hidden"
+        style={{ width: sidebarOpen ? 192 : 40, backgroundColor: 'var(--bg-surface)' }}
       >
         <button
           onClick={() => setSidebarOpen((o) => !o)}
-          className="flex items-center justify-center h-10 border-b border-gray-800 text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-colors shrink-0 text-xs"
+          className="flex items-center justify-center h-10 border-b border-gray-800 text-gray-300 hover:text-gray-300 hover:bg-gray-800 transition-colors shrink-0 text-xs font-semibold"
         >
           {sidebarOpen ? '◀' : '▶'}
         </button>
@@ -114,21 +124,21 @@ export default function App() {
           <div className="flex flex-col gap-5 px-3 py-4 overflow-y-auto flex-1">
 
             <div>
-              <div className="text-[10px] tracking-widest text-gray-500 uppercase mb-1">Symbol</div>
+              <div className="text-[10px] tracking-widest text-gray-300 font-semibold uppercase mb-1">Symbol</div>
               <div className="text-blue-400 font-bold text-lg tracking-wider">QQQ</div>
             </div>
 
             <div className="h-px bg-gray-800" />
 
             <div>
-              <div className="text-[10px] tracking-widest text-gray-500 uppercase mb-2">Timeframe</div>
+              <div className="text-[10px] tracking-widest text-gray-300 font-semibold uppercase mb-2">Timeframe</div>
               <TimeframeSelector />
             </div>
 
             <div className="h-px bg-gray-800" />
 
             <div>
-              <div className="text-[10px] tracking-widest text-gray-500 uppercase mb-2">Indicators</div>
+              <div className="text-[10px] tracking-widest text-gray-300 font-semibold uppercase mb-2">Indicators</div>
               <IndicatorToggle />
             </div>
 
@@ -139,6 +149,7 @@ export default function App() {
                   atrValue={atrGauge.atrValue}
                   rangeUsed={atrGauge.rangeUsed}
                   percentConsumed={atrGauge.percentConsumed}
+                  theme={theme}
                 />
               </div>
             )}
@@ -152,12 +163,22 @@ export default function App() {
 
         {/* ── Header ──────────────────────────────────────────────────────── */}
         <header className="flex items-center gap-4 px-4 py-2 border-b border-gray-800 shrink-0">
-          <span className="text-blue-400 font-bold tracking-widest text-sm">MAYDEN</span>
+          <Logo />
           {bars && <PriceDisplay bars={bars} />}
           <div className="flex items-center gap-3 ml-auto">
             <NotificationBell bars={bars} timeframe={selectedTimeframe} />
             <MacroStatusBar price={macro?.price} sma50={macro?.sma50} sma200={macro?.sma200} />
             <DayTypeBanner dayType={dayType} />
+            <button
+              onClick={() => setSettingsOpen(true)}
+              className="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-colors"
+              title="Settings"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              </svg>
+            </button>
           </div>
         </header>
 
@@ -187,7 +208,7 @@ export default function App() {
             </div>
           )}
 
-          <CandlestickChart ref={chartRef} bars={bars ?? []} />
+          <CandlestickChart ref={chartRef} bars={bars ?? []} theme={theme} />
 
           {chart && candleSeries && bars && (
             <>

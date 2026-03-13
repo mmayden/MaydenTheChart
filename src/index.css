@@ -37,6 +37,56 @@ body,
   background: #4b5563;
 }
 
+/* ── Theme variables ─────────────────────────────────────────────────────── */
+
+[data-theme="dark"] {
+  --bg-base:      #0a0a0a;
+  --bg-surface:   #0d1117;
+  --border:       #1f2937;
+  --border-mid:   #374151;
+  --text-primary: #f3f4f6;
+  --text-muted:   #6b7280;
+  --hover-bg:     #1f2937;
+  --accent:       #60a5fa;
+  --accent-dim:   #172554;
+}
+
+[data-theme="loompia"] {
+  --bg-base:      #080808;
+  --bg-surface:   #0E0C0A;
+  --border:       #2A1C10;
+  --border-mid:   #1C1208;
+  --text-primary: #D0C8B8;
+  --text-muted:   #9A8870;
+  --hover-bg:     #181208;
+  --accent:       #C85818;
+  --accent-dim:   #481808;
+}
+
+/* Shell backgrounds (root + sidebar) — set via inline style in components */
+[data-theme] {
+  color: var(--text-primary);
+}
+
+/* ── Loompia theme: Tailwind class overrides ─────────────────────────────── */
+
+[data-theme="loompia"] .border-gray-800 { border-color: var(--border) !important; }
+[data-theme="loompia"] .border-gray-700 { border-color: var(--border-mid) !important; }
+[data-theme="loompia"] .text-gray-500   { color: var(--text-muted) !important; }
+[data-theme="loompia"] .text-gray-400   { color: var(--text-muted) !important; }
+[data-theme="loompia"] .text-gray-300   { color: var(--text-primary) !important; }
+[data-theme="loompia"] .text-gray-100   { color: var(--text-primary) !important; }
+[data-theme="loompia"] .text-white      { color: var(--text-primary) !important; }
+[data-theme="loompia"] .text-blue-400   { color: var(--accent) !important; }
+[data-theme="loompia"] .text-blue-300   { color: var(--accent) !important; }
+[data-theme="loompia"] .bg-gray-800     { background-color: var(--border) !important; }
+[data-theme="loompia"] .border-blue-500 { border-color: var(--accent) !important; }
+[data-theme="loompia"] .bg-blue-950     { background-color: var(--accent-dim) !important; }
+
+[data-theme="loompia"] .hover\:text-gray-300:hover { color: var(--text-primary) !important; }
+[data-theme="loompia"] .hover\:bg-gray-800:hover   { background-color: var(--hover-bg) !important; }
+[data-theme="loompia"] .hover\:border-gray-600:hover { border-color: var(--border-mid) !important; }
+
 /* ── lightweight-charts overrides ───────────────────────────────────────── */
 
 /* Ensure the chart container fills its parent fully */

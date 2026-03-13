@@ -1,4 +1,4 @@
-# Alpaca API Reference — MaydenTheChart
+# Alpaca API Reference — Loompia
 
 > Notes on every endpoint we use. Keep updated as quirks are discovered.
 

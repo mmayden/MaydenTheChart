@@ -1,4 +1,4 @@
-# Indicator Reference — MaydenTheChart
+# Indicator Reference — Loompia
 
 > Math, logic, and trading context for every indicator we build.
 > This is the source of truth Claude uses when writing indicator code.

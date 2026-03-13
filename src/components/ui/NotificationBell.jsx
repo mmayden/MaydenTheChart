@@ -90,7 +90,7 @@ export function NotificationBell({ bars, timeframe }) {
       if (!hit) return
       markTriggered(alert.id)
       fireNotification(
-        'MaydenTheChart — Price Alert',
+        'Loompia — Price Alert',
         `QQQ ${alert.condition === 'above' ? 'crossed above' : 'crossed below'} $${alert.price.toFixed(2)} · now $${currentPrice.toFixed(2)}`
       )
     })
@@ -110,7 +110,7 @@ export function NotificationBell({ bars, timeframe }) {
         markTriggered(alert.id)
         const dot = streak.direction === 'green' ? '🟢' : '🔴'
         fireNotification(
-          'MaydenTheChart — Candle Streak',
+          'Loompia — Candle Streak',
           `${streak.count} consecutive ${streak.direction} candles on ${timeframe ?? ''} ${dot}`
         )
       }

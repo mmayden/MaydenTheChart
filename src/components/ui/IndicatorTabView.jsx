@@ -137,7 +137,7 @@ export function IndicatorTabView({ bars, rsiEnabled, macdEnabled }) {
   return (
     <div className="shrink-0 border-t border-gray-800" style={{ height: 116 }}>
       {/* Tab buttons */}
-      <div className="flex items-center gap-1 px-3 py-1.5 border-b border-gray-800 bg-[#0d1117]">
+      <div className="flex items-center gap-1 px-3 py-1.5 border-b border-gray-800" style={{ backgroundColor: 'var(--bg-surface, #0d1117)' }}>
         {tabs.map((tab) => (
           <button
             key={tab}

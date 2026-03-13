@@ -27,14 +27,21 @@ import {
 } from '../../constants/chart'
 import { relativeVolume } from '../../utils/indicators'
 
+const CANDLE_COLORS = {
+  dark:    { up: '#22c55e', down: '#ef4444' },
+  loompia: { up: '#48B068', down: '#D44020' },
+}
+
 export const CandlestickChart = forwardRef(function CandlestickChart(
-  { bars, children },
+  { bars, children, theme = 'dark' },
   ref
 ) {
   const containerRef = useRef(null)
   const chartRef     = useRef(null)
   const candleRef    = useRef(null)
   const volumeRef    = useRef(null)
+  const themeRef     = useRef(theme)
+  themeRef.current   = theme  // always current, readable inside effects
 
   // Init chart on mount
   useEffect(() => {
@@ -87,14 +94,15 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
       height: containerRef.current.clientHeight,
     })
 
-    // Candlestick series
+    // Candlestick series — use theme-appropriate colors at init time
+    const { up, down } = CANDLE_COLORS[themeRef.current] ?? CANDLE_COLORS.dark
     const candleSeries = chart.addSeries(CandlestickSeries, {
-      upColor:          '#22c55e',
-      downColor:        '#ef4444',
-      borderUpColor:    '#22c55e',
-      borderDownColor:  '#ef4444',
-      wickUpColor:      '#22c55e',
-      wickDownColor:    '#ef4444',
+      upColor:          up,
+      downColor:        down,
+      borderUpColor:    up,
+      borderDownColor:  down,
+      wickUpColor:      up,
+      wickDownColor:    down,
     })
 
     // Volume bars — as a histogram in the main pane, scaled down
@@ -129,6 +137,17 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
       volumeRef.current = null
     }
   }, [])
+
+  // Re-apply candle colors when theme changes
+  useEffect(() => {
+    if (!candleRef.current) return
+    const { up, down } = CANDLE_COLORS[theme] ?? CANDLE_COLORS.dark
+    candleRef.current.applyOptions({
+      upColor: up, downColor: down,
+      borderUpColor: up, borderDownColor: down,
+      wickUpColor: up, wickDownColor: down,
+    })
+  }, [theme])
 
   // Update data when bars change
   useEffect(() => {

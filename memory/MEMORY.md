@@ -1,4 +1,4 @@
-# MaydenTheChart — Session Memory
+# Loompia — Session Memory
 
 ## Project Docs Location
 All spec docs are in the ROOT (not .roo/): project.md, tasks.md, indicators.md, architecture.md

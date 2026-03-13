@@ -1,4 +1,4 @@
-# MaydenTheChart
+# Loompia
 
 A professional-grade day trading chart tool for QQQ, built around a specific, validated
 trading system derived from 11 months of real trader analysis. Purpose-built around
@@ -39,7 +39,7 @@ This is not a generic charting tool. Every feature is intentional:
 ## Project Structure
 
 ```
-mayden-the-chart/
+loompia/
 ├── .roo/
 │   ├── project.md          # Master spec & all decisions
 │   ├── tasks.md            # Phase-by-phase task board
@@ -105,8 +105,8 @@ mayden-the-chart/
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/yourusername/mayden-the-chart.git
-cd mayden-the-chart
+git clone https://github.com/yourusername/loompia.git
+cd loompia
 
 # 2. Install dependencies
 npm install

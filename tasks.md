@@ -1,4 +1,4 @@
-# Task List — MaydenTheChart
+# Task List — Loompia
 
 > Living task board. Update status as work progresses.
 > 🔲 not started | 🔄 in progress | ✅ done | ❌ blocked
@@ -8,7 +8,7 @@
 ## ✅ Completed Sprint — Project Bootstrap
 
 ### Setup & Infrastructure
-- ✅ Vite 7 + React 18 scaffolded in MaydenTheChart/ root (not a subdirectory)
+- ✅ Vite 7 + React 18 scaffolded in Loompia/ root (not a subdirectory)
 - ✅ All deps installed — lightweight-charts v5, axios, zustand, @tanstack/react-query v5, vitest v3
 - ✅ Zero vulnerabilities
 - ✅ `.env.example` committed, `.env` in `.gitignore`
@@ -212,6 +212,20 @@ Then fill in both values. Alpaca key location:
   - Browser Notification API with permission request on first alert
   - Alert list filtered by active tab; delete always visible; hit alerts show ✓
   - `barsLengthAtCreation` guard: streak alerts only fire on NEW bars, not existing data
+
+### Branding + UI Polish — Session 5 (2026-03-13)
+- ✅ Renamed project: `MaydenTheChart` → `Loompia` everywhere (package.json, docs, notifications, comments)
+- ✅ `src/components/ui/Logo.jsx` — Boogaloo Filipino-poster font logo replacing plain MAYDEN text
+- ✅ `index.html` — Boogaloo font loaded via Google Fonts, page title updated
+- ✅ `src/components/ui/SettingsModal.jsx` — gear icon in header opens centered settings modal
+- ✅ `src/store/useChartStore.js` — `theme` state persisted to localStorage, defaults to `'dark'`
+- ✅ `src/index.css` — CSS custom property theme system (`[data-theme="dark"]` / `[data-theme="loompia"]`)
+- ✅ **Dark theme** — unchanged terminal black (#0a0a0a), blue accents
+- ✅ **Loompia theme** — near-black (#080808) with ember-orange accent (#C85818), warm stone text (#D0C8B8)
+- ✅ `CandlestickChart`: theme-aware candle colors (terracotta red + forest green in loompia); fixed init-time color bug via `themeRef`
+- ✅ `ATRGauge`: theme-aware red/yellow/green colors; bolded label + taller gauge bar
+- ✅ Sidebar section labels (SYMBOL / TIMEFRAME / INDICATORS): bumped to `text-gray-300 font-semibold`
+- ✅ TimeframeSelector + IndicatorToggle buttons: `font-semibold text-gray-300` for inactive state
 
 ### Data / Chart Fixes (2026-03-13)
 - ✅ `useAlpacaBars`: `todayKey` in queryKey → cache invalidates at day boundary

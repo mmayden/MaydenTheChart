@@ -1,5 +1,5 @@
 /**
- * indicators.js — Pure math for every indicator in MaydenTheChart.
+ * indicators.js — Pure math for every indicator in Loompia.
  *
  * CONTRACT: Every exported function returns BOTH:
  *   series: [{ time, value }]  — ready for lightweight-charts series.setData()

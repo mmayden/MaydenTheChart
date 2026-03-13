@@ -9,6 +9,14 @@ import { create } from 'zustand'
 import { DEFAULT_SYMBOL, DEFAULT_TIMEFRAME } from '../constants/chart'
 
 export const useChartStore = create((set) => ({
+  // ─── Theme ─────────────────────────────────────────────────────────────────
+  theme: localStorage.getItem('loompia-theme') ?? 'dark',
+  setTheme: (theme) => {
+    localStorage.setItem('loompia-theme', theme)
+    set({ theme })
+  },
+
+
   // ─── Selection ─────────────────────────────────────────────────────────────
   selectedSymbol:    DEFAULT_SYMBOL,
   selectedTimeframe: DEFAULT_TIMEFRAME,

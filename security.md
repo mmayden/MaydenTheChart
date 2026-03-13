@@ -1,4 +1,4 @@
-# Security Standards — MaydenTheChart
+# Security Standards — Loompia
 
 > Follow these rules every session without exception.
 > Security is non-negotiable even on a learning project.

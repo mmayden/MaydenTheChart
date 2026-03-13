@@ -1,4 +1,4 @@
-# Project Spec — MaydenTheChart
+# Project Spec — Loompia
 
 > Claude reads this file at the start of every session to restore full context.
 > Update this file whenever a major decision is made.
@@ -202,7 +202,7 @@ Component state (useState — local only):
 
 ## Current Status
 
-- [x] Project initialized (Vite 7 + React 18, scaffolded directly in MaydenTheChart/)
+- [x] Project initialized (Vite 7 + React 18, scaffolded directly in Loompia/)
 - [x] Dependencies installed (lightweight-charts v5, axios, zustand, @tanstack/react-query v5, tailwind, vitest)
 - [x] Git initialized, first commit on `main` — 36 files, 33/33 tests passing, clean build
 - [ ] `.env` configured with Alpaca paper keys — **BLOCKED: need to find keys in Alpaca dashboard**

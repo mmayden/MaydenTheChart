@@ -1,4 +1,4 @@
-# Architecture — MaydenTheChart
+# Architecture — Loompia
 
 ---
 

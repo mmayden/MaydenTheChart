@@ -27,10 +27,10 @@ export function IndicatorToggle() {
             key={key}
             onClick={() => toggleIndicator(key)}
             className={[
-              'px-2 py-1 text-xs font-mono rounded border transition-colors text-left',
+              'px-2 py-1 text-xs font-mono font-semibold rounded border transition-colors text-left',
               on
                 ? 'border-blue-500 text-blue-300 bg-blue-950'
-                : 'border-gray-700 text-gray-400 bg-transparent hover:border-gray-600 hover:text-gray-300',
+                : 'border-gray-700 text-gray-300 bg-transparent hover:border-gray-600 hover:text-gray-300',
             ].join(' ')}
           >
             <span className="mr-1.5 opacity-50">{on ? '●' : '○'}</span>

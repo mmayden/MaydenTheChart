@@ -18,7 +18,7 @@ export function validateEnv() {
 
   if (missing.length > 0) {
     throw new Error(
-      `MaydenTheChart: Missing required environment variables.\n\n` +
+      `Loompia: Missing required environment variables.\n\n` +
         `Missing or placeholder values:\n` +
         missing.map((k) => `  • ${k}`).join('\n') +
         `\n\nCopy .env.example to .env and fill in your Alpaca paper trading keys.\n` +

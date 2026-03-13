@@ -1,4 +1,4 @@
-# MaydenTheChart — Claude Session Instructions
+# Loompia — Claude Session Instructions
 
 ## Start of every session
 Read these files in order before doing anything else:

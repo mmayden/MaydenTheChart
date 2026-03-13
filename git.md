@@ -1,4 +1,4 @@
-# Git Conventions — MaydenTheChart
+# Git Conventions — Loompia
 
 > Follow these rules every session. Claude will remind you when to branch, commit, and PR.
 
@@ -163,7 +163,7 @@ git add .
 git commit -m "chore: init vite react project"
 
 # Set up remote (after creating repo on github.com)
-git remote add origin https://github.com/yourusername/mayden-the-chart.git
+git remote add origin https://github.com/yourusername/loompia.git
 git push -u origin main
 
 # Set up develop branch
