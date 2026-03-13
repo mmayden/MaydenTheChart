@@ -43,3 +43,8 @@ body,
 .tv-lightweight-charts {
   display: block !important;
 }
+
+/* Hide TradingView attribution watermark */
+.tv-lightweight-charts a[href*="tradingview"] {
+  display: none !important;
+}
