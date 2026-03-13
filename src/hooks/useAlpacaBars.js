@@ -36,19 +36,21 @@ export function useAlpacaBars() {
 
   const config = TIMEFRAME_CONFIG[timeframe]
 
-  // Compute start/end window based on timeframe config
-  const now   = new Date()
-  const start = new Date(now.getTime() - config.lookbackMs)
-  const end   = now
+  // Include today's date so the cache invalidates at day boundaries.
+  // Without this, the queryKey never changes and start/end inside queryFn
+  // would be stale forever even as real time advances.
+  const todayKey = new Date().toISOString().slice(0, 10)
 
   return useQuery({
-    queryKey: ['bars', symbol, timeframe],
+    queryKey: ['bars', symbol, timeframe, todayKey],
     queryFn:  async () => {
+      const now   = new Date()
+      const start = new Date(now.getTime() - config.lookbackMs)
       const raw = await fetchBars(
         symbol,
         config.alpacaTimeframe,
         start.toISOString(),
-        end.toISOString(),
+        now.toISOString(),
         config.limit,
       )
       // Sort oldest → newest, normalize to lw-charts shape
@@ -56,6 +58,9 @@ export function useAlpacaBars() {
         .sort((a, b) => new Date(a.t) - new Date(b.t))
         .map(normalizebar)
     },
-    enabled: !!symbol && !!timeframe,
+    enabled:         !!symbol && !!timeframe,
+    // Intraday: refetch every 60s to pull in new bars during market hours.
+    // Daily/swing: every 5 min is plenty.
+    refetchInterval: config.intraday ? 60 * 1000 : 5 * 60 * 1000,
   })
 }

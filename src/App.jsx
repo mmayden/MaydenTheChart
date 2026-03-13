@@ -34,6 +34,7 @@ import { ATRGauge } from './components/ui/ATRGauge'
 import { DayTypeBanner } from './components/ui/DayTypeBanner'
 import { MacroStatusBar } from './components/ui/MacroStatusBar'
 import { IndicatorTabView } from './components/ui/IndicatorTabView'
+import { NotificationBell } from './components/ui/NotificationBell'
 
 export default function App() {
   const chartRef = useRef(null)
@@ -49,15 +50,21 @@ export default function App() {
 
   const tfConfig = TIMEFRAME_CONFIG[selectedTimeframe]
 
-  // ── Chart instance (polling until forwardRef is ready) ─────────────────────
+  // ── Chart instance detection ────────────────────────────────────────────────
+  // Polls chartRef continuously so it re-detects the chart if it ever
+  // destroys and recreates (e.g. Vite HMR, future dynamic remounts).
+  // Uses functional setters so it only triggers re-renders on actual changes.
   useEffect(() => {
-    if (!chartRef.current) return
-    const instance = chartRef.current
+    let lastChart = null
     const id = setInterval(() => {
-      const c  = instance.chart?.()
-      const cs = instance.candleSeries?.()
-      if (c && cs) { setChart(c); setCandleSeries(cs); clearInterval(id) }
-    }, 50)
+      const c  = chartRef.current?.chart?.()
+      const cs = chartRef.current?.candleSeries?.()
+      if (c && cs && c !== lastChart) {
+        lastChart = c
+        setChart(c)
+        setCandleSeries(cs)
+      }
+    }, 100)
     return () => clearInterval(id)
   }, [])
 
@@ -148,6 +155,7 @@ export default function App() {
           <span className="text-blue-400 font-bold tracking-widest text-sm">MAYDEN</span>
           {bars && <PriceDisplay bars={bars} />}
           <div className="flex items-center gap-3 ml-auto">
+            <NotificationBell bars={bars} timeframe={selectedTimeframe} />
             <MacroStatusBar price={macro?.price} sma50={macro?.sma50} sma200={macro?.sma200} />
             <DayTypeBanner dayType={dayType} />
           </div>

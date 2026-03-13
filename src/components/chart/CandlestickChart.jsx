@@ -58,9 +58,30 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
         borderColor: GRID_COLOR,
       },
       timeScale: {
-        borderColor:       GRID_COLOR,
-        timeVisible:       true,
-        secondsVisible:    false,
+        borderColor:    GRID_COLOR,
+        timeVisible:    true,
+        secondsVisible: false,
+        // Axis tick marks in ET — TickMarkType: 0=Year 1=Month 2=Day 3=Time
+        tickMarkFormatter: (unixSecs, tickMarkType) => {
+          const d  = new Date(unixSecs * 1000)
+          const et = { timeZone: 'America/New_York' }
+          if (tickMarkType === 0) return d.toLocaleString('en-US', { ...et, year: 'numeric' })
+          if (tickMarkType === 1) return d.toLocaleString('en-US', { ...et, month: 'short' })
+          if (tickMarkType === 2) return d.toLocaleString('en-US', { ...et, month: 'short', day: 'numeric' })
+          return d.toLocaleString('en-US', { ...et, hour: '2-digit', minute: '2-digit', hour12: false })
+        },
+      },
+      // Crosshair tooltip also in ET
+      localization: {
+        timeFormatter: (unixSecs) =>
+          new Date(unixSecs * 1000).toLocaleString('en-US', {
+            timeZone: 'America/New_York',
+            month:    'short',
+            day:      'numeric',
+            hour:     '2-digit',
+            minute:   '2-digit',
+            hour12:   false,
+          }),
       },
       width:  containerRef.current.clientWidth,
       height: containerRef.current.clientHeight,
@@ -141,6 +162,10 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
   return (
     <div className="relative w-full h-full">
       <div ref={containerRef} className="w-full h-full" />
+      {/* Volume section label — sits above the volume bars (bottom ~15% of chart) */}
+      <div className="absolute left-2 bottom-[17%] text-[9px] text-gray-600 font-mono pointer-events-none select-none">
+        VOL
+      </div>
       {children}
     </div>
   )
