@@ -202,16 +202,21 @@ Component state (useState — local only):
 
 ## Current Status
 
-- [ ] Project initialized (`npm create vite@latest mayden-the-chart -- --template react`)
-- [ ] Dependencies installed (lightweight-charts v5, axios, zustand, @tanstack/react-query, tailwind)
-- [ ] Git initialized, GitHub repo created, main + develop branches pushed
-- [ ] `.env` configured with Alpaca paper keys
-- [ ] Phase 1 — core chart + levels + VWAP + EMAs
+- [x] Project initialized (Vite 7 + React 18, scaffolded directly in MaydenTheChart/)
+- [x] Dependencies installed (lightweight-charts v5, axios, zustand, @tanstack/react-query v5, tailwind, vitest)
+- [x] Git initialized, first commit on `main` — 36 files, 33/33 tests passing, clean build
+- [ ] `.env` configured with Alpaca paper keys — **BLOCKED: need to find keys in Alpaca dashboard**
+- [x] Phase 1 — core chart + levels + VWAP + EMAs (all code written, tested, committed)
 - [ ] Phase 2 — ORB zone + RVOL + VWAP bands
 - [ ] Phase 3 — RSI/MACD + ATR gauge + day type banner
 - [ ] Phase 4 — S/R + macro status bar + 4hr cross annotations
 - [ ] Phase 5 — live WebSocket
 - [ ] Phase 6 — Vercel deployment
+
+### Alpaca API Key Location (for next session)
+Keys are NOT under "API" in the sidebar (that goes to docs).
+Go to: `app.alpaca.markets/account/configuration` → look for an "API Keys" tab or section on that page, OR navigate directly to `app.alpaca.markets/account/api-keys`.
+Need: Key ID (starts with PK...) + Secret Key (shown only once at creation).
 
 ---
 
@@ -221,3 +226,4 @@ Component state (useState — local only):
 |---|---|
 | 2026-03-13 | Project scoped, initial structure and all docs written |
 | 2026-03-13 | Deep research: compared Nick's system vs. ORB research, Minervini, ATR methodology, 2026 React stack. Stack upgraded to v5 + Zustand + TanStack Query. All docs finalized. |
+| 2026-03-13 | Phase 1 fully built: all indicator math, data layer, chart components, overlays, 33 unit tests, first git commit. Blocked on .env setup — Alpaca key UI unclear. |

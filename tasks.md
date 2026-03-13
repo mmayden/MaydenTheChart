@@ -5,27 +5,31 @@
 
 ---
 
-## 🔄 Current Sprint — Project Bootstrap
+## ✅ Completed Sprint — Project Bootstrap
 
 ### Setup & Infrastructure
-- 🔲 Run `npm create vite@latest mayden-the-chart -- --template react`
-- 🔲 Run `npm install`
-- 🔲 Install core deps: `npm install lightweight-charts axios zustand @tanstack/react-query`
-- 🔲 Install dev deps: `npm install -D tailwindcss postcss autoprefixer vitest && npx tailwindcss init -p`
-- 🔲 Create `.env.example` (template, safe to commit) — do this BEFORE first git commit
-- 🔲 Create `.env` from `.env.example`, add Alpaca paper keys
-- 🔲 Verify `.env` does NOT appear in `git status`
-- 🔲 Run `npm audit` — zero critical/high vulnerabilities before proceeding
-- 🔲 Copy `.roo/`, `docs/`, `.env.example`, `.gitignore`, `README.md` into project
-- 🔲 Git init + first commit on `main`: `chore: init vite react project`
-- 🔲 Create `develop` branch, push both to GitHub
-- 🔲 **Confirm**: paste `node -v && npm -v && git branch` output
+- ✅ Vite 7 + React 18 scaffolded in MaydenTheChart/ root (not a subdirectory)
+- ✅ All deps installed — lightweight-charts v5, axios, zustand, @tanstack/react-query v5, vitest v3
+- ✅ Zero vulnerabilities
+- ✅ `.env.example` committed, `.env` in `.gitignore`
+- ✅ First commit on `main` — 36 files
+- ❌ `.env` with real Alpaca keys — **NEXT STEP** (see note below)
+- 🔲 Create `develop` branch + push to GitHub (do after app is verified working)
+
+### ⚠️ Next session starts here: create `.env`
+```
+cp .env.example .env
+```
+Then fill in both values. Alpaca key location:
+- Go to `app.alpaca.markets` → click **Account** in left sidebar → look for **API Keys** tab
+- Or try navigating directly to `app.alpaca.markets/account/api-keys`
+- Click **"Generate New Key"** — copy BOTH the Key ID (PK...) and Secret Key before closing
 
 ---
 
-## 🔲 Phase 1 — Core Chart + Essential Levels
+## ✅ Phase 1 — Core Chart + Essential Levels — COMPLETE
 
-**Branch:** `feature/core-chart`
+**Committed on `main`** — 33/33 tests passing, `npm run build` clean
 
 ### Step 1 — Data layer first (verify bars in console BEFORE touching the chart)
 - 🔲 `src/utils/validateEnv.js` — validate all VITE_* vars on startup, throw clear errors
