@@ -12,25 +12,29 @@
  * ET = America/New_York timezone.
  */
 
-const ET_OFFSET_HOURS = -5   // EST (winter) — note: -4 in EDT (summer)
+const ET_LOCALE = 'America/New_York'
 
 /**
  * Convert a bar's Unix timestamp (seconds) to ET date string 'YYYY-MM-DD'.
+ * Uses Intl.DateTimeFormat so DST (EDT/EST) is handled automatically.
  */
 function toETDateString(unixSecs) {
-  // Create date, shift to ET by adding offset
-  const d = new Date((unixSecs + ET_OFFSET_HOURS * 3600) * 1000)
-  return d.toISOString().slice(0, 10)
+  return new Intl.DateTimeFormat('en-CA', { timeZone: ET_LOCALE })
+    .format(new Date(unixSecs * 1000))
 }
 
 /**
  * Get ET hour:minute from a Unix timestamp (seconds).
+ * Uses Intl.DateTimeFormat so DST (EDT/EST) is handled automatically.
  */
 function toETTime(unixSecs) {
-  const d = new Date((unixSecs + ET_OFFSET_HOURS * 3600) * 1000)
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: ET_LOCALE,
+    hour: 'numeric', minute: 'numeric', hour12: false,
+  }).formatToParts(new Date(unixSecs * 1000))
   return {
-    hour:   d.getUTCHours(),
-    minute: d.getUTCMinutes(),
+    hour:   Number(parts.find((p) => p.type === 'hour').value),
+    minute: Number(parts.find((p) => p.type === 'minute').value),
   }
 }
 

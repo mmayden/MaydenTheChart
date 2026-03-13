@@ -49,12 +49,12 @@ export function MacroStatusBar({ price, sma50, sma200 }) {
       </div>
 
       {/* MA distances */}
-      <span className="text-gray-600">
+      <span className="text-gray-400">
         50MA <span style={{ color: aboveSma50 ? '#22c55e' : '#ef4444' }}>
           {sign50}{pctFrom50}%
         </span>
       </span>
-      <span className="text-gray-600">
+      <span className="text-gray-400">
         200MA <span style={{ color: aboveSma200 ? '#22c55e' : '#ef4444' }}>
           {sign200}{pctFrom200}%
         </span>

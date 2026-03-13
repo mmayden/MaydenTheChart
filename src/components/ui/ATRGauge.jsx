@@ -32,7 +32,7 @@ export function ATRGauge({ atrValue, rangeUsed, percentConsumed }) {
   return (
     <div className="flex flex-col gap-1 min-w-[140px]">
       <div className="flex items-center justify-between text-xs font-mono">
-        <span className="text-gray-500">ATR Range</span>
+        <span className="text-gray-400">ATR Range</span>
         <span style={{ color }} className="font-bold">
           {percentConsumed.toFixed(0)}%
         </span>
@@ -47,7 +47,7 @@ export function ATRGauge({ atrValue, rangeUsed, percentConsumed }) {
       </div>
 
       <div className="flex items-center justify-between text-xs font-mono">
-        <span className="text-gray-600">
+        <span className="text-gray-400">
           {rangeUsed.toFixed(2)} / {atrValue.toFixed(2)}
         </span>
         <span style={{ color }} className="text-xs">

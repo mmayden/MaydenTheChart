@@ -1,6 +1,5 @@
 /**
- * Alpaca API client — axios instance with auth headers baked in.
- * Two separate instances: one for account/trading, one for market data.
+ * Alpaca market data client — axios instance with auth headers baked in.
  * All keys come from VITE_* env vars — never hardcoded.
  */
 
@@ -10,12 +9,6 @@ const AUTH_HEADERS = {
   'APCA-API-KEY-ID':     import.meta.env.VITE_ALPACA_API_KEY,
   'APCA-API-SECRET-KEY': import.meta.env.VITE_ALPACA_SECRET_KEY,
 }
-
-/** Account/trading endpoint (paper) */
-export const alpacaClient = axios.create({
-  baseURL: import.meta.env.VITE_ALPACA_BASE_URL,
-  headers: AUTH_HEADERS,
-})
 
 /** Market data endpoint */
 export const alpacaDataClient = axios.create({
@@ -40,13 +33,3 @@ export async function fetchBars(symbol, timeframe, start, end, limit = 1000) {
   return data.bars ?? []
 }
 
-/**
- * Fetch the latest quote for a symbol (for live price display).
- *
- * @param {string} symbol
- * @returns {Promise<Quote>}
- */
-export async function fetchLatestQuote(symbol) {
-  const { data } = await alpacaDataClient.get(`/stocks/${symbol}/quotes/latest`)
-  return data.quote
-}

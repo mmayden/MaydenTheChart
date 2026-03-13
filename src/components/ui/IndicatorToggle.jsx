@@ -19,7 +19,7 @@ export function IndicatorToggle() {
   const toggleIndicator = useChartStore((s) => s.toggleIndicator)
 
   return (
-    <div className="flex items-center gap-1 flex-wrap">
+    <div className="flex flex-col gap-1">
       {TOGGLES.map(({ key, label }) => {
         const on = indicators[key]
         return (
@@ -27,12 +27,13 @@ export function IndicatorToggle() {
             key={key}
             onClick={() => toggleIndicator(key)}
             className={[
-              'px-2 py-1 text-xs font-mono rounded border transition-colors',
+              'px-2 py-1 text-xs font-mono rounded border transition-colors text-left',
               on
-                ? 'border-gray-600 text-gray-200 bg-gray-800'
-                : 'border-gray-700 text-gray-600 bg-transparent',
+                ? 'border-blue-500 text-blue-300 bg-blue-950'
+                : 'border-gray-700 text-gray-400 bg-transparent hover:border-gray-600 hover:text-gray-300',
             ].join(' ')}
           >
+            <span className="mr-1.5 opacity-50">{on ? '●' : '○'}</span>
             {label}
           </button>
         )

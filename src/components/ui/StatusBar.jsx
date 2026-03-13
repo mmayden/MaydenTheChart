@@ -3,14 +3,14 @@
  */
 
 export function StatusBar({ lastUpdated }) {
-  const now        = new Date()
-  const etHour     = now.getUTCHours() - 5   // rough EST
-  const etMin      = now.getUTCMinutes()
-  const minuteOfDay = etHour * 60 + etMin
+  const now   = new Date()
+  // Use Intl so EDT/EST is handled automatically — no hardcoded offset
+  const nowET = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }))
+  const minuteOfDay = nowET.getHours() * 60 + nowET.getMinutes()
 
   // Market hours: 9:30 AM – 4:00 PM ET (570 – 960 minutes from midnight)
   const isMarketHours = minuteOfDay >= 570 && minuteOfDay < 960
-  const isWeekend     = now.getUTCDay() === 0 || now.getUTCDay() === 6
+  const isWeekend     = nowET.getDay() === 0 || nowET.getDay() === 6
 
   const marketOpen = isMarketHours && !isWeekend
 
@@ -36,7 +36,7 @@ export function StatusBar({ lastUpdated }) {
         </span>
       </div>
       {timeStr && (
-        <span className="text-gray-600">
+        <span className="text-gray-400">
           Updated {timeStr} ET
         </span>
       )}

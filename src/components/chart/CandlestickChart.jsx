@@ -43,7 +43,7 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
     const chart = createChart(containerRef.current, {
       layout: {
         background: { color: CHART_BG_COLOR },
-        textColor:  '#9ca3af',
+        textColor:  '#d1d5db',
         fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
       },
       grid: {
