@@ -12,6 +12,7 @@ const TOGGLES = [
   { key: 'levels', label: 'Levels' },
   { key: 'rsi',    label: 'RSI'    },
   { key: 'macd',   label: 'MACD'   },
+  { key: 'sr',     label: 'S/R'    },
 ]
 
 export function IndicatorToggle() {
@@ -29,9 +30,10 @@ export function IndicatorToggle() {
             className={[
               'px-2 py-1 text-xs font-mono font-semibold rounded border transition-colors text-left',
               on
-                ? 'border-blue-500 text-blue-300 bg-blue-950'
-                : 'border-gray-700 text-gray-300 bg-transparent hover:border-gray-600 hover:text-gray-300',
+                ? 'border-blue-500 bg-blue-950'
+                : 'border-gray-700 bg-transparent hover:border-gray-600',
             ].join(' ')}
+            style={{ color: on ? '#e8e0d0' : '#d1ccc4' }}
           >
             <span className="mr-1.5 opacity-50">{on ? '●' : '○'}</span>
             {label}

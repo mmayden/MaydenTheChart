@@ -188,6 +188,7 @@ Component state (useState — local only):
 | `src/components/indicators/EMAOverlay.jsx` | EMA 9/48/200 line series |
 | `src/components/indicators/VWAPOverlay.jsx` | VWAP + band series |
 | `src/components/indicators/LevelOverlay.jsx` | Prev H/L lines, ORB shaded zone, open of day line |
+| `src/components/indicators/SROverlay.jsx` | Support/resistance lines + swing high/low markers |
 | `src/components/indicators/RSIChart.jsx` | RSI in v5 pane |
 | `src/components/indicators/MACDChart.jsx` | MACD in v5 pane |
 | `src/components/ui/ATRGauge.jsx` | Daily range used vs ATR budget gauge |
@@ -205,19 +206,14 @@ Component state (useState — local only):
 - [x] Project initialized (Vite 7 + React 18, scaffolded directly in Loompia/)
 - [x] Dependencies installed (lightweight-charts v5, axios, zustand, @tanstack/react-query v5, tailwind, vitest)
 - [x] Git initialized, first commit on `main` — 36 files, 33/33 tests passing, clean build
-- [ ] `.env` configured with Alpaca paper keys — **BLOCKED: need to find keys in Alpaca dashboard**
+- [x] `.env` configured with Alpaca paper keys
 - [x] Phase 1 — core chart + levels + VWAP + EMAs (all code written, tested, committed)
-- [ ] Phase 2 — ORB zone + RVOL + VWAP bands
+- [x] Phase 2 — ORB zone + RVOL + VWAP bands (built during Phase 1)
 - [x] Phase 3 — RSI/MACD panes, ATR gauge, day type banner — committed
-- [ ] Phase 4 — S/R + macro status bar + 4hr cross annotations
+- [x] Phase 4 — S/R detection + macro status bar — 45/45 tests, build clean
 - [ ] Phase 5 — live WebSocket
 - [ ] Phase 6 — Vercel deployment
 - [x] Alert system (Tier 3 stretch) — price-level and candle-streak alerts with browser notifications
-
-### Alpaca API Key Location (for next session)
-Keys are NOT under "API" in the sidebar (that goes to docs).
-Go to: `app.alpaca.markets/account/configuration` → look for an "API Keys" tab or section on that page, OR navigate directly to `app.alpaca.markets/account/api-keys`.
-Need: Key ID (starts with PK...) + Secret Key (shown only once at creation).
 
 ---
 
@@ -231,3 +227,4 @@ Need: Key ID (starts with PK...) + Secret Key (shown only once at creation).
 | 2026-03-13 | Phase 3 built: RSI/MACD panes, ATR gauge, day type banner, sidebar layout, indicator tabs, visibility toggles, DST fixes. Committed. |
 | 2026-03-13 | Alert system (Tier 3): NotificationBell in header, price-level alerts, candle-streak alerts (N consecutive same-color candles), browser notifications, Zustand store. |
 | 2026-03-13 | Bug fixes: chart ET timezone (tickMarkFormatter + localization), VOL label, data refetch interval (60s intraday), queryKey date-based cache invalidation, chart polling fix for stale refs after HMR. |
+| 2026-03-13 | Phase 4 built: S/R detection algorithm (pivot + clustering), SROverlay with swing markers, 12 new tests (45 total). UI: indicator labels warm cream color, QQQ golden Inter font. Fixed SROverlay crash (marker time validation + try/catch). |

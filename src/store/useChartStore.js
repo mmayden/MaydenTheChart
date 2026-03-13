@@ -32,6 +32,7 @@ export const useChartStore = create((set) => ({
     rsi:    true,
     macd:   true,
     levels: true,   // prev day H/L, ODC, ORB
+    sr:     true,   // support & resistance levels + swing markers
   },
 
   toggleIndicator: (key) =>

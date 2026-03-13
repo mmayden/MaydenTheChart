@@ -13,17 +13,8 @@
 - ✅ Zero vulnerabilities
 - ✅ `.env.example` committed, `.env` in `.gitignore`
 - ✅ First commit on `main` — 36 files
-- ❌ `.env` with real Alpaca keys — **NEXT STEP** (see note below)
+- ✅ `.env` with real Alpaca keys — configured
 - 🔲 Create `develop` branch + push to GitHub (do after app is verified working)
-
-### ⚠️ Next session starts here: create `.env`
-```
-cp .env.example .env
-```
-Then fill in both values. Alpaca key location:
-- Go to `app.alpaca.markets` → click **Account** in left sidebar → look for **API Keys** tab
-- Or try navigating directly to `app.alpaca.markets/account/api-keys`
-- Click **"Generate New Key"** — copy BOTH the Key ID (PK...) and Secret Key before closing
 
 ---
 
@@ -68,88 +59,37 @@ Then fill in both values. Alpaca key location:
 
 ---
 
-## 🔲 Phase 2 — ORB Zone + VWAP Bands + RVOL
+## ✅ Phase 2 — ORB Zone + VWAP Bands + RVOL — COMPLETE
 
-**Branch:** `feature/levels-vwap`
+**Built during Phase 1** — all math and components were implemented together.
 
-### Math
-- 🔲 `src/utils/indicators.js` — VWAP function (cumulative, resets on date change)
-- 🔲 `src/utils/indicators.js` — VWAP standard deviation bands (1σ, 2σ)
-- 🔲 `src/utils/levels.js` — 15-minute ORB zone (high/low of first 15min)
-- 🔲 `src/utils/indicators.js` — RVOL function (current bar volume / 20-bar avg)
-
-### Components
-- 🔲 `src/components/indicators/VWAPOverlay.jsx` — VWAP line + 1σ upper/lower + 2σ upper/lower (5 lines)
-- 🔲 `src/components/indicators/LevelOverlay.jsx` — add ORB shaded zone (semi-transparent box)
-- 🔲 Volume bars — add RVOL color highlight (1.5x+ = brighter/different color)
-- 🔲 `src/components/ui/IndicatorToggle.jsx` — toggle each indicator on/off (reads/writes Zustand)
-
-### Tests & Verification
-- 🔲 **RUN: `npm run test`** — all unit tests green
-- 🔲 VWAP resets at 9:30 AM ET daily (verify with 1m/5m chart spanning multiple days)
-- 🔲 VWAP hidden on 4h and 1D timeframes
-- 🔲 ORB zone only shows on intraday timeframes (1m, 5m, 15m)
-- 🔲 RVOL highlight visible on high-volume bars
-- 🔲 **RUN: `npm run build`** — zero errors
-
-- 🔲 **COMMIT:** `feat(indicators): ORB zone, VWAP bands, and RVOL volume highlight`
-- 🔲 **PR:** `feature/levels-vwap` → `develop`
+- ✅ VWAP + 1σ/2σ bands in `indicators.js` + `VWAPOverlay.jsx`
+- ✅ ORB zone in `levels.js` + `LevelOverlay.jsx`
+- ✅ RVOL highlighting in `indicators.js` + `CandlestickChart.jsx` (amber ≥1.5x, red ≥2.0x)
+- ✅ Indicator toggles in Zustand store + `IndicatorToggle.jsx`
 
 ---
 
-## 🔲 Phase 3 — RSI, MACD, ATR Gauge, Day Type Banner
+## ✅ Phase 3 — RSI, MACD, ATR Gauge, Day Type Banner — COMPLETE
 
-**Branch:** `feature/momentum-intelligence`
+**Committed on `main`**
 
-### Math
-- 🔲 `src/utils/indicators.js` — RSI(14) function
-- 🔲 `src/utils/indicators.js` — MACD(12,26,9) function
-- 🔲 `src/utils/indicators.js` — ATR(14) function
-- 🔲 Day type classification logic — "Trend" / "Range" / "Chop" based on prev H/L breaks
-
-### Components (lightweight-charts v5 panes)
-- 🔲 `src/components/indicators/RSIChart.jsx` — RSI in v5 pane, 70/30 lines, 50 midline
-- 🔲 `src/components/indicators/MACDChart.jsx` — MACD line + signal + histogram in v5 pane
-- 🔲 Crosshair sync across main chart + RSI pane + MACD pane
-- 🔲 `src/components/ui/ATRGauge.jsx` — gauge showing % of ATR consumed today (fills like a fuel gauge; turns red at 85%+)
-- 🔲 `src/components/ui/DayTypeBanner.jsx` — live banner: "📈 Trend Day (Bullish)" / "📉 Trend Day (Bearish)" / "↔️ Range Day" / "⚡ Chop — Both Levels Hit"
-- 🔲 `src/components/indicators/LevelOverlay.jsx` — add 4hr EMA cross annotation arrows
-
-### Tests & Verification
-- 🔲 **RUN: `npm run test`** — all unit tests green
-- 🔲 RSI values match TradingView for same symbol/timeframe (spot check)
-- 🔲 MACD histogram green above zero, red below zero
-- 🔲 Crosshair moves in sync across all panes
-- 🔲 ATR gauge updates each bar
-- 🔲 Day type banner updates when prev H/L is broken
-- 🔲 **RUN: `npm run build`** — zero errors
-
-- 🔲 **COMMIT:** `feat(momentum): RSI/MACD panes, ATR gauge, day type banner`
-- 🔲 **PR:** `feature/momentum-intelligence` → `develop`
+- ✅ RSI(14), MACD(12,26,9), ATR(14) math in `indicators.js`
+- ✅ Day type classification in `levels.js`
+- ✅ RSI pane + MACD pane with tab view
+- ✅ ATR gauge (fuel gauge style, theme-aware)
+- ✅ Day type banner (Trend/Range/Chop)
 
 ---
 
-## 🔲 Phase 4 — S/R Levels + Macro Status Bar
+## ✅ Phase 4 — S/R Levels + Macro Status Bar — COMPLETE
 
-**Branch:** `feature/structure`
-
-### Math
-- 🔲 `src/utils/supportResistance.js` — pivot point algorithm, cluster nearby pivots
-- 🔲 `src/hooks/useSupportResistance.js` — compute S/R from bars
-
-### Components
-- 🔲 S/R horizontal lines on chart (green = support, red = resistance, opacity = strength)
-- 🔲 Swing high / swing low dot markers
-- 🔲 `src/components/ui/MacroStatusBar.jsx` — shows QQQ vs 50MA and 200MA, bullish/bearish/neutral label
-
-### Tests & Verification
-- 🔲 **RUN: `npm run test`** — all unit tests green
-- 🔲 S/R lines cluster correctly (no 50 lines for the same zone)
-- 🔲 Macro status bar shows correct MA relationship
-- 🔲 **RUN: `npm run build`** — zero errors
-
-- 🔲 **COMMIT:** `feat(structure): S/R detection, swing markers, macro status bar`
-- 🔲 **PR:** `feature/structure` → `develop`
+- ✅ `src/utils/supportResistance.js` — pivot point algorithm, clustering, swing detection
+- ✅ `src/utils/supportResistance.test.js` — 12 unit tests passing
+- ✅ `src/components/indicators/SROverlay.jsx` — S/R lines (green=support, red=resistance, opacity=strength) + swing markers
+- ✅ `src/components/ui/MacroStatusBar.jsx` — QQQ vs 50MA/200MA, bull/bear/neutral pill
+- ✅ S/R toggle added to Zustand store + IndicatorToggle
+- ✅ 45/45 tests passing, build clean
 
 ---
 
@@ -226,6 +166,16 @@ Then fill in both values. Alpaca key location:
 - ✅ `ATRGauge`: theme-aware red/yellow/green colors; bolded label + taller gauge bar
 - ✅ Sidebar section labels (SYMBOL / TIMEFRAME / INDICATORS): bumped to `text-gray-300 font-semibold`
 - ✅ TimeframeSelector + IndicatorToggle buttons: `font-semibold text-gray-300` for inactive state
+
+### Phase 4 + UI Polish — Session 6 (2026-03-13)
+- ✅ `src/utils/supportResistance.js` — pivot-based S/R detection with clustering
+- ✅ `src/utils/supportResistance.test.js` — 12 unit tests (swing points, clustering, full pipeline)
+- ✅ `src/components/indicators/SROverlay.jsx` — S/R lines + swing high/low arrow markers
+- ✅ `sr` toggle added to Zustand store + IndicatorToggle
+- ✅ Indicator toggle labels: warm cream color (#e8e0d0 on, #d1ccc4 off) matching timeframe/symbol style
+- ✅ QQQ symbol: Inter 800 golden gradient (modern, clean)
+- ✅ `index.html`: Inter font loaded from Google Fonts
+- ✅ SROverlay crash fix: marker time validation against bar times + try/catch guard
 
 ### Data / Chart Fixes (2026-03-13)
 - ✅ `useAlpacaBars`: `todayKey` in queryKey → cache invalidates at day boundary

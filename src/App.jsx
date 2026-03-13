@@ -28,6 +28,7 @@ import { PriceDisplay } from './components/chart/PriceDisplay'
 import { EMAOverlay } from './components/indicators/EMAOverlay'
 import { VWAPOverlay } from './components/indicators/VWAPOverlay'
 import { LevelOverlay } from './components/indicators/LevelOverlay'
+import { SROverlay } from './components/indicators/SROverlay'
 import { StatusBar } from './components/ui/StatusBar'
 import { IndicatorToggle } from './components/ui/IndicatorToggle'
 import { ATRGauge } from './components/ui/ATRGauge'
@@ -125,7 +126,19 @@ export default function App() {
 
             <div>
               <div className="text-[10px] tracking-widest text-gray-300 font-semibold uppercase mb-1">Symbol</div>
-              <div className="text-blue-400 font-bold text-lg tracking-wider">QQQ</div>
+              <div
+                style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '1.3rem',
+                  fontWeight: 800,
+                  letterSpacing: '0.18em',
+                  background: 'linear-gradient(160deg, #F5D060 0%, #D4A830 45%, #B8860B 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  filter: 'drop-shadow(0 1px 2px rgba(184,134,11,0.3))',
+                }}
+              >QQQ</div>
             </div>
 
             <div className="h-px bg-gray-800" />
@@ -221,6 +234,11 @@ export default function App() {
                 bars={bars}
                 showORB={tfConfig.showORB}
                 visible={indicators.levels}
+              />
+              <SROverlay
+                candleSeries={candleSeries}
+                bars={bars}
+                visible={indicators.sr}
               />
             </>
           )}
