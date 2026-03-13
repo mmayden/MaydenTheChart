@@ -34,7 +34,8 @@ export const alpacaDataClient = axios.create({
  * @returns {Promise<Bar[]>} - array of bar objects from Alpaca
  */
 export async function fetchBars(symbol, timeframe, start, end, limit = 1000) {
-  const params = { timeframe, start, end, limit, adjustment: 'raw' }
+  // feed=iex required for free-tier Alpaca accounts (default 'sip' returns 403)
+  const params = { timeframe, start, end, limit, adjustment: 'raw', feed: 'iex' }
   const { data } = await alpacaDataClient.get(`/stocks/${symbol}/bars`, { params })
   return data.bars ?? []
 }
