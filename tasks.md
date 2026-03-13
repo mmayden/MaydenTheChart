@@ -109,17 +109,17 @@
 
 ---
 
-## 🔲 Phase 6 — Deploy to Vercel
+## 🔄 Phase 6 — Deploy to Vercel
 
-**Branch:** `feature/deploy`
-
-- 🔲 Create `vercel.json`
-- 🔲 `npm run build && npm run preview` — verify production build locally
-- 🔲 Add env vars to Vercel dashboard
-- 🔲 Deploy: `vercel --prod`
-- 🔲 Verify live URL works
-- 🔲 Merge `develop` → `main`
-- 🔲 **COMMIT:** `chore(deploy): vercel config and production deployment`
+- ✅ Create `vercel.json` — rewrites for API routes + SPA fallback
+- ✅ `api/bars.js` — Vercel serverless function proxies Alpaca API (keys server-only)
+- ✅ `src/services/alpaca.js` rewritten to call `/api/bars` proxy instead of direct Alpaca
+- ✅ Removed `VITE_` prefix from all env vars — keys never reach browser bundle
+- ✅ `vite.config.js` — dev proxy to `localhost:3000` for `vercel dev`
+- ✅ Add env vars to Vercel dashboard (ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_DATA_URL)
+- ✅ Deployed to Vercel — build succeeds, 4 successful deployments
+- ✅ Custom domain `cheechart.space` added via CNAME → `cname.vercel-dns.com`
+- 🔄 Verify live URL works (SSL cert was propagating — check again)
 
 ---
 
@@ -166,6 +166,16 @@
 - ✅ `ATRGauge`: theme-aware red/yellow/green colors; bolded label + taller gauge bar
 - ✅ Sidebar section labels (SYMBOL / TIMEFRAME / INDICATORS): bumped to `text-gray-300 font-semibold`
 - ✅ TimeframeSelector + IndicatorToggle buttons: `font-semibold text-gray-300` for inactive state
+
+### Vercel Deployment + Security — Session 7 (2026-03-13)
+- ✅ `vercel.json` — build config, rewrites, cache headers
+- ✅ `api/bars.js` — serverless proxy for Alpaca API (keys never leave server)
+- ✅ `src/services/alpaca.js` — rewritten to use `/api/bars` proxy
+- ✅ Removed VITE_ prefix from all env vars (ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_DATA_URL)
+- ✅ `vite.config.js` — dev proxy /api → localhost:3000
+- ✅ Verified zero API keys in production bundle (`grep -c` on dist/assets/*.js = 0)
+- ✅ Deployed to Vercel, custom domain cheechart.space configured
+- 🔄 SSL cert propagation for cheechart.space (was in progress)
 
 ### Phase 4 + UI Polish — Session 6 (2026-03-13)
 - ✅ `src/utils/supportResistance.js` — pivot-based S/R detection with clustering

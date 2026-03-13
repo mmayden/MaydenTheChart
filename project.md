@@ -212,7 +212,7 @@ Component state (useState — local only):
 - [x] Phase 3 — RSI/MACD panes, ATR gauge, day type banner — committed
 - [x] Phase 4 — S/R detection + macro status bar — 45/45 tests, build clean
 - [ ] Phase 5 — live WebSocket
-- [ ] Phase 6 — Vercel deployment
+- [x] Phase 6 — Vercel deployment (api/bars.js serverless proxy, cheechart.space custom domain, SSL pending)
 - [x] Alert system (Tier 3 stretch) — price-level and candle-streak alerts with browser notifications
 
 ---
@@ -228,3 +228,4 @@ Component state (useState — local only):
 | 2026-03-13 | Alert system (Tier 3): NotificationBell in header, price-level alerts, candle-streak alerts (N consecutive same-color candles), browser notifications, Zustand store. |
 | 2026-03-13 | Bug fixes: chart ET timezone (tickMarkFormatter + localization), VOL label, data refetch interval (60s intraday), queryKey date-based cache invalidation, chart polling fix for stale refs after HMR. |
 | 2026-03-13 | Phase 4 built: S/R detection algorithm (pivot + clustering), SROverlay with swing markers, 12 new tests (45 total). UI: indicator labels warm cream color, QQQ golden Inter font. Fixed SROverlay crash (marker time validation + try/catch). |
+| 2026-03-13 | Vercel deployment: serverless proxy (api/bars.js) for API key security, removed VITE_ prefix from env vars, verified zero keys in browser bundle. Custom domain cheechart.space via CNAME. SSL cert propagating. |
