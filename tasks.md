@@ -188,7 +188,7 @@ Then fill in both values. Alpaca key location:
 - 🔲 `src/utils/backtest.js` — replay historical days using same indicator math, output win rate / R:R / by day type
 - 🔲 Weekly gap tracking panel (unfilled QQQ weekly gaps with distance from current price)
 - 🔲 Volume profile (horizontal bars at each price level)
-- 🔲 Price alert system (browser notification on level hit)
+- ✅ Price alert system (browser notification on level hit) — **DONE**: price-level + candle-streak alerts
 - 🔲 Multi-symbol watchlist (NVDA, TSLA, SPY alongside QQQ)
 - 🔲 Bollinger Bands overlay
 - 🔲 RSI divergence detection (auto-annotation)
@@ -203,4 +203,20 @@ Then fill in both values. Alpaca key location:
 
 ## ✅ Completed
 
-> Nothing completed yet — project being finalized before VS Code handoff.
+### Alert System (2026-03-13)
+- ✅ `src/store/useAlertsStore.js` — Zustand store: addAlert / removeAlert / markTriggered, typed alerts
+- ✅ `src/components/ui/NotificationBell.jsx` — bell icon in header (left of Bear/Bull Trend pill)
+  - Price Level tab: fires when price crosses above/below a set price
+  - Candle Streak tab: fires when N consecutive same-color candles close (e.g. 6 green, 8 red, or either)
+  - Live streak readout in form shows current streak count + direction
+  - Browser Notification API with permission request on first alert
+  - Alert list filtered by active tab; delete always visible; hit alerts show ✓
+  - `barsLengthAtCreation` guard: streak alerts only fire on NEW bars, not existing data
+
+### Data / Chart Fixes (2026-03-13)
+- ✅ `useAlpacaBars`: `todayKey` in queryKey → cache invalidates at day boundary
+- ✅ `useAlpacaBars`: `refetchInterval` 60s intraday / 5min daily → chart stays live
+- ✅ `CandlestickChart`: `tickMarkFormatter` → x-axis tick marks display ET (not UTC)
+- ✅ `CandlestickChart`: `localization.timeFormatter` → crosshair tooltip in ET
+- ✅ `CandlestickChart`: VOL label overlaid above volume bars
+- ✅ `App.jsx`: chart polling uses `chartRef.current` directly (not a captured snapshot) → overlays re-attach correctly after any chart re-creation / HMR

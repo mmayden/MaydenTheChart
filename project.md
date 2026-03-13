@@ -208,10 +208,11 @@ Component state (useState — local only):
 - [ ] `.env` configured with Alpaca paper keys — **BLOCKED: need to find keys in Alpaca dashboard**
 - [x] Phase 1 — core chart + levels + VWAP + EMAs (all code written, tested, committed)
 - [ ] Phase 2 — ORB zone + RVOL + VWAP bands
-- [ ] Phase 3 — RSI/MACD + ATR gauge + day type banner
+- [x] Phase 3 — RSI/MACD panes, ATR gauge, day type banner — committed
 - [ ] Phase 4 — S/R + macro status bar + 4hr cross annotations
 - [ ] Phase 5 — live WebSocket
 - [ ] Phase 6 — Vercel deployment
+- [x] Alert system (Tier 3 stretch) — price-level and candle-streak alerts with browser notifications
 
 ### Alpaca API Key Location (for next session)
 Keys are NOT under "API" in the sidebar (that goes to docs).
@@ -227,3 +228,6 @@ Need: Key ID (starts with PK...) + Secret Key (shown only once at creation).
 | 2026-03-13 | Project scoped, initial structure and all docs written |
 | 2026-03-13 | Deep research: compared Nick's system vs. ORB research, Minervini, ATR methodology, 2026 React stack. Stack upgraded to v5 + Zustand + TanStack Query. All docs finalized. |
 | 2026-03-13 | Phase 1 fully built: all indicator math, data layer, chart components, overlays, 33 unit tests, first git commit. Blocked on .env setup — Alpaca key UI unclear. |
+| 2026-03-13 | Phase 3 built: RSI/MACD panes, ATR gauge, day type banner, sidebar layout, indicator tabs, visibility toggles, DST fixes. Committed. |
+| 2026-03-13 | Alert system (Tier 3): NotificationBell in header, price-level alerts, candle-streak alerts (N consecutive same-color candles), browser notifications, Zustand store. |
+| 2026-03-13 | Bug fixes: chart ET timezone (tickMarkFormatter + localization), VOL label, data refetch interval (60s intraday), queryKey date-based cache invalidation, chart polling fix for stale refs after HMR. |
