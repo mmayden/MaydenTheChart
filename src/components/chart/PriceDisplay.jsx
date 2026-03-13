@@ -51,7 +51,7 @@ export function PriceDisplay({ bars }) {
       <span className={`font-mono text-sm ${color}`}>
         {sign}{change.toFixed(2)} ({sign}{changePct.toFixed(2)}%)
       </span>
-      <span className="text-gray-500 font-mono text-xs uppercase tracking-wider">
+      <span className="text-blue-400 font-mono text-xs uppercase tracking-wider">
         {symbol}
       </span>
     </div>
