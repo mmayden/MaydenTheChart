@@ -21,8 +21,8 @@ const SCHEMES = [
     },
   },
   {
-    id: 'loompia',
-    name: 'Loompia',
+    id: 'lumpia',
+    name: 'Lumpia',
     description: 'Dark espresso & gold — rich, warm, earthy',
     preview: {
       bg:      '#080808',

@@ -29,7 +29,7 @@ import { relativeVolume } from '../../utils/indicators'
 
 const CANDLE_COLORS = {
   dark:    { up: '#22c55e', down: '#ef4444' },
-  loompia: { up: '#48B068', down: '#D44020' },
+  lumpia: { up: '#48B068', down: '#D44020' },
 }
 
 export const CandlestickChart = forwardRef(function CandlestickChart(

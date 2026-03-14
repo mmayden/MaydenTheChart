@@ -11,7 +11,7 @@
 
 const ATR_COLORS = {
   dark:    { red: '#ef4444', yellow: '#eab308', green: '#22c55e' },
-  loompia: { red: '#D44020', yellow: '#C85818', green: '#48B068' },
+  lumpia: { red: '#D44020', yellow: '#C85818', green: '#48B068' },
 }
 
 export function ATRGauge({ atrValue, rangeUsed, percentConsumed, theme = 'dark' }) {

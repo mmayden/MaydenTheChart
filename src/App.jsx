@@ -127,6 +127,7 @@ export default function App() {
             <div>
               <div className="text-[10px] tracking-widest text-gray-300 font-semibold uppercase mb-1">Symbol</div>
               <div
+                className="qqq-symbol"
                 style={{
                   fontFamily: "'Inter', sans-serif",
                   fontSize: '1.3rem',
@@ -138,6 +139,7 @@ export default function App() {
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
+                  color: 'transparent',
                   filter: theme === 'dark'
                     ? 'drop-shadow(0 1px 2px rgba(11,106,184,0.3))'
                     : 'drop-shadow(0 1px 2px rgba(184,134,11,0.3))',
