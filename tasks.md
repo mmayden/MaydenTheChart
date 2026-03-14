@@ -93,19 +93,17 @@
 
 ---
 
-## 🔲 Phase 5 — Live WebSocket
+## ✅ Phase 5 — Live WebSocket — COMPLETE
 
-**Branch:** `feature/live-data`
-
-- 🔲 `src/services/websocket.js` — Alpaca WebSocket, auth, reconnect logic
-- 🔲 `src/hooks/useAlpacaSocket.js` — subscribe to QQQ bars, emit to chart
-- 🔲 Update chart in real time as new bars arrive
-- 🔲 Handle market open / market close gracefully
-- 🔲 Show "Market Closed" state outside trading hours
-- 🔲 **RUN: `npm run build`** — zero errors
-
-- 🔲 **COMMIT:** `feat(data): live WebSocket bar feed`
-- 🔲 **PR:** `feature/live-data` → `develop`
+- ✅ `api/ws-auth.js` — serverless credential proxy (bearer token protected)
+- ✅ `src/services/websocket.js` — Alpaca WebSocket manager (auth, subscribe, exponential backoff reconnect)
+- ✅ `src/hooks/useAlpacaSocket.js` — market-hours gating, 1-min bar aggregation into selected timeframe, TanStack Query cache injection
+- ✅ `src/store/useChartStore.js` — added `wsStatus`, `isMarketOpen` state
+- ✅ `src/hooks/useAlpacaBars.js` — REST polling disabled when WS is streaming
+- ✅ `src/components/ui/StatusBar.jsx` — Live/Connecting/Reconnecting/Market Closed states
+- ✅ `src/App.jsx` — mounts `useAlpacaSocket()`
+- ✅ `.env.example` + `.env` — `WS_AUTH_TOKEN` + `VITE_WS_AUTH_TOKEN`
+- ✅ 45/45 tests passing, build clean
 
 ---
 
@@ -142,6 +140,16 @@
 ---
 
 ## ✅ Completed
+
+### Phase 5 — Live WebSocket (2026-03-14)
+- ✅ `api/ws-auth.js` — serverless credential proxy, bearer token auth
+- ✅ `src/services/websocket.js` — Alpaca WS connection manager: auth → subscribe → reconnect (exp. backoff, max 10 retries, 1s–30s + jitter)
+- ✅ `src/hooks/useAlpacaSocket.js` — market-hours gating (9:30–4 ET, weekdays), 1-min bar aggregation into any timeframe via bucket math, injects into TanStack Query cache (`queryClient.setQueryData`)
+- ✅ `src/store/useChartStore.js` — `wsStatus` + `isMarketOpen` state
+- ✅ `src/hooks/useAlpacaBars.js` — REST polling disabled when `wsStatus === 'subscribed'`
+- ✅ `src/components/ui/StatusBar.jsx` — Live (green) / Connecting (yellow) / Reconnecting (red) / Market Closed (gray)
+- ✅ `.env` — `WS_AUTH_TOKEN` + `VITE_WS_AUTH_TOKEN` added
+- ✅ Note: Vercel dashboard needs `WS_AUTH_TOKEN` + `VITE_WS_AUTH_TOKEN` env vars for production
 
 ### Alert System (2026-03-13)
 - ✅ `src/store/useAlertsStore.js` — Zustand store: addAlert / removeAlert / markTriggered, typed alerts

@@ -16,6 +16,7 @@
 
 import { useRef, useState, useEffect, useMemo } from 'react'
 import { useAlpacaBars } from './hooks/useAlpacaBars'
+import { useAlpacaSocket } from './hooks/useAlpacaSocket'
 import { useDailyBars } from './hooks/useDailyBars'
 import { useChartStore } from './store/useChartStore'
 import { TIMEFRAME_CONFIG, TIMEFRAME_ORDER } from './constants/chart'
@@ -52,6 +53,9 @@ export default function App() {
 
   const { data: bars, isLoading, isError, error, dataUpdatedAt } = useAlpacaBars()
   const { data: dailyBars } = useDailyBars()
+
+  // Live WebSocket — connects during market hours, injects bars into TanStack cache
+  useAlpacaSocket()
 
   const tfConfig = TIMEFRAME_CONFIG[selectedTimeframe]
 

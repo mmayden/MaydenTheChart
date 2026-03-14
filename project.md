@@ -195,6 +195,9 @@ Component state (useState — local only):
 | `src/components/ui/DayTypeBanner.jsx` | Trend / Range / Chop live classification |
 | `src/components/ui/MacroStatusBar.jsx` | 50MA / 200MA alignment, macro bias label |
 | `src/components/ui/IndicatorToggle.jsx` | Show/hide toggles for each indicator |
+| `src/services/websocket.js` | Alpaca WebSocket connection manager — auth, subscribe, reconnect with exponential backoff |
+| `src/hooks/useAlpacaSocket.js` | React hook — connects WS during market hours, aggregates 1-min bars into selected timeframe, injects into TanStack Query cache |
+| `api/ws-auth.js` | Vercel serverless function — returns Alpaca WS credentials, protected by bearer token |
 | `src/constants/chart.js` | All colors, periods, timeframe configs |
 | `src/main.jsx` | App entry: QueryClientProvider, validateEnv() call |
 | `src/App.jsx` | Root layout and routing |
@@ -211,7 +214,7 @@ Component state (useState — local only):
 - [x] Phase 2 — ORB zone + RVOL + VWAP bands (built during Phase 1)
 - [x] Phase 3 — RSI/MACD panes, ATR gauge, day type banner — committed
 - [x] Phase 4 — S/R detection + macro status bar — 45/45 tests, build clean
-- [ ] Phase 5 — live WebSocket
+- [x] Phase 5 — live WebSocket (ws-auth proxy, websocket.js manager, useAlpacaSocket hook, StatusBar live indicator)
 - [x] Phase 6 — Vercel deployment (api/bars.js serverless proxy, cheechart.space custom domain, SSL pending)
 - [x] Alert system (Tier 3 stretch) — price-level and candle-streak alerts with browser notifications
 
@@ -229,3 +232,4 @@ Component state (useState — local only):
 | 2026-03-13 | Bug fixes: chart ET timezone (tickMarkFormatter + localization), VOL label, data refetch interval (60s intraday), queryKey date-based cache invalidation, chart polling fix for stale refs after HMR. |
 | 2026-03-13 | Phase 4 built: S/R detection algorithm (pivot + clustering), SROverlay with swing markers, 12 new tests (45 total). UI: indicator labels warm cream color, QQQ golden Inter font. Fixed SROverlay crash (marker time validation + try/catch). |
 | 2026-03-13 | Vercel deployment: serverless proxy (api/bars.js) for API key security, removed VITE_ prefix from env vars, verified zero keys in browser bundle. Custom domain cheechart.space via CNAME. SSL cert propagating. |
+| 2026-03-14 | Phase 5: Live WebSocket feed. `api/ws-auth.js` credential proxy, `src/services/websocket.js` connection manager (auth + exponential backoff reconnect), `src/hooks/useAlpacaSocket.js` (market-hours gating, 1-min bar aggregation into any timeframe, TanStack cache injection). StatusBar shows Live/Connecting/Reconnecting/Market Closed. REST polling auto-disabled when WS active. 45/45 tests, build clean. |

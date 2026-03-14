@@ -43,6 +43,12 @@ export const useChartStore = create((set) => ({
       },
     })),
 
+  // ─── WebSocket state ───────────────────────────────────────────────────────
+  wsStatus: 'disconnected', // 'connecting' | 'authenticated' | 'subscribed' | 'disconnected' | 'error'
+  isMarketOpen: false,
+  setWsStatus:   (status) => set({ wsStatus: status }),
+  setMarketOpen: (open)   => set({ isMarketOpen: open }),
+
   // ─── UI panels ─────────────────────────────────────────────────────────────
   ui: {
     rsiPaneVisible:  true,

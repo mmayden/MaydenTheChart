@@ -15,6 +15,9 @@ import { fetchBars } from '../services/alpaca'
 import { useChartStore } from '../store/useChartStore'
 import { TIMEFRAME_CONFIG } from '../constants/chart'
 
+// When the WebSocket is actively streaming bars, disable REST polling
+// to avoid redundant API calls and potential data conflicts.
+
 /**
  * Convert an Alpaca bar to the shape lightweight-charts expects.
  * Alpaca bar timestamp is ISO 8601; lw-charts v5 needs Unix seconds.
@@ -33,6 +36,7 @@ function normalizebar(bar) {
 export function useAlpacaBars() {
   const symbol    = useChartStore((s) => s.selectedSymbol)
   const timeframe = useChartStore((s) => s.selectedTimeframe)
+  const wsStatus  = useChartStore((s) => s.wsStatus)
 
   const config = TIMEFRAME_CONFIG[timeframe]
 
@@ -59,8 +63,10 @@ export function useAlpacaBars() {
         .map(normalizebar)
     },
     enabled:         !!symbol && !!timeframe,
-    // Intraday: refetch every 60s to pull in new bars during market hours.
-    // Daily/swing: every 5 min is plenty.
-    refetchInterval: config.intraday ? 60 * 1000 : 5 * 60 * 1000,
+    // When WebSocket is streaming live bars, skip REST polling entirely.
+    // Otherwise: intraday refetch every 60s, daily/swing every 5 min.
+    refetchInterval: wsStatus === 'subscribed'
+      ? false
+      : (config.intraday ? 60 * 1000 : 5 * 60 * 1000),
   })
 }
