@@ -143,7 +143,7 @@ export function NotificationBell({ bars, timeframe }) {
       {/* ── Bell button ──────────────────────────────────────────────────── */}
       <button
         onClick={() => setOpen((o) => !o)}
-        className="relative flex items-center justify-center w-8 h-8 rounded hover:bg-gray-800 text-gray-400 hover:text-gray-100 transition-colors"
+        className="relative flex items-center justify-center w-8 h-8 rounded hover:bg-gray-800 text-yellow-400 hover:text-yellow-300 transition-colors"
         title="Alerts"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="w-4 h-4">
