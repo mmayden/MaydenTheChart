@@ -86,7 +86,7 @@ body,
 [data-theme="lumpia"] .hover\:text-gray-300:hover { color: var(--text-primary) !important; }
 [data-theme="lumpia"] .hover\:bg-gray-800:hover   { background-color: var(--hover-bg) !important; }
 [data-theme="lumpia"] .hover\:border-gray-600:hover { border-color: var(--border-mid) !important; }
-.qqq-symbol { color: transparent !important; -webkit-text-fill-color: transparent !important; }
+[data-theme] .qqq-symbol { color: transparent !important; -webkit-text-fill-color: transparent !important; background-clip: text !important; -webkit-background-clip: text !important; }
 
 /* ── lightweight-charts overrides ───────────────────────────────────────── */
 
