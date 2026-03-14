@@ -143,7 +143,7 @@ export function SettingsModal({ onClose }) {
         }}>
           <div>
             <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: '0.04em' }}>Settings</div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Loompia QQQ Terminal</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Cheechart QQQ Terminal</div>
           </div>
           <button
             onClick={onClose}

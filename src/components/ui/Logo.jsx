@@ -1,7 +1,6 @@
 /**
- * Loompia logo — Filipino movie-poster / signage typography.
- * Uses "Boogaloo" (loaded in index.html) — bold, rounded, hand-lettered feel
- * inspired by classic Filipino title cards.
+ * Cheechart logo — bold, rounded, hand-lettered feel.
+ * Uses "Boogaloo" (loaded in index.html).
  */
 export default function Logo() {
   return (
@@ -20,7 +19,7 @@ export default function Logo() {
         userSelect: 'none',
       }}
     >
-      LOOMPIA
+      CHEECHART
     </span>
   )
 }

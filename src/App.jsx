@@ -132,11 +132,15 @@ export default function App() {
                   fontSize: '1.3rem',
                   fontWeight: 800,
                   letterSpacing: '0.18em',
-                  background: 'linear-gradient(160deg, #F5D060 0%, #D4A830 45%, #B8860B 100%)',
+                  background: theme === 'dark'
+                    ? 'linear-gradient(160deg, #60B4F5 0%, #3090D4 45%, #0B6AB8 100%)'
+                    : 'linear-gradient(160deg, #F5D060 0%, #D4A830 45%, #B8860B 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
-                  filter: 'drop-shadow(0 1px 2px rgba(184,134,11,0.3))',
+                  filter: theme === 'dark'
+                    ? 'drop-shadow(0 1px 2px rgba(11,106,184,0.3))'
+                    : 'drop-shadow(0 1px 2px rgba(184,134,11,0.3))',
                 }}
               >QQQ</div>
             </div>
