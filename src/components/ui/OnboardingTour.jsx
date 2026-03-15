@@ -44,12 +44,6 @@ const STEPS = [
   },
 ]
 
-function getRect(selector) {
-  const el = document.querySelector(selector)
-  if (!el) return null
-  return el.getBoundingClientRect()
-}
-
 export function OnboardingTour() {
   const [step, setStep] = useState(0)
   const [visible, setVisible] = useState(false)

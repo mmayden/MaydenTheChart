@@ -106,11 +106,10 @@ export function detectEMACrosses(ema9Series, ema48Series) {
  */
 export function vwapWithBands(bars) {
   if (!bars || bars.length === 0) {
-    const empty = { series: [], signal: { value: null, bias: 'neutral', strength: 'weak' } }
     return {
-      vwap: [], band1Upper: [], band1Lower: [],
+      series: [], vwap: [], band1Upper: [], band1Lower: [],
       band2Upper: [], band2Lower: [],
-      signal: empty.signal,
+      signal: { value: null, bias: 'neutral', strength: 'weak' },
     }
   }
 
@@ -172,7 +171,7 @@ export function vwapWithBands(bars) {
   const strength = pctDiff > 0.005 ? 'strong' : pctDiff > 0.002 ? 'moderate' : 'weak'
 
   return {
-    vwap, band1Upper, band1Lower, band2Upper, band2Lower,
+    series: vwap, vwap, band1Upper, band1Lower, band2Upper, band2Lower,
     signal: { value: lastVwap, bias, strength },
   }
 }

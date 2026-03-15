@@ -50,7 +50,6 @@ export function getPreviousLevels(bars, byDay = null) {
 
   const grouped   = byDay ?? groupBarsByDay(bars)
   const days      = Array.from(grouped.keys()).sort()
-  const todayKey  = days[days.length - 1]
   const prevKey   = days[days.length - 2]
 
   if (!prevKey) {

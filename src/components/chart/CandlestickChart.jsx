@@ -47,7 +47,7 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
   const candleRef    = useRef(null)
   const volumeRef    = useRef(null)
   const themeRef     = useRef(theme)
-  themeRef.current   = theme  // always current, readable inside effects
+  useEffect(() => { themeRef.current = theme }, [theme])
 
   const prevBarsRef = useRef(null)
 

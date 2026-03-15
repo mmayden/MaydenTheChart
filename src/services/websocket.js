@@ -146,6 +146,7 @@ export function createAlpacaSocket({ onBar, onStatus, getSymbol }) {
       BASE_DELAY_MS * Math.pow(2, retryCount - 1) + Math.random() * 1000,
       MAX_DELAY_MS,
     )
+    // eslint-disable-next-line no-console
     DEBUG && console.log(`[WS] Reconnecting in ${Math.round(delay)}ms (attempt ${retryCount}/${MAX_RETRIES})`)
     retryTimer = setTimeout(connect, delay)
   }

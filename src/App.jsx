@@ -124,20 +124,24 @@ export default function App() {
 
   const tfConfig = TIMEFRAME_CONFIG[selectedTimeframe]
 
-  // Chart instance detection (polls for HMR resilience)
+  // Chart instance detection (polls until found, then stops; re-polls on HMR)
   useEffect(() => {
-    let lastChart = null
-    const id = setInterval(() => {
+    function check() {
       const c  = chartRef.current?.chart?.()
       const cs = chartRef.current?.candleSeries?.()
-      if (c && cs && c !== lastChart) {
-        lastChart = c
+      if (c && cs) {
         setChart(c)
         setCandleSeries(cs)
+        return true
       }
+      return false
+    }
+    if (check()) return // already available
+    const id = setInterval(() => {
+      if (check()) clearInterval(id)
     }, 100)
     return () => clearInterval(id)
-  }, [])
+  }, [dataUpdatedAt])
 
   // Pre-compute groupBarsByDay once
   const byDay = useMemo(() => {

@@ -28,7 +28,7 @@ function makeIntradayBars(days = 5, barsPerDay = 20) {
         high: basePrice + drift + 0.5,
         low: basePrice + drift - 0.5,
         close: basePrice + drift,
-        volume: 1000 + Math.random() * 2000,
+        volume: 1000 + ((d * barsPerDay + i) % 7) * 300,
       })
     }
   }
@@ -90,13 +90,13 @@ describe('backtestORB', () => {
     expect(stats.wins + stats.losses + stats.breakeven).toBe(stats.totalTrades)
   })
 
-  it('win rate is between 0 and 100', () => {
-    const bars = makeIntradayBars(10, 30)
+  it('win rate is between 0 and 100 when trades exist', () => {
+    const bars = makeIntradayBars(10, 60)
     const { stats } = backtestORB(bars)
-    if (stats.totalTrades > 0) {
-      expect(stats.winRate).toBeGreaterThanOrEqual(0)
-      expect(stats.winRate).toBeLessThanOrEqual(100)
-    }
+    // ORB may not always trigger on synthetic data — validate bounds unconditionally
+    expect(stats.winRate).toBeGreaterThanOrEqual(0)
+    expect(stats.winRate).toBeLessThanOrEqual(100)
+    expect(stats.wins + stats.losses + stats.breakeven).toBe(stats.totalTrades)
   })
 })
 
@@ -123,11 +123,10 @@ describe('backtestEMACross', () => {
   it('stats computed correctly when trades exist', () => {
     const bars = makeCrossoverBars(200)
     const { stats } = backtestEMACross(bars)
-    if (stats.totalTrades > 0) {
-      expect(stats.winRate).toBeGreaterThanOrEqual(0)
-      expect(stats.winRate).toBeLessThanOrEqual(100)
-      expect(stats.wins + stats.losses + stats.breakeven).toBe(stats.totalTrades)
-    }
+    expect(stats.totalTrades).toBeGreaterThan(0)
+    expect(stats.winRate).toBeGreaterThanOrEqual(0)
+    expect(stats.winRate).toBeLessThanOrEqual(100)
+    expect(stats.wins + stats.losses + stats.breakeven).toBe(stats.totalTrades)
   })
 })
 

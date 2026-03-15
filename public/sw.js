@@ -7,7 +7,9 @@
  * - On install, immediately activate (no waiting for old tabs).
  */
 
-const CACHE_NAME = 'cheechart-v1'
+// Bump this version on each deploy to invalidate stale caches.
+// For CI/CD, replace with a build hash (e.g., via Vite define).
+const CACHE_NAME = 'cheechart-v2'
 
 // Assets to pre-cache on install (app shell)
 const PRECACHE = [

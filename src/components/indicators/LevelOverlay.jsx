@@ -121,7 +121,7 @@ export function LevelOverlay({ chart, candleSeries, bars, byDay: byDayProp = nul
         odcSeriesRef.current = null
       }
     }
-  }, [chart, candleSeries, bars, showORB, visible])
+  }, [chart, candleSeries, bars, byDayProp, showORB, visible])
 
   return null
 }

@@ -10,7 +10,7 @@
  *   vwap      — VWAP bounce (price touches VWAP and reverses)
  */
 
-import { ema, rsi, relativeVolume, vwapWithBands } from './indicators'
+import { ema, relativeVolume, vwapWithBands } from './indicators'
 import { groupBarsByDay, getPreviousLevels, getORBZone, classifyDayType } from './levels'
 import { EMA_PERIODS } from '../constants/chart'
 

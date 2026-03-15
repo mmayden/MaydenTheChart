@@ -46,7 +46,7 @@ function formatTimeET(unixSeconds) {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export function CrosshairLegend({ chart, bars, theme = 'dark' }) {
+export function CrosshairLegend({ chart, bars, theme: _theme = 'dark' }) {
   const legendRef = useRef(null)
   const barsRef   = useRef(bars)
 

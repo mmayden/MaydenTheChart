@@ -50,7 +50,9 @@ export class ErrorBoundary extends React.Component {
             The chart encountered an unexpected error. You can try resetting the view or reloading the page.
           </p>
           <p style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '1.5rem', maxWidth: '28rem', wordBreak: 'break-word' }}>
-            {this.state.error?.message}
+            {import.meta.env.DEV
+              ? this.state.error?.message
+              : 'An unexpected error occurred. Try reloading the page.'}
           </p>
           <div style={{ display: 'flex', gap: '0.75rem' }}>
             <button

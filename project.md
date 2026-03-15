@@ -409,7 +409,7 @@ Component state (useState — local only):
 
 ## Current Status
 
-**257/257 tests passing, build clean. Main bundle 226KB + 164KB lightweight-charts + 81KB vendor-api (6 lazy chunks).**
+**274/274 tests passing, build clean, ESLint 0 errors. Main bundle 226KB + 164KB lightweight-charts + 81KB vendor-api (6 lazy chunks).**
 
 ### Completed
 - [x] Phases 1–4: Core chart, indicators, levels, S/R detection, ATR gauge, day type
@@ -427,6 +427,7 @@ Component state (useState — local only):
 - [x] Alert system: price-level + candle-streak alerts with browser notifications
 - [x] QOL: crosshair legend, toasts, viewport persistence, keyboard shortcuts, error boundary
 - [x] Health audits: security headers, input validation, shared utilities, dead code cleanup
+- [x] Comprehensive audit (2026-03-15): security hardening (rate limiting, SSRF guard, input validation), ESLint, timezone tests, backtest test determinism, contract fixes, dead code cleanup
 
 ### Upcoming
 - [ ] Phase 12+: Screener, trade replay, gap tracking, cloud sync
@@ -470,3 +471,4 @@ Component state (useState — local only):
 | 2026-03-15 | Color architecture overhaul: centralized all nav icon colors into CSS custom properties (`--nav-icon`, `--nav-icon-hover`, `--nav-active-bg`, `--alert-color`, `--alert-active-bg`) with per-theme values. Added `.nav-icon` semantic CSS utility class. TopNav buttons use themed variables instead of hardcoded Tailwind classes. Symbol label uses `--symbol-color` per theme (subtle brightness lift). Removed sidebar collapse toggle (◀/▶), hamburger always visible in TopNav. Reduced ATR gauge spacing. Onboarding tour viewport clamping fixes (3 iterations). 257/257 tests, build clean. |
 | 2026-03-15 | Per-panel icon colors: unique CSS variable per panel button across all 3 themes (alerts amber, watchlist teal, backtest purple, journal coral, cmd-palette purple). Replaced all remaining hardcoded Tailwind color classes (bg-blue-600, bg-[#0a0a0a], accent-blue-500, border-gray-500) with themed CSS properties (.btn-primary, .bg-input, --focus-ring, --settings-color). Panel button order: alerts → watchlist → backtest → journal. 257/257 tests, build clean. |
 | 2026-03-15 | Nav hover micro-animations: unique CSS keyframe animation per TopNav button — bell ring (24° swing), watchlist bounce (translateY oscillation), backtest EKG pulse (double-tap scale), journal tilt (rotate from spine), search zoom, settings gear spin + glow. All icons pop 1.25-1.4x on hover. Sound alerts default changed to ON for new users. Settings gear gets unique per-theme color (dark cyan, terminal mint, lumpia warm gold). 257/257 tests, build clean. |
+| 2026-03-15 | Comprehensive audit: 4 parallel agents (security, testing, architecture, build health). **Security:** rate limiting on all 3 API endpoints (ws-auth 5/min, bars 60/min, snapshot 30/min), SSRF guard (ALPACA_DATA_URL allowlist), symbol regex validation on URL params + watchlist input, ISO date regex anchored, ErrorBoundary hides raw errors in prod, SW cache versioned. **Testing:** +17 timezone.js tests (DST boundaries), backtest tests deterministic (removed Math.random), removed empty assertion guards. **Code quality:** ESLint added (eslint 9 + react-hooks plugin, 0 errors), vwapWithBands now returns .series per contract, chart polling stops after found, ref-during-render fixed, missing useEffect deps fixed, dead code removed. Alpaca keys rotated. 274/274 tests, build clean. |

@@ -25,9 +25,19 @@ The live chart and the backtester share identical math. Never duplicate indicato
 ## Stack (locked)
 - Vite 7 + React 18 + lightweight-charts **v5** (NOT v4)
 - TanStack Query v5, Zustand v4, Axios, Tailwind CSS 3, Vitest v3
+- ESLint 9 + eslint-plugin-react-hooks (flat config, `eslint.config.js`)
 - JavaScript (not TypeScript)
 - `feed: 'iex'` required on all Alpaca data fetches (free tier)
 - **No react-router-dom** — single-page app, panel-based architecture
+
+## Security rules
+- All API endpoints must have rate limiting (in-memory per-instance, IP-based)
+- `ALPACA_DATA_URL` must be validated against `ALLOWED_DATA_HOSTS` allowlist (SSRF guard)
+- All user input from URL params, forms, and localStorage must be regex-validated before use
+- API errors must never leak upstream status codes, URLs, or stack traces to clients
+- ErrorBoundary shows raw error messages only in `import.meta.env.DEV`
+- Service worker `CACHE_NAME` must be bumped on each deploy
+- Bearer token in `ws-auth.js` is NOT a real secret (ships in client bundle) — rate limiting is the real gate
 
 ## Architecture
 
@@ -124,6 +134,9 @@ keyframes in `src/index.css` (`.nav-btn-{id}` classes).
 - Manifest: `public/manifest.json`
 - Service worker: `public/sw.js`
 - Icons: `public/icons/icon-192.png`, `public/icons/icon-512.png`
+
+### Tooling
+- ESLint config (flat): `eslint.config.js`
 
 ### Docs
 - Project spec + architecture: `project.md`

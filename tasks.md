@@ -422,6 +422,45 @@
 
 ---
 
+## ✅ Comprehensive Audit — Security + Testing + Architecture + Build (2026-03-15)
+
+**274/274 tests passing, build clean, ESLint 0 errors**
+
+### Security Hardening
+- ✅ Rate limiting on all 3 API endpoints: `ws-auth` 5/IP/min, `bars` 60/IP/min, `snapshot` 30/IP/min (in-memory, best-effort per serverless instance)
+- ✅ SSRF guard: `ALPACA_DATA_URL` validated against `ALLOWED_DATA_HOSTS` allowlist in `bars.js` + `snapshot.js`
+- ✅ Symbol regex validation: `useURLState.js` URL param `?s=` now validated against `/^[A-Z]{1,10}(\.[A-Z]{1,2})?$/`
+- ✅ Symbol regex validation: `WatchlistPanel.jsx` `addSymbol()` rejects invalid input
+- ✅ ISO date regex anchored with `$` in `bars.js` — no trailing garbage
+- ✅ ErrorBoundary shows generic message in production, raw error only in dev
+- ✅ Service worker cache versioned (`cheechart-v2`) — invalidates stale caches on deploy
+- ✅ `ws-auth.js` documents credential exposure risk (bearer token ships in client bundle)
+- ✅ Alpaca paper API key rotated
+
+### Testing Improvements
+- ✅ `src/utils/timezone.test.js` — 17 new tests: DST spring forward/fall back boundaries, midnight edge cases, market open/close times
+- ✅ `backtest.test.js` deterministic: replaced `Math.random()` volume with modular formula
+- ✅ Removed `if (totalTrades > 0)` empty assertion guards — tests now validate bounds unconditionally
+
+### Code Quality
+- ✅ ESLint added: `eslint.config.js` with `@eslint/js` + `eslint-plugin-react-hooks` — 0 errors, 4 minor warnings (unused vars in test files only)
+- ✅ `vwapWithBands()` now returns `.series` per CLAUDE.md `{series, signal}` contract (`.vwap` kept for backward compat)
+- ✅ Chart polling interval (`App.jsx`) stops after chart found instead of running forever at 100ms
+- ✅ Fixed ref-during-render in `CandlestickChart.jsx` (themeRef wrapped in useEffect)
+- ✅ Fixed setState-in-effect in `useViewportPersistence.js` (refactored to useMemo)
+- ✅ Fixed missing `byDayProp` dependency in `LevelOverlay.jsx` useEffect
+- ✅ Removed dead code: `getRect()` in OnboardingTour, unused `rsi` import in backtest.js, unused `todayKey` in levels.js
+- ✅ Fixed unused `theme` param in CrosshairLegend (renamed to `_theme`)
+- ✅ Suppressed dev-gated console.log in websocket.js with eslint-disable
+
+### Architecture Assessment (no changes needed)
+- ✅ Clean separation of concerns: pure utils, idiomatic Zustand selectors, proper TanStack Query v5
+- ✅ No class components (except ErrorBoundary — required by React), no anti-patterns
+- ✅ All cleanup (intervals, listeners, observers, WS) verified correct — no memory leaks
+- ✅ 0 npm vulnerabilities, all dependencies current
+
+---
+
 ## 📌 Deferred — Mobile Polish (low priority)
 
 > **Pin:** Mobile UX works but is not the focus. Touch targets + swipe gestures are in place.

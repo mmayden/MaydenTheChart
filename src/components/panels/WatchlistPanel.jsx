@@ -35,10 +35,12 @@ export function WatchlistPanel() {
   const selectedSymbol = useChartStore((s) => s.selectedSymbol)
   const { quotes, isLoading } = useWatchlistQuotes(symbols)
 
+  const SYMBOL_RE = /^[A-Z]{1,10}(\.[A-Z]{1,2})?$/
+
   function addSymbol(e) {
     e.preventDefault()
     const s = newSymbol.trim().toUpperCase()
-    if (!s || symbols.includes(s)) return
+    if (!s || !SYMBOL_RE.test(s) || symbols.includes(s)) return
     const next = [...symbols, s]
     setSymbols(next)
     saveWatchlist(next)

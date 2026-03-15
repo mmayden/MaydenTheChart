@@ -8,9 +8,37 @@
  *   symbols - comma-separated list, e.g. 'QQQ,SPY,AAPL'
  */
 
+/**
+ * Simple in-memory rate limiter (best-effort per serverless instance).
+ */
+const rateLimitMap = new Map()
+const RATE_LIMIT_WINDOW = 60_000
+const RATE_LIMIT_MAX = 30 // 30 requests per IP per minute
+
+function isRateLimited(ip) {
+  const now = Date.now()
+  const entry = rateLimitMap.get(ip)
+  if (!entry || now - entry.start > RATE_LIMIT_WINDOW) {
+    rateLimitMap.set(ip, { start: now, count: 1 })
+    return false
+  }
+  entry.count++
+  if (entry.count > RATE_LIMIT_MAX) return true
+  return false
+}
+
+/** SSRF guard — only allow known Alpaca data hosts. */
+const ALLOWED_DATA_HOSTS = ['https://data.alpaca.markets']
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  // Rate limit by IP
+  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown'
+  if (isRateLimited(ip)) {
+    return res.status(429).json({ error: 'Too many requests — try again later' })
   }
 
   const { symbols } = req.query
@@ -34,6 +62,11 @@ export default async function handler(req, res) {
   const apiKey = process.env.ALPACA_API_KEY
   const secretKey = process.env.ALPACA_SECRET_KEY
   const dataUrl = process.env.ALPACA_DATA_URL || 'https://data.alpaca.markets/v2'
+
+  // SSRF guard — reject misconfigured data URLs
+  if (!ALLOWED_DATA_HOSTS.some(h => dataUrl.startsWith(h))) {
+    return res.status(500).json({ error: 'Server misconfigured' })
+  }
 
   if (!apiKey || !secretKey) {
     return res.status(500).json({ error: 'Server misconfigured — missing Alpaca credentials' })

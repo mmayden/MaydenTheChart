@@ -1,8 +1,8 @@
 /**
  * useViewportPersistence — Preserves chart viewport across live data updates.
  *
- * Calls fitContent() only on initial load or symbol/timeframe change.
- * During live streaming updates, maintains the user's current zoom/scroll.
+ * Returns true on initial load or symbol/timeframe change (fit content).
+ * Returns false on live data updates (preserve viewport).
  *
  * Usage:
  *   const shouldFit = useViewportPersistence(symbol, timeframe, dataUpdatedAt)
@@ -10,24 +10,18 @@
  *   if (shouldFit) chart.timeScale().fitContent()
  */
 
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useMemo } from 'react'
 
-export function useViewportPersistence(symbol, timeframe, dataUpdatedAt) {
+export function useViewportPersistence(symbol, timeframe, _dataUpdatedAt) {
   const prevKeyRef = useRef(null)
-  const [shouldFit, setShouldFit] = useState(true)
 
-  useEffect(() => {
+  return useMemo(() => {
     const key = `${symbol}|${timeframe}`
-
     if (prevKeyRef.current !== key) {
-      // Symbol or timeframe changed (or first load) — fit content
       prevKeyRef.current = key
-      setShouldFit(true)
-    } else {
-      // Same symbol+timeframe, just a live data update — preserve viewport
-      setShouldFit(false)
+      return true
     }
-  }, [symbol, timeframe, dataUpdatedAt])
-
-  return shouldFit
+    return false
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [symbol, timeframe, _dataUpdatedAt])
 }
