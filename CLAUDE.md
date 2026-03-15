@@ -46,7 +46,7 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - All user input from URL params, forms, and localStorage must be regex-validated before use
 - API errors must never leak upstream status codes, URLs, or stack traces to clients
 - ErrorBoundary shows raw error messages only in `import.meta.env.DEV`
-- Service worker `CACHE_NAME` must be bumped on each deploy
+- Service worker `CACHE_NAME` is auto-versioned at build time (Vite plugin in `vite.config.js`)
 - Bearer token in `ws-auth.js` is NOT a real secret (ships in client bundle) — rate limiting is the real gate
 
 ## Architecture
@@ -63,7 +63,7 @@ Values: `null | 'alerts' | 'backtest' | 'journal' | 'watchlist'`. Same panel = c
 different panel = switch. On mobile (<768px), panels become full-screen overlays.
 
 **Color architecture:** All colors flow from CSS custom properties in `src/index.css`
-(lines 42-133). Each theme defines 25+ variables. Components use semantic CSS classes
+(lines 60-151). Each theme defines 25+ variables. Components use semantic CSS classes
 (`.btn-primary`, `.bg-input`, `.border-theme`, `.text-accent`, etc.) or inline
 `var(--name)` references — never hardcoded Tailwind color classes. Each panel button
 has its own `--{id}-color` and `--{id}-active-bg` variables. The settings gear has
@@ -140,13 +140,18 @@ keyframes in `src/index.css` (`.nav-btn-{id}` classes).
 - localStorage schema validation: `src/utils/validate.js`
 - Chart snapshot capture + export: `src/utils/snapshot.js`
 
+### Services
+- Sentry error tracking (conditional): `src/services/sentry.js`
+
 ### PWA
 - Manifest: `public/manifest.json`
-- Service worker: `public/sw.js`
+- Service worker (source, build-time processed): `src/sw.js`
+- Self-hosted fonts: `public/fonts/boogaloo-regular.woff2`, `public/fonts/inter-800.woff2`
 - Icons: `public/icons/icon-192.png`, `public/icons/icon-512.png`
 
 ### Tooling
 - ESLint config (flat): `eslint.config.js`
+- Vite config + SW versioning plugin: `vite.config.js`
 
 ### Docs
 - Project spec + architecture: `project.md`

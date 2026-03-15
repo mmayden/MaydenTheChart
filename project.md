@@ -347,11 +347,14 @@ Component state (useState — local only):
 | `src/services/alpaca.js` | Axios client, auth headers, base URLs |
 | `src/services/queryClient.js` | TanStack Query client config + default options |
 | `src/services/websocket.js` | Alpaca WebSocket connection manager — auth, subscribe, reconnect with exponential backoff |
+| `src/services/sentry.js` | Sentry error tracking — conditional init via `VITE_SENTRY_DSN` env var |
 | `api/bars.js` | Vercel serverless proxy — Alpaca API (keys server-only, pagination) |
 | `api/ws-auth.js` | Vercel serverless function — returns Alpaca WS credentials, protected by bearer token |
 | `api/snapshot.js` | Vercel serverless proxy — Alpaca snapshots for watchlist live prices |
 | `public/manifest.json` | PWA manifest (standalone display, icons, theme) |
-| `public/sw.js` | Network-first service worker (API bypass, static asset cache) |
+| `src/sw.js` | Service worker source — build-time processed by Vite plugin, auto-versioned CACHE_NAME |
+| `public/fonts/boogaloo-regular.woff2` | Self-hosted Boogaloo font (logo) |
+| `public/fonts/inter-800.woff2` | Self-hosted Inter 800 font (symbol display) |
 
 ### Stores (Zustand)
 | File | Purpose |
@@ -391,7 +394,7 @@ Component state (useState — local only):
 ### App Shell
 | File | Purpose |
 |---|---|
-| `src/main.jsx` | App entry: ErrorBoundary, QueryClientProvider |
+| `src/main.jsx` | App entry: ErrorBoundary, QueryClientProvider, Sentry init, SW registration |
 | `src/App.jsx` | Single-page shell: TopNav + Sidebar + Chart + Right Panel + overlays |
 | `src/constants/chart.js` | All colors, periods, timeframe configs, symbol suggestions |
 | `src/constants/presets.js` | Default preset definitions (Clean, Full, Scalp, Swing) |
