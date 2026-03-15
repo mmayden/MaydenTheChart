@@ -307,7 +307,10 @@
 - ✅ `src/index.css` — CSS custom property theme system (`[data-theme="dark"]` / `[data-theme="lumpia"]` / `[data-theme="terminal"]`)
 - ✅ **Dark theme** — unchanged terminal black (#0a0a0a), blue accents
 - ✅ **Lumpia theme** — near-black (#080808) with ember-orange accent (#C85818), warm stone text (#D0C8B8)
-- ✅ **Terminal theme** — true black (#000000) with phosphor green text (#33ff33), neon green accent (#00ff41)
+- ✅ **Terminal theme** — deep black (#060806) with sage green text (#a8d8a8), vivid green accent (#50d050)
+- ✅ Preset delete: two-click confirmation with red-tinted pill capsule, cancel button
+- ✅ Preset manage buttons: pill capsule border (theme-aware), always visible, larger hit targets
+- ✅ Hover feedback on all preset buttons (default pills, saved presets, "Save current") via `hover:brightness-125`
 - ✅ `CandlestickChart`: theme-aware candle colors (terracotta red + forest green in lumpia); fixed init-time color bug via `themeRef`
 - ✅ `ATRGauge`: theme-aware red/yellow/green colors; bolded label + taller gauge bar
 - ✅ Sidebar section labels (SYMBOL / TIMEFRAME / INDICATORS): bumped to `text-gray-300 font-semibold`
