@@ -107,12 +107,11 @@ export function TopNav() {
           <button
             key={id}
             onClick={() => setActivePanel(id)}
-            className={`flex items-center justify-center w-8 h-8 rounded transition-colors touch-target ${
-              activePanel === id
-                ? 'text-accent'
-                : 'nav-icon hover:bg-theme-hover'
-            }`}
-            style={activePanel === id ? { backgroundColor: 'var(--nav-active-bg)' } : undefined}
+            className="flex items-center justify-center w-8 h-8 rounded transition-colors touch-target hover:bg-theme-hover"
+            style={{
+              color: `var(--${id}-color)`,
+              backgroundColor: activePanel === id ? `var(--${id}-active-bg)` : undefined,
+            }}
             title={title}
           >
             {icon}
