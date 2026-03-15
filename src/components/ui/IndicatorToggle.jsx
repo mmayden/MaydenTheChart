@@ -4,6 +4,7 @@
  */
 
 import { useChartStore } from '../../store/useChartStore'
+import { usePresetsStore } from '../../store/usePresetsStore'
 
 const TOGGLES = [
   { key: 'ema',    label: 'EMA'    },
@@ -16,6 +17,7 @@ const TOGGLES = [
 export function IndicatorToggle() {
   const indicators     = useChartStore((s) => s.indicators)
   const toggleIndicator = useChartStore((s) => s.toggleIndicator)
+  const markModified    = usePresetsStore((s) => s.markModified)
 
   return (
     <div className="flex flex-col gap-1">
@@ -24,7 +26,7 @@ export function IndicatorToggle() {
         return (
           <button
             key={key}
-            onClick={() => toggleIndicator(key)}
+            onClick={() => { toggleIndicator(key); markModified() }}
             className={[
               'px-2 py-1 text-xs font-mono font-semibold rounded border transition-colors text-left',
               on

@@ -20,6 +20,7 @@ import { useDailyBars } from './hooks/useDailyBars'
 import { useAlpacaSocket } from './hooks/useAlpacaSocket'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import { useChartStore } from './store/useChartStore'
+import { usePresetsStore } from './store/usePresetsStore'
 import { TIMEFRAME_CONFIG } from './constants/chart'
 import { atr, getDailyRangeStatus } from './utils/indicators'
 import { getPreviousLevels, classifyDayType, groupBarsByDay } from './utils/levels'
@@ -33,6 +34,7 @@ import { VWAPOverlay } from './components/indicators/VWAPOverlay'
 import { LevelOverlay } from './components/indicators/LevelOverlay'
 import { SROverlay } from './components/indicators/SROverlay'
 import { StatusBar } from './components/ui/StatusBar'
+import { PresetSelector } from './components/ui/PresetSelector'
 import { IndicatorToggle } from './components/ui/IndicatorToggle'
 import { ATRGauge } from './components/ui/ATRGauge'
 import { DayTypeBanner } from './components/ui/DayTypeBanner'
@@ -60,6 +62,12 @@ export default function App() {
   const { data: bars, isLoading, isError, error, dataUpdatedAt, refetch } = useAlpacaBars()
   const { data: dailyBars } = useDailyBars()
   const selectedSymbol = useChartStore((s) => s.selectedSymbol)
+
+  // Apply persisted preset on mount (restores indicator toggles + timeframe)
+  useEffect(() => {
+    const { activePresetId, applyPreset } = usePresetsStore.getState()
+    if (activePresetId) applyPreset(activePresetId)
+  }, [])
 
   // Live WebSocket — connects during market hours, injects bars into TanStack cache
   useAlpacaSocket()
@@ -148,6 +156,13 @@ export default function App() {
             <div>
               <div className="text-[10px] tracking-widest text-gray-300 font-semibold uppercase mb-2">Timeframe</div>
               <TimeframeSelector />
+            </div>
+
+            <div className="h-px bg-gray-800" />
+
+            <div>
+              <div className="text-[10px] tracking-widest text-gray-300 font-semibold uppercase mb-2">Presets</div>
+              <PresetSelector />
             </div>
 
             <div className="h-px bg-gray-800" />

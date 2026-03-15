@@ -1,4 +1,4 @@
-# Task List — Loompia
+# Task List — Lumpia
 
 > Living task board. Update status as work progresses.
 > 🔲 not started | 🔄 in progress | ✅ done | ❌ blocked
@@ -8,7 +8,7 @@
 ## ✅ Completed Sprint — Project Bootstrap
 
 ### Setup & Infrastructure
-- ✅ Vite 7 + React 18 scaffolded in Loompia/ root (not a subdirectory)
+- ✅ Vite 7 + React 18 scaffolded in Lumpia/ root (not a subdirectory)
 - ✅ All deps installed — lightweight-charts v5, axios, zustand, @tanstack/react-query v5, vitest v3
 - ✅ Zero vulnerabilities
 - ✅ `.env.example` committed, `.env` in `.gitignore`
@@ -29,7 +29,7 @@
 - 🔲 `src/hooks/useAlpacaBars.js` — TanStack Query hook, fetches bars by timeframe
 - 🔲 **Verify**: `console.log(bars)` in App.jsx confirms real QQQ data before any chart work
 - 🔲 `src/store/useChartStore.js` — Zustand store: timeframe, symbol, indicator toggles
-- 🔲 `src/constants/chart.js` — all colors (Nick's EMA colors), timeframes, periods
+- 🔲 `src/constants/chart.js` — all colors (EMA colors), timeframes, periods
 - 🔲 `src/utils/indicators.js` — EMA math function (+ vitest unit tests)
 - 🔲 `src/utils/levels.js` — calculates prev day H/L, open of day from bar data
 - 🔲 **RUN: `npm run test`** — all indicator math tests pass before building UI
@@ -230,15 +230,63 @@
 
 ---
 
-## 🔲 Phase 7b — Stretch Goals
+## 🔲 Phase 8 — Saved Chart Presets
+
+> Lightweight layout system — symbol-agnostic presets that save indicator config + timeframe + theme.
+> Attacks the #1 universal complaint across TradingView, thinkorswim, and Webull: settings not persisting.
+> Design: symbol floats freely (not tied to preset), matching TradingView's consensus model.
+
+### Step 1 — Preset Data Layer
+- 🔲 `src/constants/presets.js` — default preset definitions:
+  - **Full Terminal**: all indicators on, 5m timeframe, current theme
+  - **Clean**: all indicators off, 5m timeframe
+  - **Scalp**: ema + vwap on, others off, 5m timeframe
+  - **Swing**: ema + levels + sr on, others off, 4h timeframe
+- 🔲 `src/store/usePresetsStore.js` — Zustand store:
+  - `activePresetId` — currently applied preset
+  - `presets` — map of all presets (defaults + user-created)
+  - `applyPreset(id)` — applies indicator toggles + timeframe + theme from preset to `useChartStore`
+  - `saveCurrentAsPreset(name)` — snapshots current `useChartStore` state into a new preset
+  - `renamePreset(id, newName)` / `deletePreset(id)` — manage user presets (defaults not deletable)
+  - localStorage persistence (auto-save on every mutation, no manual save button)
+- 🔲 Unit tests for preset store (save, load, apply, rename, delete, localStorage round-trip)
+
+### Step 2 — Preset Selector UI
+- 🔲 `src/components/ui/PresetSelector.jsx` — sidebar dropdown (above indicator toggles):
+  - Dropdown shows all presets, active one highlighted
+  - "Save Current as..." option at bottom → inline name input
+  - Right-click or icon menu on user presets: rename / delete
+  - Default presets are not deletable (but can be overridden by saving with same name? TBD)
+  - Toast notification on preset switch
+- 🔲 Wire into `App.jsx` / sidebar layout
+
+### Step 3 — Integration & Polish
+- 🔲 Keyboard shortcut for preset cycling (e.g., `P` or `[`/`]` to cycle presets)
+- 🔲 Indicator toggles update live when preset is applied (Zustand subscription)
+- 🔲 Persist `activePresetId` across page refresh
+- 🔲 Edge cases: what happens if user manually toggles an indicator after loading a preset? (becomes "modified" state, or auto-creates a custom preset? TBD — discuss with user)
+
+### Tests & Verification
+- 🔲 **RUN: `npm run test`** — all unit tests green
+- 🔲 Preset switching applies correct indicator states
+- 🔲 Custom presets survive page refresh
+- 🔲 Default presets cannot be deleted
+- 🔲 Toast fires on preset switch
+- 🔲 **RUN: `npm run build`** — zero errors before committing
+- 🔲 **COMMIT:** `feat(presets): saved chart presets with default layouts and custom save/load`
+
+---
+
+## 🔲 Phase 9 — Stretch Goals
 
 - 🔲 `src/utils/backtest.js` — replay historical days using same indicator math, output win rate / R:R / by day type
 - 🔲 Weekly gap tracking panel (unfilled QQQ weekly gaps with distance from current price)
 - 🔲 Volume profile (horizontal bars at each price level)
-- ✅ Price alert system (browser notification on level hit) — **DONE**: price-level + candle-streak alerts
-- ✅ Multi-symbol support (base) — **DONE**: dynamic symbol input, all systems symbol-agnostic
 - 🔲 Bollinger Bands overlay
 - 🔲 RSI divergence detection (auto-annotation)
+- 🔲 Alert sets per preset (tie alert configs to presets)
+- 🔲 Instrument linking (multi-chart: change symbol in one panel, all linked panels follow)
+- 🔲 Cloud sync / preset export (multi-device persistence, preset sharing)
 
 ---
 
@@ -271,15 +319,15 @@
   - `barsLengthAtCreation` guard: streak alerts only fire on NEW bars, not existing data
 
 ### Branding + UI Polish — Session 5 (2026-03-13)
-- ✅ Renamed project: `MaydenTheChart` → `Loompia` everywhere (package.json, docs, notifications, comments)
+- ✅ Renamed project: `MaydenTheChart` → `Lumpia` everywhere (package.json, docs, notifications, comments)
 - ✅ `src/components/ui/Logo.jsx` — Boogaloo Filipino-poster font logo replacing plain MAYDEN text
 - ✅ `index.html` — Boogaloo font loaded via Google Fonts, page title updated
 - ✅ `src/components/ui/SettingsModal.jsx` — gear icon in header opens centered settings modal
 - ✅ `src/store/useChartStore.js` — `theme` state persisted to localStorage, defaults to `'dark'`
-- ✅ `src/index.css` — CSS custom property theme system (`[data-theme="dark"]` / `[data-theme="loompia"]`)
+- ✅ `src/index.css` — CSS custom property theme system (`[data-theme="dark"]` / `[data-theme="lumpia"]`)
 - ✅ **Dark theme** — unchanged terminal black (#0a0a0a), blue accents
-- ✅ **Loompia theme** — near-black (#080808) with ember-orange accent (#C85818), warm stone text (#D0C8B8)
-- ✅ `CandlestickChart`: theme-aware candle colors (terracotta red + forest green in loompia); fixed init-time color bug via `themeRef`
+- ✅ **Lumpia theme** — near-black (#080808) with ember-orange accent (#C85818), warm stone text (#D0C8B8)
+- ✅ `CandlestickChart`: theme-aware candle colors (terracotta red + forest green in lumpia); fixed init-time color bug via `themeRef`
 - ✅ `ATRGauge`: theme-aware red/yellow/green colors; bolded label + taller gauge bar
 - ✅ Sidebar section labels (SYMBOL / TIMEFRAME / INDICATORS): bumped to `text-gray-300 font-semibold`
 - ✅ TimeframeSelector + IndicatorToggle buttons: `font-semibold text-gray-300` for inactive state

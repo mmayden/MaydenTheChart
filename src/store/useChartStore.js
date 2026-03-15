@@ -45,6 +45,9 @@ export const useChartStore = create((set) => ({
       },
     })),
 
+  /** Bulk-set all indicator toggles (used by preset system). */
+  setIndicators: (indicators) => set({ indicators }),
+
   // ─── WebSocket state ───────────────────────────────────────────────────────
   wsStatus: 'disconnected', // 'connecting' | 'authenticated' | 'subscribed' | 'disconnected' | 'error'
   isMarketOpen: false,
