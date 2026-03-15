@@ -219,6 +219,7 @@ export default function App() {
                 <VWAPOverlay chart={chart} bars={bars} visible={indicators.vwap} />
               )}
               <LevelOverlay
+                chart={chart}
                 candleSeries={candleSeries}
                 bars={bars}
                 showORB={tfConfig.showORB}

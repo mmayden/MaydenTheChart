@@ -97,11 +97,11 @@ export function getPreviousLevels(bars) {
 }
 
 /**
- * Get the Open of Day Candle (ODC) price.
+ * Get the Open of Day Candle (ODC) price and today's time range.
  * The open price of the first bar of today's session.
  *
  * @param {Array<{time, open, ...}>} bars - sorted oldest → newest
- * @returns {number | null}
+ * @returns {{ price: number, startTime: number, endTime: number } | null}
  */
 export function getOpenOfDay(bars) {
   if (!bars || bars.length === 0) return null
@@ -113,9 +113,13 @@ export function getOpenOfDay(bars) {
 
   if (!todayBars || todayBars.length === 0) return null
 
-  // First bar of the day (copy to avoid mutating input)
+  // Sort today's bars by time (copy to avoid mutating input)
   const sorted = [...todayBars].sort((a, b) => a.time - b.time)
-  return sorted[0].open
+  return {
+    price:     sorted[0].open,
+    startTime: sorted[0].time,
+    endTime:   sorted[sorted.length - 1].time,
+  }
 }
 
 /**

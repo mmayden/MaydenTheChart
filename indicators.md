@@ -103,9 +103,18 @@ The first bar's open price. Nick references "open of day" constantly as a direct
 pivot — price reclaiming the open is bullish; price losing the open is bearish.
 
 ### Rendering
-- Thin solid horizontal line, white/light color
+- Thin solid white line, scoped to today's session only (does not bleed into previous days)
+- Rendered as a `LineSeries` with two data points (session start → session end), not a price line
 - Label: "ODC" (Open of Day Candle)
 - Only on intraday timeframes
+
+### Code signature
+```js
+// returns { price, startTime, endTime } or null
+// price = open of today's first bar
+// startTime/endTime = Unix timestamps bounding today's session bars
+getOpenOfDay(bars)
+```
 
 ---
 

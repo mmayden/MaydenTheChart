@@ -2,16 +2,17 @@
  * LevelOverlay — Renders key price levels on the chart.
  *
  * Levels rendered:
- *   - Previous Day High (PDH) — gold dashed line, labeled "PDH"
- *   - Previous Day Low  (PDL) — gold dashed line, labeled "PDL"
- *   - Open of Day Candle (ODC) — white solid line
- *   - ORB zone — shaded box using two horizontal lines (only on intraday TFs)
+ *   - Previous Day High (PDH) — gold dashed price line, labeled "PDH"
+ *   - Previous Day Low  (PDL) — gold dashed price line, labeled "PDL"
+ *   - Open of Day Candle (ODC) — white LineSeries scoped to today's session only
+ *   - ORB zone — two horizontal price lines for high/low (only on intraday TFs)
  *
- * Uses lightweight-charts v5 price lines (createPriceLine) on the candle series,
- * not separate series — this is the correct v5 pattern for horizontal levels.
+ * PDH/PDL/ORB use createPriceLine (full-width horizontal).
+ * ODC uses a separate LineSeries so it only spans today's bars.
  */
 
 import { useEffect, useRef } from 'react'
+import { LineSeries } from 'lightweight-charts'
 import { getPreviousLevels, getOpenOfDay, getORBZone } from '../../utils/levels'
 import {
   PREV_LEVEL_COLOR,
@@ -19,17 +20,24 @@ import {
   ORB_COLOR,
 } from '../../constants/chart'
 
-export function LevelOverlay({ candleSeries, bars, showORB = true, visible = true }) {
-  const linesRef = useRef([])  // array of { line, series } for cleanup
+export function LevelOverlay({ chart, candleSeries, bars, showORB = true, visible = true }) {
+  const linesRef    = useRef([])  // array of { line, series } for cleanup
+  const odcSeriesRef = useRef(null)
 
   useEffect(() => {
     if (!candleSeries || !bars || bars.length === 0) return
 
-    // Clear previous lines
+    // Clear previous price lines
     for (const { line } of linesRef.current) {
       try { candleSeries.removePriceLine(line) } catch (_) {}
     }
     linesRef.current = []
+
+    // Clear previous ODC line series
+    if (odcSeriesRef.current && chart) {
+      try { chart.removeSeries(odcSeriesRef.current) } catch (_) {}
+      odcSeriesRef.current = null
+    }
 
     const { prevHigh, prevLow } = getPreviousLevels(bars)
     const odc                   = getOpenOfDay(bars)
@@ -66,15 +74,22 @@ export function LevelOverlay({ candleSeries, bars, showORB = true, visible = tru
       })
     }
 
-    // Open of Day Candle — white thin solid
-    if (odc) {
-      addLine(odc, {
-        color:         ODC_COLOR,
-        lineWidth:     1,
-        lineStyle:     0,   // solid
-        axisLabelVisible: true,
-        title:         'ODC',
+    // Open of Day Candle — white line scoped to today's session only
+    if (odc && chart && visible) {
+      const odcSeries = chart.addSeries(LineSeries, {
+        color:                  ODC_COLOR,
+        lineWidth:              1,
+        lineStyle:              0,   // solid
+        priceLineVisible:       false,
+        lastValueVisible:       true,
+        crosshairMarkerVisible: false,
+        title:                  'ODC',
       })
+      odcSeries.setData([
+        { time: odc.startTime, value: odc.price },
+        { time: odc.endTime,   value: odc.price },
+      ])
+      odcSeriesRef.current = odcSeries
     }
 
     // ORB zone — two lines for high and low (only intraday)
@@ -100,8 +115,12 @@ export function LevelOverlay({ candleSeries, bars, showORB = true, visible = tru
         try { candleSeries.removePriceLine(line) } catch (_) {}
       }
       linesRef.current = []
+      if (odcSeriesRef.current && chart) {
+        try { chart.removeSeries(odcSeriesRef.current) } catch (_) {}
+        odcSeriesRef.current = null
+      }
     }
-  }, [candleSeries, bars, showORB, visible])
+  }, [chart, candleSeries, bars, showORB, visible])
 
   return null
 }

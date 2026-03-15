@@ -187,7 +187,7 @@ Component state (useState — local only):
 | `src/components/chart/PriceDisplay.jsx` | Live price + % change header |
 | `src/components/indicators/EMAOverlay.jsx` | EMA 9/48/200 line series |
 | `src/components/indicators/VWAPOverlay.jsx` | VWAP + band series |
-| `src/components/indicators/LevelOverlay.jsx` | Prev H/L lines, ORB shaded zone, open of day line |
+| `src/components/indicators/LevelOverlay.jsx` | Prev H/L price lines, ORB zone, ODC as session-scoped LineSeries |
 | `src/components/indicators/SROverlay.jsx` | Support/resistance lines + swing high/low markers |
 | `src/components/indicators/RSIChart.jsx` | RSI in v5 pane |
 | `src/components/indicators/MACDChart.jsx` | MACD in v5 pane |
@@ -236,3 +236,4 @@ Component state (useState — local only):
 | 2026-03-14 | Multi-symbol base: stripped all QQQ hardcoding (MacroStatusBar removed, params saved to qqq-specific-features.txt). SymbolInput component (click-to-edit ticker). WebSocket uses dynamic getSymbol callback. NotificationBell, SettingsModal, loading message all symbol-agnostic. 45/45 tests, build clean. |
 | 2026-03-14 | Symbol autocomplete: SYMBOL_SUGGESTIONS (~80 tickers) in chart.js for dropdown suggestions. SymbolInput rewritten with autocomplete dropdown (prefix filter, usage-frequency sorting via localStorage, arrow key nav, bold prefix highlight). Alpaca validation remains final gate. 45/45 tests, build clean. |
 | 2026-03-14 | Volume bars: switched from RVOL-based color coding (gray/amber/red) to candle-direction coloring (green up / red down, semi-transparent). RVOL math retained in `relativeVolume()` for backtester and future settings toggle. 45/45 tests, build clean. |
+| 2026-03-14 | ODC line fix: was rendering as full-width price line bleeding across all days. Changed `getOpenOfDay()` to return `{ price, startTime, endTime }`. LevelOverlay now renders ODC as a `LineSeries` scoped to today's session. Build clean. |

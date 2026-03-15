@@ -169,6 +169,17 @@
 
 ---
 
+## ✅ ODC Line Fix — Session-Scoped (2026-03-14)
+
+- ✅ ODC (Open of Day Candle) line was rendering as a full-width `createPriceLine`, bleeding across all visible days
+- ✅ `src/utils/levels.js` — `getOpenOfDay()` now returns `{ price, startTime, endTime }` instead of just the price number
+- ✅ `src/components/indicators/LevelOverlay.jsx` — ODC now rendered as a `LineSeries` with two data points (session start → end), scoped to today only
+- ✅ `LevelOverlay` accepts new `chart` prop for series creation; `App.jsx` passes it
+- ✅ `indicators.md` — updated ODC section with rendering details and code signature
+- ✅ Build clean
+
+---
+
 ## 🔲 Phase 7b — Stretch Goals
 
 - 🔲 `src/utils/backtest.js` — replay historical days using same indicator math, output win rate / R:R / by day type
