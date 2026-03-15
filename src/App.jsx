@@ -144,8 +144,10 @@ export default function App() {
           {sidebarOpen ? '◀' : '▶'}
         </button>
 
-        {sidebarOpen && (
-          <div className="flex flex-col gap-5 px-3 py-4 overflow-y-auto flex-1">
+        <div
+          className="flex flex-col gap-5 px-3 py-4 overflow-y-auto flex-1 transition-opacity duration-200"
+          style={{ opacity: sidebarOpen ? 1 : 0, pointerEvents: sidebarOpen ? 'auto' : 'none', minWidth: 168 }}
+        >
 
             <div>
               <div className="text-[10px] tracking-widest text-gray-300 font-semibold uppercase mb-1">Symbol</div>
@@ -186,7 +188,6 @@ export default function App() {
             )}
 
           </div>
-        )}
       </aside>
 
       {/* ══ MAIN AREA ════════════════════════════════════════════════════════ */}
