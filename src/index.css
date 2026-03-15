@@ -251,24 +251,55 @@ body,
   100% { transform: rotate(0); }
 }
 
-/* Watchlist — list expands outward */
-.nav-btn-watchlist svg { transition: transform 0.3s ease; }
-.nav-btn-watchlist:hover svg { transform: scaleY(1.15) scaleX(1.05); }
+/* Watchlist — list fans out from center */
+.nav-btn-watchlist svg { transition: transform 0.2s ease; }
+.nav-btn-watchlist:hover svg {
+  animation: list-fan 0.45s ease;
+}
+@keyframes list-fan {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.05, 1.25); }
+  60%  { transform: scale(1.1, 1.18); }
+  100% { transform: scale(1.08, 1.15); }
+}
 
-/* Backtest — graph line stretches wider */
-.nav-btn-backtest svg { transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); }
-.nav-btn-backtest:hover svg { transform: scaleX(1.2) scaleY(1.05); }
+/* Backtest — pulse line stretches and bounces */
+.nav-btn-backtest svg { transition: transform 0.2s ease; }
+.nav-btn-backtest:hover svg {
+  animation: graph-stretch 0.5s ease;
+}
+@keyframes graph-stretch {
+  0%   { transform: scale(1); }
+  25%  { transform: scaleX(1.3) scaleY(0.92); }
+  50%  { transform: scaleX(1.15) scaleY(1.08); }
+  75%  { transform: scaleX(1.22) scaleY(1.0); }
+  100% { transform: scaleX(1.18) scaleY(1.04); }
+}
 
-/* Journal — book cracks open */
-.nav-btn-journal svg {
-  transition: transform 0.3s ease;
+/* Journal — book swings open */
+.nav-btn-journal svg { transition: transform 0.2s ease; }
+.nav-btn-journal:hover svg {
+  animation: book-open 0.5s ease forwards;
   transform-origin: left center;
 }
-.nav-btn-journal:hover svg { transform: perspective(80px) rotateY(-12deg) scale(1.05); }
+@keyframes book-open {
+  0%   { transform: rotate(0) scale(1); }
+  30%  { transform: rotate(-14deg) scale(1.12); }
+  60%  { transform: rotate(-8deg) scale(1.1); }
+  100% { transform: rotate(-10deg) scale(1.08); }
+}
 
-/* Command palette search — zoom */
-.nav-btn-search svg { transition: transform 0.25s ease; }
-.nav-btn-search:hover svg { transform: scale(1.15); }
+/* Command palette search — bounce zoom */
+.nav-btn-search svg { transition: transform 0.2s ease; }
+.nav-btn-search:hover svg {
+  animation: search-zoom 0.4s ease;
+}
+@keyframes search-zoom {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.25); }
+  70%  { transform: scale(1.1); }
+  100% { transform: scale(1.18); }
+}
 
 /* Settings gear — spin + glow */
 .settings-gear {
