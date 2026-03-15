@@ -137,7 +137,7 @@ Lightweight saved layout system — the #1 UX gap across all major charting plat
 | Feature | Why it's here |
 |---|---|
 | **Saved chart presets** | Serialize indicator toggles + timeframe + theme under a named preset. Switch strategies in one click — solves the #1 trader complaint (settings not persisting). Symbol floats freely (not tied to preset), matching TradingView's consensus model. |
-| **Default presets shipped** | "Full Terminal" (everything on), "Clean" (candles + volume only), "Scalp" (VWAP + EMAs, 5m default), "Swing" (EMAs + S/R + levels, 4h default) — instant onboarding value |
+| **Default presets shipped** | "Full" (everything on), "Clean" (candles + volume only), "Scalp" (VWAP + EMAs, 5m default), "Swing" (EMAs + S/R + levels, 4h default) — instant onboarding value |
 | **Save / rename / delete custom presets** | User creates their own presets from current toggle state via "Save Current as..." |
 | **Sidebar preset dropdown** | Prominent dropdown above indicator toggles — zero-click discovery vs TradingView's buried menus |
 | **localStorage persistence** | Auto-persist on every change — no manual save button, no multi-tab bugs, no "settings vanished overnight" |
@@ -168,7 +168,7 @@ Client state (Zustand store):
   - selectedTimeframe: '5Min'
   - selectedSymbol: 'QQQ'
   - indicators: { ema: true, vwap: true, rvol: true, rsi: true, macd: true, levels: true, sr: true }
-  - activePreset: 'full-terminal'        // currently applied preset name
+  - activePreset: 'full'        // currently applied preset name
   - presets: { ... }                     // saved presets (persisted to localStorage)
 
 Component state (useState — local only):
@@ -215,7 +215,7 @@ Component state (useState — local only):
 | `src/hooks/useKeyboardShortcuts.js` | Global keyboard shortcuts (1-6 for timeframes) |
 | `src/store/usePresetsStore.js` | *(Phase 8)* Zustand preset store — save/load/rename/delete named presets, localStorage persistence |
 | `src/components/ui/PresetSelector.jsx` | *(Phase 8)* Sidebar dropdown — switch presets, "Save Current as...", rename/delete |
-| `src/constants/presets.js` | *(Phase 8)* Default preset definitions (Full Terminal, Clean, Scalp, Swing) |
+| `src/constants/presets.js` | *(Phase 8)* Default preset definitions (Clean, Full, Scalp, Swing) |
 | `src/constants/chart.js` | All colors, periods, timeframe configs |
 | `src/main.jsx` | App entry: QueryClientProvider, validateEnv() call |
 | `src/App.jsx` | Root layout and routing |

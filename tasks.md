@@ -238,7 +238,7 @@
 
 ### Step 1 — Preset Data Layer
 - 🔲 `src/constants/presets.js` — default preset definitions:
-  - **Full Terminal**: all indicators on, 5m timeframe, current theme
+  - **Full**: all indicators on, 5m timeframe, current theme
   - **Clean**: all indicators off, 5m timeframe
   - **Scalp**: ema + vwap on, others off, 5m timeframe
   - **Swing**: ema + levels + sr on, others off, 4h timeframe

@@ -39,9 +39,9 @@ describe('usePresetsStore', () => {
       expect(defaults).toHaveLength(4)
     })
 
-    it('has full-terminal as the default active preset', () => {
+    it('has full as the default active preset', () => {
       const { activePresetId } = usePresetsStore.getState()
-      expect(activePresetId).toBe('full-terminal')
+      expect(activePresetId).toBe('full')
     })
 
     it('each default preset has required fields', () => {
@@ -84,7 +84,7 @@ describe('usePresetsStore', () => {
 
     it('does nothing for non-existent preset', () => {
       usePresetsStore.getState().applyPreset('nonexistent')
-      expect(usePresetsStore.getState().activePresetId).toBe('full-terminal')
+      expect(usePresetsStore.getState().activePresetId).toBe('full')
     })
   })
 
@@ -129,8 +129,8 @@ describe('usePresetsStore', () => {
     })
 
     it('does not rename default presets', () => {
-      usePresetsStore.getState().renamePreset('full-terminal', 'Hacked')
-      expect(usePresetsStore.getState().presets['full-terminal'].name).toBe('Full Terminal')
+      usePresetsStore.getState().renamePreset('full', 'Hacked')
+      expect(usePresetsStore.getState().presets['full'].name).toBe('Full')
     })
   })
 
@@ -143,15 +143,15 @@ describe('usePresetsStore', () => {
     })
 
     it('does not delete default presets', () => {
-      usePresetsStore.getState().deletePreset('full-terminal')
-      expect(usePresetsStore.getState().presets['full-terminal']).toBeDefined()
+      usePresetsStore.getState().deletePreset('full')
+      expect(usePresetsStore.getState().presets['full']).toBeDefined()
     })
 
-    it('falls back to full-terminal if active preset is deleted', () => {
+    it('falls back to full if active preset is deleted', () => {
       const id = usePresetsStore.getState().saveCurrentAsPreset('Active')
       expect(usePresetsStore.getState().activePresetId).toBe(id)
       usePresetsStore.getState().deletePreset(id)
-      expect(usePresetsStore.getState().activePresetId).toBe('full-terminal')
+      expect(usePresetsStore.getState().activePresetId).toBe('full')
     })
 
     it('keeps activePresetId unchanged if non-active preset is deleted', () => {
@@ -182,8 +182,8 @@ describe('usePresetsStore', () => {
       useChartStore.setState({
         indicators: { ema: false, vwap: false, rvol: false, rsi: false, macd: false, levels: false, sr: false },
       })
-      usePresetsStore.getState().updatePreset('full-terminal')
-      expect(usePresetsStore.getState().presets['full-terminal'].indicators.ema).toBe(true)
+      usePresetsStore.getState().updatePreset('full')
+      expect(usePresetsStore.getState().presets['full'].indicators.ema).toBe(true)
     })
   })
 

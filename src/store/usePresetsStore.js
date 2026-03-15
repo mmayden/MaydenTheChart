@@ -143,7 +143,7 @@ export const usePresetsStore = create((set, get) => ({
 
   /**
    * Delete a custom preset. Default presets cannot be deleted.
-   * If the deleted preset was active, falls back to full-terminal.
+   * If the deleted preset was active, falls back to full.
    */
   deletePreset: (id) => {
     const preset = get().presets[id]
