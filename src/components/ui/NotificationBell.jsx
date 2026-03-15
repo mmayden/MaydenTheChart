@@ -10,6 +10,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useAlertsStore } from '../../store/useAlertsStore'
+import { useChartStore } from '../../store/useChartStore'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -66,6 +67,7 @@ export function NotificationBell({ bars, timeframe }) {
   const panelRef = useRef(null)
 
   const { alerts, addAlert, removeAlert, markTriggered } = useAlertsStore()
+  const selectedSymbol = useChartStore((s) => s.selectedSymbol)
   const activeCount  = alerts.filter((a) => !a.triggered).length
   const currentPrice = bars?.[bars.length - 1]?.close ?? null
 
@@ -91,10 +93,10 @@ export function NotificationBell({ bars, timeframe }) {
       markTriggered(alert.id)
       fireNotification(
         'Loompia — Price Alert',
-        `QQQ ${alert.condition === 'above' ? 'crossed above' : 'crossed below'} $${alert.price.toFixed(2)} · now $${currentPrice.toFixed(2)}`
+        `${selectedSymbol} ${alert.condition === 'above' ? 'crossed above' : 'crossed below'} $${alert.price.toFixed(2)} · now $${currentPrice.toFixed(2)}`
       )
     })
-  }, [currentPrice, alerts, markTriggered])
+  }, [currentPrice, alerts, markTriggered, selectedSymbol])
 
   // ── Check candle-streak alerts ─────────────────────────────────────────────
   // barsLengthAtCreation ensures we only fire on NEW bars, not existing data.

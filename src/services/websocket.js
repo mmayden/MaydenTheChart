@@ -27,7 +27,7 @@ async function fetchCredentials() {
 /**
  * Normalize an Alpaca WebSocket bar to the shape lightweight-charts expects.
  *
- * WS bar shape: { T:'b', S:'QQQ', o, h, l, c, v, t:'2026-03-14T14:30:00Z', n, vw }
+ * WS bar shape: { T:'b', S:'AAPL', o, h, l, c, v, t:'2026-03-14T14:30:00Z', n, vw }
  * Output:       { time (unix seconds), open, high, low, close, volume }
  */
 function normalizeWsBar(bar) {
@@ -45,16 +45,16 @@ function normalizeWsBar(bar) {
  * Create and manage an Alpaca WebSocket connection.
  *
  * @param {Object} options
- * @param {(bar: Object) => void} options.onBar       — called with each normalized bar
- * @param {(status: string) => void} options.onStatus  — 'connecting' | 'authenticated' | 'subscribed' | 'disconnected' | 'error'
+ * @param {(bar: Object) => void} options.onBar        — called with each normalized bar
+ * @param {(status: string) => void} options.onStatus   — 'connecting' | 'authenticated' | 'subscribed' | 'disconnected' | 'error'
+ * @param {() => string} [options.getSymbol]            — returns the current symbol to subscribe to (default: 'QQQ')
  * @returns {{ connect: Function, disconnect: Function }}
  */
-export function createAlpacaSocket({ onBar, onStatus }) {
+export function createAlpacaSocket({ onBar, onStatus, getSymbol }) {
   let ws = null
   let retryCount = 0
   let retryTimer = null
   let intentionalClose = false
-  const subscribedSymbols = ['QQQ']
 
   function connect() {
     if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
@@ -97,9 +97,10 @@ export function createAlpacaSocket({ onBar, onStatus }) {
             if (msg.T === 'success' && msg.msg === 'authenticated') {
               retryCount = 0 // reset on successful auth
               onStatus('authenticated')
+              const symbol = typeof getSymbol === 'function' ? getSymbol() : 'QQQ'
               ws.send(JSON.stringify({
                 action: 'subscribe',
-                bars: subscribedSymbols,
+                bars: [symbol],
               }))
             }
 

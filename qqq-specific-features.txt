@@ -1,0 +1,63 @@
+# QQQ-Specific Features — Saved Reference
+#
+# These features were removed from the active UI to make the chart
+# symbol-agnostic. They can be re-introduced later as QQQ-only features
+# or adapted to work per-symbol.
+#
+# Removed: 2026-03-14
+# Reason:  Preparing base chart for multi-symbol support
+# ────────────────────────────────────────────────────────────────────────
+
+## 1. MacroStatusBar (Minervini-style Market Filter)
+##    File: src/components/ui/MacroStatusBar.jsx (kept in codebase, unused)
+##
+##    Purpose:
+##      Shows QQQ's position relative to its 50-day and 200-day SMAs.
+##      Contextualizes every intraday signal — a bull setup in a bear macro
+##      carries extra risk. Based on Mark Minervini's Trend Template.
+##
+##    Logic:
+##      - Fetches 200+ daily bars for QQQ
+##      - Computes SMA(50) and SMA(200) of daily close
+##      - Bullish:  price > SMA50 > SMA200, both MAs trending up
+##      - Neutral:  price between MAs, or MAs flat
+##      - Bearish:  price < SMA50, SMA200 trending down or price below it
+##
+##    Display:
+##      - "Bull Trend" pill (green) — QQQ above both MAs, 50MA rising
+##      - "Bear Trend" pill (red)   — QQQ below 200MA
+##      - "Mixed" pill (yellow)     — everything else
+##      - Shows % distance from 50MA and 200MA
+##
+##    Props received from App.jsx:
+##      { price, sma50, sma200 }
+##      Computed via useDailyBars() hook → sma(50), sma(200) of daily closes
+##
+##    Re-integration notes:
+##      - Could be made symbol-aware by passing selectedSymbol
+##      - useDailyBars already uses selectedSymbol from the store
+##      - Main value is QQQ-specific context (academic ORB research, Minervini)
+##      - For other symbols, the bull/bear/mixed classification still works
+##        but the QQQ-specific commentary and academic backing doesn't apply
+
+## 2. QQQ Sidebar Gradient Styling
+##
+##    The QQQ symbol label had a custom gradient treatment:
+##      - Dark theme:   blue gradient (#60B4F5 -> #3090D4 -> #0B6AB8)
+##      - Lumpia theme: gold gradient (#F5D060 -> #D4A830 -> #B8860B)
+##      - Font: Inter 800, letter-spacing 0.18em
+##      - CSS class: .qqq-symbol (with background-clip: text for gradient text)
+##      - Drop shadow varied by theme
+##
+##    Replaced with: plain .symbol-display class, standard text styling
+
+## 3. QQQ-Specific Academic Context (informational, not code)
+##
+##    The following research context applies specifically to QQQ:
+##      - ORB (Opening Range Breakout) on QQQ: 33% annualized alpha (SSRN 2023)
+##      - Volume confirmation raises ORB success: ~45% -> ~65% with 1.5x RVOL
+##      - QQQ trades 80-95% of its 14-day ATR in the first few hours most days
+##      - March 2026: QQQ below 200MA = bearish macro bias
+##
+##    These stats are QQQ-specific. The indicators (ORB, ATR, RVOL) still work
+##    on any symbol, but the academic edge validation is QQQ-only.

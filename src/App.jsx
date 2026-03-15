@@ -3,7 +3,7 @@
  *
  * Layout:
  *   ┌──────────┬──────────────────────────────────────────┐
- *   │          │  Header: price | macro | day type        │
+ *   │          │  Header: price | day type | settings     │
  *   │ Sidebar  ├──────────────────────────────────────────┤
  *   │          │                                          │
  *   │ Symbol   │   Main chart (candles + EMA + VWAP)     │
@@ -17,15 +17,15 @@
 import { useRef, useState, useEffect, useMemo } from 'react'
 import { useAlpacaBars } from './hooks/useAlpacaBars'
 import { useAlpacaSocket } from './hooks/useAlpacaSocket'
-import { useDailyBars } from './hooks/useDailyBars'
 import { useChartStore } from './store/useChartStore'
-import { TIMEFRAME_CONFIG, TIMEFRAME_ORDER } from './constants/chart'
+import { TIMEFRAME_CONFIG } from './constants/chart'
 import { atr, getDailyRangeStatus } from './utils/indicators'
 import { getPreviousLevels, classifyDayType, groupBarsByDay } from './utils/levels'
 
 import { CandlestickChart } from './components/chart/CandlestickChart'
 import { TimeframeSelector } from './components/chart/TimeframeSelector'
 import { PriceDisplay } from './components/chart/PriceDisplay'
+import { SymbolInput } from './components/chart/SymbolInput'
 import { EMAOverlay } from './components/indicators/EMAOverlay'
 import { VWAPOverlay } from './components/indicators/VWAPOverlay'
 import { LevelOverlay } from './components/indicators/LevelOverlay'
@@ -34,7 +34,7 @@ import { StatusBar } from './components/ui/StatusBar'
 import { IndicatorToggle } from './components/ui/IndicatorToggle'
 import { ATRGauge } from './components/ui/ATRGauge'
 import { DayTypeBanner } from './components/ui/DayTypeBanner'
-import { MacroStatusBar } from './components/ui/MacroStatusBar'
+// MacroStatusBar removed — QQQ-specific feature, saved in qqq-specific-features.txt
 import { IndicatorTabView } from './components/ui/IndicatorTabView'
 import { NotificationBell } from './components/ui/NotificationBell'
 import Logo from './components/ui/Logo'
@@ -52,7 +52,7 @@ export default function App() {
   const theme             = useChartStore((s) => s.theme)
 
   const { data: bars, isLoading, isError, error, dataUpdatedAt } = useAlpacaBars()
-  const { data: dailyBars } = useDailyBars()
+  const selectedSymbol = useChartStore((s) => s.selectedSymbol)
 
   // Live WebSocket — connects during market hours, injects bars into TanStack cache
   useAlpacaSocket()
@@ -96,13 +96,6 @@ export default function App() {
     return classifyDayType(bars, prevHigh, prevLow)
   }, [bars])
 
-  // ── Macro status ────────────────────────────────────────────────────────────
-  const macro = useMemo(() => {
-    if (!dailyBars || dailyBars.length < 50) return null
-    const price = dailyBars[dailyBars.length - 1].close
-    const sma   = (n) => dailyBars.slice(-n).reduce((s, b) => s + b.close, 0) / Math.min(n, dailyBars.length)
-    return { price, sma50: sma(50), sma200: sma(Math.min(200, dailyBars.length)) }
-  }, [dailyBars])
 
   return (
     <div
@@ -130,25 +123,7 @@ export default function App() {
 
             <div>
               <div className="text-[10px] tracking-widest text-gray-300 font-semibold uppercase mb-1">Symbol</div>
-              <div
-                className="qqq-symbol"
-                style={{
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: '1.3rem',
-                  fontWeight: 800,
-                  letterSpacing: '0.18em',
-                  background: theme === 'dark'
-                    ? 'linear-gradient(160deg, #60B4F5 0%, #3090D4 45%, #0B6AB8 100%)'
-                    : 'linear-gradient(160deg, #F5D060 0%, #D4A830 45%, #B8860B 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  color: 'transparent',
-                  filter: theme === 'dark'
-                    ? 'drop-shadow(0 1px 2px rgba(11,106,184,0.3))'
-                    : 'drop-shadow(0 1px 2px rgba(184,134,11,0.3))',
-                }}
-              >QQQ</div>
+              <SymbolInput />
             </div>
 
             <div className="h-px bg-gray-800" />
@@ -190,7 +165,6 @@ export default function App() {
           {bars && <PriceDisplay bars={bars} />}
           <div className="flex items-center gap-3 ml-auto">
             <NotificationBell bars={bars} timeframe={selectedTimeframe} />
-            <MacroStatusBar price={macro?.price} sma50={macro?.sma50} sma200={macro?.sma200} />
             <DayTypeBanner dayType={dayType} />
             <button
               onClick={() => setSettingsOpen(true)}
@@ -212,7 +186,7 @@ export default function App() {
             <div className="absolute inset-0 flex items-center justify-center z-10 bg-[#0a0a0a]">
               <div className="flex flex-col items-center gap-3">
                 <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                <span className="text-gray-500 text-sm">Loading QQQ…</span>
+                <span className="text-gray-500 text-sm">Loading {selectedSymbol}…</span>
               </div>
             </div>
           )}

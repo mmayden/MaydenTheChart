@@ -18,10 +18,13 @@ export const useChartStore = create((set) => ({
 
 
   // ─── Selection ─────────────────────────────────────────────────────────────
-  selectedSymbol:    DEFAULT_SYMBOL,
+  selectedSymbol: (() => { try { return localStorage.getItem('cheechart-symbol') ?? DEFAULT_SYMBOL } catch { return DEFAULT_SYMBOL } })(),
   selectedTimeframe: DEFAULT_TIMEFRAME,
 
-  setSymbol:    (symbol)    => set({ selectedSymbol: symbol }),
+  setSymbol: (symbol) => {
+    try { localStorage.setItem('cheechart-symbol', symbol) } catch { /* storage unavailable */ }
+    set({ selectedSymbol: symbol })
+  },
   setTimeframe: (timeframe) => set({ selectedTimeframe: timeframe }),
 
   // ─── Indicator toggles ─────────────────────────────────────────────────────

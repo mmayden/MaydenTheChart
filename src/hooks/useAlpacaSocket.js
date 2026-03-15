@@ -54,6 +54,7 @@ function getBucketTime(unixSeconds, timeframeSecs) {
 
 export function useAlpacaSocket() {
   const queryClient = useQueryClient()
+  const selectedSymbol = useChartStore((s) => s.selectedSymbol)
 
   useEffect(() => {
     const { setWsStatus, setMarketOpen } = useChartStore.getState()
@@ -110,6 +111,7 @@ export function useAlpacaSocket() {
     const socket = createAlpacaSocket({
       onBar:    handleBar,
       onStatus: handleStatus,
+      getSymbol: () => useChartStore.getState().selectedSymbol,
     })
     // ── Market hours check — connect/disconnect based on market state ──────
     function syncMarketState() {
@@ -131,7 +133,7 @@ export function useAlpacaSocket() {
       socket.disconnect()
       clearInterval(marketCheckId)
     }
-  }, [queryClient])
+  }, [queryClient, selectedSymbol])
 
   const wsStatus = useChartStore((s) => s.wsStatus)
   const isMarketOpen = useChartStore((s) => s.isMarketOpen)

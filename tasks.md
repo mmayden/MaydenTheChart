@@ -121,13 +121,28 @@
 
 ---
 
-## 🔲 Phase 7 — Stretch Goals
+## ✅ Phase 7a — Multi-Symbol Support (Base) — COMPLETE
+
+- ✅ Stripped QQQ-specific features, saved parameters to `qqq-specific-features.txt`
+- ✅ Removed `MacroStatusBar` from UI (file kept for future re-integration)
+- ✅ Removed macro status computation + `useDailyBars` import from `App.jsx`
+- ✅ `src/components/chart/SymbolInput.jsx` — click-to-edit ticker input (Enter to submit, Escape to cancel, auto-uppercase)
+- ✅ `src/services/websocket.js` — `getSymbol` callback replaces hardcoded `['QQQ']` subscription
+- ✅ `src/components/ui/NotificationBell.jsx` — alert notifications use dynamic `selectedSymbol`
+- ✅ `src/components/ui/SettingsModal.jsx` — subtitle changed to "Appearance"
+- ✅ `src/index.css` — removed `.qqq-symbol` gradient CSS rule
+- ✅ Loading message uses dynamic symbol
+- ✅ 45/45 tests passing, build clean
+
+---
+
+## 🔲 Phase 7b — Stretch Goals
 
 - 🔲 `src/utils/backtest.js` — replay historical days using same indicator math, output win rate / R:R / by day type
 - 🔲 Weekly gap tracking panel (unfilled QQQ weekly gaps with distance from current price)
 - 🔲 Volume profile (horizontal bars at each price level)
 - ✅ Price alert system (browser notification on level hit) — **DONE**: price-level + candle-streak alerts
-- 🔲 Multi-symbol watchlist (NVDA, TSLA, SPY alongside QQQ)
+- ✅ Multi-symbol support (base) — **DONE**: dynamic symbol input, all systems symbol-agnostic
 - 🔲 Bollinger Bands overlay
 - 🔲 RSI divergence detection (auto-annotation)
 
@@ -202,3 +217,17 @@
 - ✅ `CandlestickChart`: `localization.timeFormatter` → crosshair tooltip in ET
 - ✅ `CandlestickChart`: VOL label overlaid above volume bars
 - ✅ `App.jsx`: chart polling uses `chartRef.current` directly (not a captured snapshot) → overlays re-attach correctly after any chart re-creation / HMR
+
+### Multi-Symbol Base — Session 9 (2026-03-14)
+- ✅ Stripped all QQQ-specific hardcoding to prepare for multi-symbol support
+- ✅ Saved QQQ-specific feature parameters to `qqq-specific-features.txt` for future reference
+- ✅ Removed `MacroStatusBar` from header (Minervini-style macro filter — QQQ-specific)
+- ✅ Removed macro status computation + `useDailyBars` import from App.jsx
+- ✅ `src/components/chart/SymbolInput.jsx` — click-to-edit ticker input in sidebar (Enter submits, Escape cancels, auto-uppercase, max 10 chars)
+- ✅ `src/services/websocket.js` — new `getSymbol` callback replaces hardcoded `['QQQ']` subscription
+- ✅ `src/hooks/useAlpacaSocket.js` — passes store's `selectedSymbol` via `getSymbol`
+- ✅ `src/components/ui/NotificationBell.jsx` — alert notifications use dynamic symbol from store
+- ✅ `src/components/ui/SettingsModal.jsx` — subtitle changed from "Cheechart QQQ Terminal" to "Appearance"
+- ✅ `src/index.css` — removed `.qqq-symbol` gradient text CSS rule
+- ✅ `src/App.jsx` — loading message uses dynamic symbol; removed unused `TIMEFRAME_ORDER` import
+- ✅ 45/45 tests passing, build clean
