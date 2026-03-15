@@ -20,6 +20,21 @@ export default function Logo() {
       }}
     >
       CHEECHART
+      <span
+        style={{
+          fontFamily: "'Inter', sans-serif",
+          fontSize: '0.55rem',
+          fontWeight: 800,
+          letterSpacing: '0.12em',
+          marginLeft: '0.4em',
+          verticalAlign: 'super',
+          WebkitTextFillColor: '#9ca3af',
+          background: 'none',
+          filter: 'none',
+        }}
+      >
+        BETA
+      </span>
     </span>
   )
 }

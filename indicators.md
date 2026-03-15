@@ -352,8 +352,9 @@ RSI = 100 - (100 / (1 + RS))
 
 ### Code signature
 ```js
-// returns array of { time, value } (0–100)
-rsi(closes, period = 14)
+// bars sorted oldest → newest, each { time, close }
+// returns { series: [{ time, value }], signal: { value, bias, strength } }
+rsi(bars, period = 14)
 ```
 
 ---

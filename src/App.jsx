@@ -247,11 +247,7 @@ export default function App() {
         </div>
 
         {/* ── Indicator tab strip (RSI / MACD) ────────────────────────────── */}
-        <IndicatorTabView
-          bars={bars}
-          rsiEnabled={indicators.rsi}
-          macdEnabled={indicators.macd}
-        />
+        <IndicatorTabView bars={bars} />
 
         {/* ── Status bar ──────────────────────────────────────────────────── */}
         <div className="flex items-center px-4 py-1.5 border-t border-gray-800 shrink-0">

@@ -159,8 +159,7 @@ Server state (TanStack Query):
 Client state (Zustand store):
   - selectedTimeframe: '5Min'
   - selectedSymbol: 'QQQ'
-  - indicators: { ema: true, vwap: true, bollinger: false, rsi: true, macd: true }
-  - ui: { rsiVisible: true, macdVisible: true }
+  - indicators: { ema: true, vwap: true, rvol: true, rsi: true, macd: true, levels: true, sr: true }
 
 Component state (useState — local only):
   - Hover states, animation, tooltip position
@@ -189,12 +188,11 @@ Component state (useState — local only):
 | `src/components/indicators/VWAPOverlay.jsx` | VWAP + band series |
 | `src/components/indicators/LevelOverlay.jsx` | Prev H/L price lines, ORB zone, ODC as session-scoped LineSeries |
 | `src/components/indicators/SROverlay.jsx` | Support/resistance lines + swing high/low markers |
-| `src/components/indicators/RSIChart.jsx` | RSI in v5 pane |
-| `src/components/indicators/MACDChart.jsx` | MACD in v5 pane |
+| `src/components/ui/IndicatorTabView.jsx` | RSI + MACD toggle buttons and mini charts below main chart |
 | `src/components/ui/ATRGauge.jsx` | Daily range used vs ATR budget gauge |
 | `src/components/ui/DayTypeBanner.jsx` | Trend / Range / Chop live classification |
 | `src/components/ui/MacroStatusBar.jsx` | 50MA / 200MA alignment, macro bias label |
-| `src/components/ui/IndicatorToggle.jsx` | Show/hide toggles for each indicator |
+| `src/components/ui/IndicatorToggle.jsx` | Sidebar show/hide toggles for chart overlays (EMA, VWAP, Levels, S/R, RVOL) |
 | `src/services/websocket.js` | Alpaca WebSocket connection manager — auth, subscribe, reconnect with exponential backoff |
 | `src/hooks/useAlpacaSocket.js` | React hook — connects WS during market hours, aggregates 1-min bars into selected timeframe, injects into TanStack Query cache |
 | `api/ws-auth.js` | Vercel serverless function — returns Alpaca WS credentials, protected by bearer token |
@@ -247,3 +245,4 @@ Component state (useState — local only):
 | 2026-03-14 | ODC line fix: was rendering as full-width price line bleeding across all days. Changed `getOpenOfDay()` to return `{ price, startTime, endTime }`. LevelOverlay now renders ODC as a `LineSeries` scoped to today's session. Build clean. |
 | 2026-03-14 | Indicator deep assessment: 6 fixes — VWAP ET timezone for day reset, ATR %-based strength thresholds, RVOL candle-direction bias, MACD return shape contract, byDay dedup optimization, 32 new levels tests. ODC color amber dashed. 77/77 tests. |
 | 2026-03-14 | QOL phase: CrosshairLegend (OHLCV on hover, ref-based zero-rerender), useToast + ToastContainer (slide-in notifications), useViewportPersistence (preserves zoom during live updates), smooth loading overlay, symbol change toasts. feature-ideas.md for keyboard shortcuts. 77/77 tests, build clean. |
+| 2026-03-15 | UX cleanup: RSI/MACD removed from sidebar IndicatorToggle, now toggled via tab buttons in IndicatorTabView. Removed dead `ui.rsiPaneVisible`/`macdPaneVisible` state from Zustand store. Fixed stale doc references (RSIChart.jsx, MACDChart.jsx, rsi signature). Beta branding: browser tab → "Beta Cheechart", logo shows BETA superscript badge. 77/77 tests, build clean. |

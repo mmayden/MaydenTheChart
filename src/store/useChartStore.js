@@ -16,7 +16,6 @@ export const useChartStore = create((set) => ({
     set({ theme })
   },
 
-
   // ─── Selection ─────────────────────────────────────────────────────────────
   selectedSymbol: (() => { try { return localStorage.getItem('cheechart-symbol') ?? DEFAULT_SYMBOL } catch { return DEFAULT_SYMBOL } })(),
   selectedTimeframe: DEFAULT_TIMEFRAME,
@@ -52,17 +51,4 @@ export const useChartStore = create((set) => ({
   setWsStatus:   (status) => set({ wsStatus: status }),
   setMarketOpen: (open)   => set({ isMarketOpen: open }),
 
-  // ─── UI panels ─────────────────────────────────────────────────────────────
-  ui: {
-    rsiPaneVisible:  true,
-    macdPaneVisible: true,
-  },
-
-  togglePane: (key) =>
-    set((state) => ({
-      ui: {
-        ...state.ui,
-        [key]: !state.ui[key],
-      },
-    })),
 }))

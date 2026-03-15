@@ -10,8 +10,6 @@ const TOGGLES = [
   { key: 'vwap',   label: 'VWAP'   },
   { key: 'rvol',   label: 'RVOL'   },
   { key: 'levels', label: 'Levels' },
-  { key: 'rsi',    label: 'RSI'    },
-  { key: 'macd',   label: 'MACD'   },
   { key: 'sr',     label: 'S/R'    },
 ]
 

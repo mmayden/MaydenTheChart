@@ -1,14 +1,17 @@
 /**
- * IndicatorTabView — Compact tabbed strip below the main chart.
+ * IndicatorTabView — Toggle strip + mini charts below the main chart.
  *
- * Shows RSI or MACD in a fixed-height mini chart (82px tall).
- * Each is its own lightweight-charts instance — the main chart
- * stays full-height with no sub-panes consuming space.
+ * RSI and MACD buttons live here (not in the sidebar IndicatorToggle).
+ * Clicking a button toggles `indicators.rsi` / `indicators.macd` in the
+ * Zustand store. When enabled, a fixed-height mini chart (82px) renders.
+ * Each is its own lightweight-charts instance — the main chart stays
+ * full-height with no sub-panes consuming space.
  */
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { createChart, LineSeries, HistogramSeries } from 'lightweight-charts'
 import { rsi as calcRsi, macd as calcMacd } from '../../utils/indicators'
+import { useChartStore } from '../../store/useChartStore'
 
 const MINI_CHART_OPTS = {
   layout: {
@@ -124,41 +127,46 @@ function MACDMiniChart({ bars }) {
 }
 
 // ── Tab strip ──────────────────────────────────────────────────────────────────
-export function IndicatorTabView({ bars, rsiEnabled, macdEnabled }) {
-  const tabs = [rsiEnabled && 'RSI', macdEnabled && 'MACD'].filter(Boolean)
-  const [activeTab, setActiveTab] = useState('RSI')
+export function IndicatorTabView({ bars }) {
+  const rsiEnabled      = useChartStore((s) => s.indicators.rsi)
+  const macdEnabled     = useChartStore((s) => s.indicators.macd)
+  const toggleIndicator = useChartStore((s) => s.toggleIndicator)
 
-  useEffect(() => {
-    if (tabs.length && !tabs.includes(activeTab)) setActiveTab(tabs[0])
-  }, [tabs.join(',')]) // eslint-disable-line react-hooks/exhaustive-deps
+  const anyVisible = rsiEnabled || macdEnabled
 
-  if (!tabs.length || !bars?.length) return null
+  if (!bars?.length) return null
 
   return (
-    <div className="shrink-0 border-t border-gray-800" style={{ height: 116 }}>
-      {/* Tab buttons */}
+    <div className="shrink-0 border-t border-gray-800">
+      {/* Tab buttons — always visible, clicking toggles on/off */}
       <div className="flex items-center gap-1 px-3 py-1.5 border-b border-gray-800" style={{ backgroundColor: 'var(--bg-surface, #0d1117)' }}>
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={[
-              'px-2.5 py-0.5 text-[10px] font-mono rounded border transition-colors tracking-widest',
-              activeTab === tab
-                ? 'border-blue-500 text-blue-300 bg-blue-950'
-                : 'border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600',
-            ].join(' ')}
-          >
-            {tab}
-          </button>
-        ))}
+        {['RSI', 'MACD'].map((tab) => {
+          const key = tab.toLowerCase()
+          const on  = key === 'rsi' ? rsiEnabled : macdEnabled
+          return (
+            <button
+              key={tab}
+              onClick={() => toggleIndicator(key)}
+              className={[
+                'px-2.5 py-0.5 text-[10px] font-mono rounded border transition-colors tracking-widest',
+                on
+                  ? 'border-blue-500 text-blue-300 bg-blue-950'
+                  : 'border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600',
+              ].join(' ')}
+            >
+              {tab}
+            </button>
+          )
+        })}
       </div>
 
-      {/* Mini chart area */}
-      <div className="w-full bg-[#0a0a0a]" style={{ height: 82 }}>
-        {activeTab === 'RSI'  && <RSIMiniChart  bars={bars} />}
-        {activeTab === 'MACD' && <MACDMiniChart bars={bars} />}
-      </div>
+      {/* Mini chart area — only rendered when at least one is on */}
+      {anyVisible && (
+        <div className="w-full bg-[#0a0a0a]" style={{ height: 82 }}>
+          {rsiEnabled  && <RSIMiniChart  bars={bars} />}
+          {macdEnabled && <MACDMiniChart bars={bars} />}
+        </div>
+      )}
     </div>
   )
 }
