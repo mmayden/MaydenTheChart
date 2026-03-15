@@ -113,29 +113,35 @@ export function OnboardingTour() {
   const tooltipStyle = {}
   const OFFSET = 12
   const TOOLTIP_W = 288 // w-72 = 18rem = 288px
+  const TOOLTIP_H = 180 // approximate max tooltip height
   const PADDING = 12
+
+  function clampX(centerX) {
+    return Math.max(PADDING, Math.min(centerX, window.innerWidth - TOOLTIP_W - PADDING))
+  }
+  function clampY(centerY) {
+    return Math.max(PADDING, Math.min(centerY, window.innerHeight - TOOLTIP_H - PADDING))
+  }
 
   switch (current.placement) {
     case 'bottom': {
-      tooltipStyle.top = rect.bottom + OFFSET
-      const centerX = rect.left + rect.width / 2 - TOOLTIP_W / 2
-      tooltipStyle.left = Math.max(PADDING, Math.min(centerX, window.innerWidth - TOOLTIP_W - PADDING))
+      tooltipStyle.top = Math.min(rect.bottom + OFFSET, window.innerHeight - TOOLTIP_H - PADDING)
+      tooltipStyle.left = clampX(rect.left + rect.width / 2 - TOOLTIP_W / 2)
       break
     }
-    case 'right':
-      tooltipStyle.top = rect.top + rect.height / 2
+    case 'right': {
+      tooltipStyle.top = clampY(rect.top + rect.height / 2 - TOOLTIP_H / 2)
       tooltipStyle.left = rect.right + OFFSET
-      tooltipStyle.transform = 'translateY(-50%)'
       break
-    case 'left':
-      tooltipStyle.top = rect.top + rect.height / 2
+    }
+    case 'left': {
+      tooltipStyle.top = clampY(rect.top + rect.height / 2 - TOOLTIP_H / 2)
       tooltipStyle.right = window.innerWidth - rect.left + OFFSET
-      tooltipStyle.transform = 'translateY(-50%)'
       break
+    }
     default: { // top
-      tooltipStyle.bottom = window.innerHeight - rect.top + OFFSET
-      const centerX2 = rect.left + rect.width / 2 - TOOLTIP_W / 2
-      tooltipStyle.left = Math.max(PADDING, Math.min(centerX2, window.innerWidth - TOOLTIP_W - PADDING))
+      tooltipStyle.bottom = Math.min(window.innerHeight - rect.top + OFFSET, window.innerHeight - PADDING)
+      tooltipStyle.left = clampX(rect.left + rect.width / 2 - TOOLTIP_W / 2)
       break
     }
   }
