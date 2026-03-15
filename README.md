@@ -1,8 +1,8 @@
-# Loompia
+# Lumpia
 
 A professional-grade day trading chart tool for QQQ, built around a specific, validated
-trading system derived from 11 months of real trader analysis. Purpose-built around
-Nick's Previous High/Low framework and validated by academic ORB research.
+trading system. Purpose-built around
+the Previous High/Low framework and validated by academic ORB research.
 
 ---
 
@@ -13,7 +13,7 @@ This is not a generic charting tool. Every feature is intentional:
 - **Previous Day High/Low lines** auto-drawn every morning — the single most important level
 - **15-minute ORB zone** — shaded breakout zone with academic backing (33% annualized alpha on QQQ)
 - **VWAP + 1σ/2σ bands** — institutional-grade intraday levels, not just the line
-- **EMA 9/48/200** in exactly Nick's colors — the directional signal stack
+- **EMA 9/48/200** in the exact colors — the directional signal stack
 - **ATR daily range meter** — prevents chasing exhausted moves
 - **Day type banner** — live Trend / Range / Chop classification
 - **RVOL highlights** — volume confirmation on breakout bars
@@ -39,7 +39,7 @@ This is not a generic charting tool. Every feature is intentional:
 ## Project Structure
 
 ```
-loompia/
+lumpia/
 ├── .roo/
 │   ├── project.md          # Master spec & all decisions
 │   ├── tasks.md            # Phase-by-phase task board
@@ -105,8 +105,8 @@ loompia/
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/yourusername/loompia.git
-cd loompia
+git clone https://github.com/yourusername/lumpia.git
+cd lumpia
 
 # 2. Install dependencies
 npm install

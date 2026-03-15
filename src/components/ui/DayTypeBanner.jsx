@@ -2,7 +2,7 @@
  * DayTypeBanner — Live banner showing current day type classification.
  *
  * Updates in real time as price breaks or holds previous day's H/L.
- * Based on Nick's Rule 1: the single most important daily level framework.
+ * Based on Rule 1: the single most important daily level framework.
  *
  *   Trend Bull  — PDH broken, PDL held → green background
  *   Trend Bear  — PDL broken, PDH held → red background

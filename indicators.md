@@ -1,8 +1,8 @@
-# Indicator Reference — Loompia
+# Indicator Reference — Lumpia
 
 > Math, logic, and trading context for every indicator we build.
 > This is the source of truth Claude uses when writing indicator code.
-> All indicators are validated against Nick's Discord system and academic ORB research.
+> All indicators are validated against the trading system rules and academic ORB research.
 
 ---
 
@@ -33,10 +33,10 @@ with historical bar slices. No duplicate math, ever.
 
 ---
 
-## Previous Day High / Low (Nick's Rule 1)
+## Previous Day High / Low (Rule 1)
 
 ### What it tells you
-The single most important level each day. Nick's entire directional bias framework
+The single most important level each day. The entire directional bias framework
 is built on whether price breaks above the previous day's high or below the previous
 day's low — and which one it breaks first.
 
@@ -104,7 +104,7 @@ getORBZone(bars, orbMinutes = 15, byDay = null)
 ## Open of Day Line
 
 ### What it tells you
-The first bar's open price. Nick references "open of day" constantly as a directional
+The first bar's open price. The "open of day" is used as a directional
 pivot — price reclaiming the open is bullish; price losing the open is bearish.
 
 ### Rendering
@@ -123,23 +123,23 @@ getOpenOfDay(bars, byDay = null)
 
 ---
 
-## EMA — Exponential Moving Average (Nick's Rule 2)
+## EMA — Exponential Moving Average (Rule 2)
 
 ### What it tells you
 EMAs smooth price and weight recent data more heavily. The slope and relationship
-between EMAs define trend direction and momentum. Nick uses three specific EMAs
-with specific colors — these are not negotiable.
+between EMAs define trend direction and momentum. Three specific EMAs
+with specific colors are used — these are not negotiable.
 
-### Nick's EMA Stack
+### EMA Stack
 | EMA | Color | Trading meaning |
 |---|---|---|
 | EMA 9 | **Blue** (#3b82f6) | Short-term momentum, crossover signal trigger |
 | EMA 48 | **Green** (#22c55e) | Medium-term trend direction |
 | EMA 200 | **White** (#e5e7eb) | Long-term bull/bear line — above = bull bias |
 
-### The 4hr EMA Cross (Nick's strongest swing signal)
+### The 4hr EMA Cross (strongest swing signal)
 - EMA 9 crossing EMA 48 on the 4-hour chart = strongest swing entry signal
-- "First time the 4hr crosses is the most reliable" (Nick, multiple times in Discord)
+- "First time the 4hr crosses is the most reliable"
 - Tool should auto-annotate these crosses with arrow markers on the chart
 
 ### Formula
@@ -170,12 +170,12 @@ detectEMACrosses(ema9Series, ema48Series)
 
 ---
 
-## VWAP — Volume Weighted Average Price (Nick's Rule 6)
+## VWAP — Volume Weighted Average Price (Rule 6)
 
 ### What it tells you
 The average price paid weighted by volume. Resets every trading session at 9:30 AM ET.
 Institutional traders benchmark every fill against VWAP — it is the most important
-intraday indicator. Nick uses it as his primary intraday bias pivot.
+intraday indicator, used as the primary intraday bias pivot.
 
 ### Formula
 ```
@@ -198,7 +198,7 @@ Band 2 lower = VWAP - 2 × stdDev
 ### Why the bands matter
 - 2σ upper band: price here = extended/overbought intraday → mean reversion zone
 - 2σ lower band: price here = extended/oversold intraday → mean reversion zone
-- This is Cheech's "play the middle" philosophy made visual
+- This is the "play the middle" philosophy made visual
 - Institutional traders use these bands — this is standard prop desk methodology
 
 ### Rendering
@@ -242,8 +242,8 @@ Range % consumed = (Daily range used / ATR14) × 100
 
 < 50%:   Plenty of range left — conditions favorable for breakout trades
 50–80%:  Getting extended — be selective
-80–95%:  Late in range — Nick says "this is a tight day, no reason to trade"
-> 100%:  High volatility expansion day — this is Nick's "expect big move" signal
+80–95%:  Late in range — "this is a tight day, no reason to trade"
+> 100%:  High volatility expansion day — "expect big move" signal
 ```
 
 ### Rendering (ATR Gauge component)
@@ -268,7 +268,7 @@ getDailyRangeStatus(todayBars, atr14Value)
 
 ### What it tells you
 Every trading day is one of three types. Knowing which type you're in changes
-your entire approach. Nick's rule about "both levels hit" is the chop signal.
+your entire approach. The rule about "both levels hit" is the chop signal.
 
 ### Logic
 ```
@@ -461,8 +461,7 @@ All bullish signals carry extra risk in this context
 
 ## Reading It All Together — The Mastery Layer
 
-This is what Nick does on his best days, and what separates skilled chart reading
-from guessing.
+This is what separates skilled chart reading from guessing.
 
 ### High-probability long setup
 1. Macro status: Bull trend (or neutral, not deep bear)

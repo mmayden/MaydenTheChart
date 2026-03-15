@@ -68,7 +68,7 @@ body,
   color: var(--text-primary);
 }
 
-/* ── Loompia theme: Tailwind class overrides ─────────────────────────────── */
+/* ── Lumpia theme: Tailwind class overrides ──────────────────────────────── */
 
 [data-theme="lumpia"] .border-gray-800 { border-color: var(--border) !important; }
 [data-theme="lumpia"] .border-gray-700 { border-color: var(--border-mid) !important; }

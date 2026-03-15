@@ -2,7 +2,7 @@
  * levels.js — Price level detection from bar data.
  *
  * Handles:
- *   - Previous Day High/Low (Nick's Rule 1 — the backbone of everything)
+ *   - Previous Day High/Low (Rule 1 — the backbone of everything)
  *   - Opening Range Breakout zone (first 15 minutes, 9:30–9:45 AM ET)
  *   - Open of Day candle (ODC) price
  *   - Day type classification (Trend/Range/Chop)
@@ -31,7 +31,7 @@ export function groupBarsByDay(bars) {
 }
 
 /**
- * Get the previous trading day's high and low (Nick's Rule 1 levels).
+ * Get the previous trading day's high and low (Rule 1 levels).
  * Also returns weekly high/low from the most recent 5 trading days.
  *
  * @param {Array<{time, high, low, close}>} bars - sorted oldest → newest, ≥2 trading days
@@ -141,7 +141,7 @@ export function getORBZone(bars, orbMinutes = 15, byDay = null) {
 }
 
 /**
- * Classify the current day type based on Nick's Rule 1.
+ * Classify the current day type based on Rule 1.
  *
  * @param {Array<{time, high, low, close}>} bars - all bars including today
  * @param {number} prevHigh - previous day's high

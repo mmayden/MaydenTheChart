@@ -3,7 +3,7 @@
  * Single source of truth. Never hardcode these in components.
  */
 
-// ─── Nick's exact EMA colors — DO NOT CHANGE ─────────────────────────────────
+// ─── EMA colors — DO NOT CHANGE ──────────────────────────────────────────────
 export const EMA_COLORS = {
   9:   '#3b82f6',  // blue  — short-term momentum
   48:  '#22c55e',  // green — medium-term trend
@@ -48,7 +48,7 @@ export const RVOL_THRESHOLD    = 1.5
 // alpacaTimeframe: the string Alpaca's API expects
 // limit: max bars to request
 // intraday: whether VWAP/ORB/levels are shown
-// showVWAP: hide VWAP on higher timeframes per Nick's rules
+// showVWAP: hide VWAP on higher timeframes per trading system rules
 
 export const TIMEFRAME_CONFIG = {
   '1Min': {

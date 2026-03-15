@@ -1,6 +1,6 @@
 /**
  * EMAOverlay — Adds EMA 9, 48, 200 line series to the chart.
- * Uses Nick's exact colors from constants/chart.js.
+ * Uses the EMA colors from constants/chart.js.
  *
  * Receives the chart instance via prop (passed down from App/ChartContainer).
  * Adds series on mount, removes on unmount, updates data when bars change.

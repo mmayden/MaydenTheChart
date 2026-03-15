@@ -1,4 +1,4 @@
-# Git Conventions — Loompia
+# Git Conventions — Lumpia
 
 > Follow these rules every session. Claude will remind you when to branch, commit, and PR.
 
@@ -65,7 +65,7 @@ Follow **Conventional Commits** spec: `type(scope): description`
 ### Examples
 ```bash
 git commit -m "feat(chart): add candlestick chart with lightweight-charts v5"
-git commit -m "feat(indicators): add EMA 9/48/200 overlays in Nick's colors"
+git commit -m "feat(indicators): add EMA 9/48/200 overlays with exact colors"
 git commit -m "feat(levels): add previous day high/low lines and ORB zone"
 git commit -m "fix(vwap): reset calculation at market open each day"
 git commit -m "feat(ui): add ATR gauge and day type banner"
@@ -163,7 +163,7 @@ git add .
 git commit -m "chore: init vite react project"
 
 # Set up remote (after creating repo on github.com)
-git remote add origin https://github.com/yourusername/loompia.git
+git remote add origin https://github.com/yourusername/lumpia.git
 git push -u origin main
 
 # Set up develop branch

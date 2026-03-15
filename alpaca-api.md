@@ -1,4 +1,4 @@
-# Alpaca API Reference — Loompia
+# Alpaca API Reference — Lumpia
 
 > Notes on every endpoint we use. Keep updated as quirks are discovered.
 
@@ -130,9 +130,9 @@ wss://stream.data.alpaca.markets/v2/iex
 |---|---|---|---|
 | 1m | `1Min` | 390 (1 trading day) | Scalping, ORB entry |
 | 5m | `5Min` | 390 (2 trading days) | Day trading, VWAP |
-| 15m | `15Min` | 400 (5 trading days) | Day trading, Nick's intraday |
+| 15m | `15Min` | 400 (5 trading days) | Day trading, intraday setups |
 | 1h | `1Hour` | 390 (2–3 weeks) | Swing context |
-| 4h | `4Hour` | 200 (1 month+) | Nick's swing EMA crosses |
+| 4h | `4Hour` | 200 (1 month+) | Swing EMA crosses |
 | 1D | `1Day` | 252 (1 year) | Macro context, gap tracking |
 
 **Note:** For VWAP and ATR calculations, always fetch extra bars beyond what's displayed

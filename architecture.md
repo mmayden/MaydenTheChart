@@ -1,4 +1,4 @@
-# Architecture — Loompia
+# Architecture — Lumpia
 
 ---
 
@@ -185,7 +185,7 @@ function CandlestickChart({ bars }) {
 
 ## Color System
 
-All colors defined in `src/constants/chart.js`. Nick's exact EMA colors are non-negotiable.
+All colors defined in `src/constants/chart.js`. The exact EMA colors are non-negotiable.
 
 ```js
 export const COLORS = {
@@ -200,7 +200,7 @@ export const COLORS = {
   bullish: '#22c55e',
   bearish: '#ef4444',
 
-  // Nick's EMA stack — do not change these colors
+  // EMA stack — do not change these colors
   ema9:   '#3b82f6',   // blue
   ema48:  '#22c55e',   // green
   ema200: '#e5e7eb',   // white

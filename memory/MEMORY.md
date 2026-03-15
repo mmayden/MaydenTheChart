@@ -1,4 +1,4 @@
-# Loompia — Session Memory
+# Lumpia — Session Memory
 
 ## Project Docs Location
 All spec docs are in the ROOT (not .roo/): project.md, tasks.md, indicators.md, architecture.md
@@ -18,7 +18,7 @@ All Phase 1 files built and tested:
 - src/services/alpaca.js + queryClient.js
 - src/hooks/useAlpacaBars.js
 - src/store/useChartStore.js
-- src/constants/chart.js — all colors (Nick's EMA colors locked), timeframe configs
+- src/constants/chart.js — all colors (EMA colors locked), timeframe configs
 - src/components/chart/CandlestickChart.jsx — lw-charts v5, forwardRef pattern
 - src/components/indicators/EMAOverlay, VWAPOverlay, LevelOverlay
 - src/components/ui/StatusBar, IndicatorToggle

@@ -1,4 +1,4 @@
-# Project Health Audit — Loompia / Cheechart
+# Project Health Audit — Lumpia / Cheechart
 
 > Reusable top-down assessment template. Run this at any milestone to get a consistent health snapshot.
 > Last run: 2026-03-15

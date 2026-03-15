@@ -14,9 +14,9 @@ export default {
           muted:   '#374151',
         },
         ema: {
-          9:   '#3b82f6',   // blue  — Nick's EMA 9
-          48:  '#22c55e',   // green — Nick's EMA 48
-          200: '#e5e7eb',   // white — Nick's EMA 200
+          9:   '#3b82f6',   // blue  — EMA 9
+          48:  '#22c55e',   // green — EMA 48
+          200: '#e5e7eb',   // white — EMA 200
         },
         vwap: '#06b6d4',    // cyan
         level: '#eab308',   // gold — prev day H/L

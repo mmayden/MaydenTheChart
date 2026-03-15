@@ -1,4 +1,4 @@
-# Security Standards — Loompia
+# Security Standards — Lumpia
 
 > Follow these rules every session without exception.
 > Security is non-negotiable even on a learning project.

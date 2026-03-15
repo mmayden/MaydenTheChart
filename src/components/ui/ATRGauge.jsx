@@ -3,7 +3,7 @@
  *
  * < 50%:  green  — plenty of range, conditions good for breakout trades
  * 50-80%: yellow — getting extended, be selective
- * 80%+:   red    — late in range, Nick says "no reason to trade"
+ * 80%+:   red    — late in range, no reason to trade
  * 100%+:  red + flashing — high volatility day, expect big move
  *
  * Receives pre-computed { atrValue, rangeUsed, percentConsumed } from parent.

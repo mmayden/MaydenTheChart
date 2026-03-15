@@ -1,4 +1,4 @@
-# Project Spec — Loompia
+# Project Spec — Lumpia
 
 > Claude reads this file at the start of every session to restore full context.
 > Update this file whenever a major decision is made.
@@ -8,10 +8,9 @@
 ## What We're Building
 
 A professional day trading chart terminal for QQQ (Nasdaq 100 ETF) using real Alpaca paper
-trading data. The goal is a tool that encodes the actual trading system used by Nick and
-CheechyMonkey from the Bulls & Bears Discord — validated against academic research and
-professional trader consensus — into a visual interface that makes high-probability setups
-obvious and low-probability conditions clearly flagged.
+trading data. The goal is a tool that encodes a rules-based trading system — validated
+against academic research and professional trader consensus — into a visual interface that
+makes high-probability setups obvious and low-probability conditions clearly flagged.
 
 This is not a generic charting tool. It is purpose-built around a specific, documented,
 rules-based system with a proven academic edge (ORB strategy on QQQ, 33% annualized alpha
@@ -22,7 +21,7 @@ per Concretum Group/SSRN research, 2016–2023).
 ## User Profile
 
 - Learning day trading / technical analysis from scratch
-- Studying QQQ specifically — familiar with Nick's Discord system (Bulls & Bears)
+- Studying QQQ specifically — familiar with the rules-based trading system
 - Comfortable in VS Code
 - Has Alpaca paper trading account with API keys ready
 - Node.js + npm installed
@@ -49,13 +48,7 @@ per Concretum Group/SSRN research, 2016–2023).
 
 ## The Trading System We're Encoding
 
-### Source
-11 months of Discord analysis (April 2025 – March 2026), Bulls & Bears #qqq-analysis channel.
-Primary analyst: Nick (1,736 messages). Secondary: CheechyMonkey (784 messages).
-Cross-validated against academic ORB research, ATR methodology, and Minervini market health
-framework.
-
-### Nick's Core Rules
+### Core Trading Rules
 
 **Rule 1 — Previous High/Low Bias (the backbone of everything)**
 - Break above previous day's high → bullish day, do NOT expect previous low to be revisited
@@ -64,7 +57,7 @@ framework.
 - Applied fractally across all timeframes: daily, weekly, monthly, quarterly — same rule scales up
 
 **Rule 2 — EMA Stack (direction confirmation)**
-- EMA 9 (blue), EMA 48 (green), EMA 200 (white) — Nick's exact colors, do not change
+- EMA 9 (blue), EMA 48 (green), EMA 200 (white) — exact colors, do not change
 - EMA 9 crossing EMA 48 = directional signal on any timeframe
 - **4-hour EMA cross is the strongest swing signal** — "first time 4hr crosses is most reliable"
 - Wait for the cross as entry confirmation; never anticipate it
@@ -81,7 +74,7 @@ framework.
 
 **Rule 5 — Timeframe Hierarchy**
 - 5min / 15min: intraday scalp entry signals (noisy, use for entry timing only)
-- 4hr: swing signals (reliable, especially EMA crosses — Nick's primary swing timeframe)
+- 4hr: swing signals (reliable, especially EMA crosses — the primary swing timeframe)
 - Daily / Weekly / Monthly: macro context and major level identification
 
 **Rule 6 — VWAP as intraday pivot**
@@ -90,7 +83,7 @@ framework.
 - Bounce off VWAP = high-probability entry point
 - VWAP only meaningful on intraday timeframes (1m, 5m, 15m) — hide on 4h/1D
 
-### CheechyMonkey's Complementary Philosophy
+### Complementary Trading Philosophy
 - Reactive not predictive — "let the move show you what to do"
 - Play the middle, take base hits not home runs
 - Never add to a losing position; cut losses without hesitation
@@ -101,7 +94,7 @@ framework.
 - ORB (Opening Range Breakout) strategy on QQQ studied by Concretum Group (SSRN, 2023)
 - 2016–2023 backtest including two bear markets: **33% annualized alpha** net of commissions
 - Volume confirmation raises breakout success rate: ~45% (no volume filter) → ~65% (1.5x avg volume) = 20 percentage point edge
-- Nick's system is a rules-based ORB + EMA confirmation + multi-timeframe structure — this is a documented, backtested approach
+- The system is a rules-based ORB + EMA confirmation + multi-timeframe structure — this is a documented, backtested approach
 
 ---
 
@@ -116,12 +109,12 @@ These make the tool functional. Without them, nothing else matters.
 | Volume bars (green up / red down) | Confirms breakout strength; colored by candle direction |
 | **Relative Volume (RVOL) math** | Volume 1.5x+ daily average = institutional conviction; available for backtester and future RVOL toggle |
 | Timeframe switcher (1m, 5m, 15m, 1h, 4h, 1D) | Multi-timeframe analysis is the entire system |
-| **Previous day High/Low lines** | Nick's Rule 1 — drawn automatically every morning; most important level |
+| **Previous day High/Low lines** | Rule 1 — drawn automatically every morning; most important level |
 | **15-minute Opening Range zone** | Shaded box for first 15 min of session; ORB zone validated by SSRN research |
-| **Open of day line** | Nick references ODC (open of day) constantly as directional pivot |
-| VWAP line (intraday, resets 9:30 AM ET daily) | Nick's Rule 6 — the intraday pivot |
-| **VWAP ± 1σ and 2σ bands** | Institutional standard: 2σ band = mean reversion zone; anchors Cheech's "play the middle" |
-| EMA 9 (blue), EMA 48 (green), EMA 200 (white) | Nick's exact EMA stack with his exact colors |
+| **Open of day line** | ODC (open of day) is used as a directional pivot |
+| VWAP line (intraday, resets 9:30 AM ET daily) | Rule 6 — the intraday pivot |
+| **VWAP ± 1σ and 2σ bands** | Institutional standard: 2σ band = mean reversion zone; anchors "play the middle" philosophy |
+| EMA 9 (blue), EMA 48 (green), EMA 200 (white) | The exact EMA stack with the exact colors |
 | Live price display + % change | Basic UX |
 
 ### Tier 2 — Intelligence Layer (Phases 3–4)
@@ -134,17 +127,32 @@ These are what make this tool better than a generic charting platform.
 | **ATR daily range meter** | Shows "range used today vs. 14-day ATR budget" as a gauge — prevents chasing exhausted moves; research shows QQQ trades 80–95% of ATR in first few hours on most days |
 | **Macro health status bar** | QQQ vs. 50MA and 200MA, both trending up/down — Minervini-style market filter; contextualizes every signal |
 | **Day type banner** | Real-time classification: Trend Day / Range Day / Chop — updates as price breaks or holds prev H/L |
-| **4hr EMA cross annotations** | Auto arrow marker on chart when 4hr EMA 9 crosses EMA 48 — Nick's strongest swing signal, visualized automatically |
+| **4hr EMA cross annotations** | Auto arrow marker on chart when 4hr EMA 9 crosses EMA 48 — the strongest swing signal, visualized automatically |
 | Auto support & resistance levels | Pivot point method, clustered by proximity, labeled with price |
 | Swing high / swing low markers | Dots at confirmed swing points |
 
-### Tier 3 — Advanced / Stretch (Phase 5+)
+### Tier 3 — Chart Presets + Workspaces (Phase 8)
+Lightweight saved layout system — the #1 UX gap across all major charting platforms.
+
 | Feature | Why it's here |
 |---|---|
-| Weekly gap tracking panel | Nick tracks these manually; a panel showing unfilled QQQ weekly gaps would be uniquely useful |
+| **Saved chart presets** | Serialize indicator toggles + timeframe + theme under a named preset. Switch strategies in one click — solves the #1 trader complaint (settings not persisting). Symbol floats freely (not tied to preset), matching TradingView's consensus model. |
+| **Default presets shipped** | "Full Terminal" (everything on), "Clean" (candles + volume only), "Scalp" (VWAP + EMAs, 5m default), "Swing" (EMAs + S/R + levels, 4h default) — instant onboarding value |
+| **Save / rename / delete custom presets** | User creates their own presets from current toggle state via "Save Current as..." |
+| **Sidebar preset dropdown** | Prominent dropdown above indicator toggles — zero-click discovery vs TradingView's buried menus |
+| **localStorage persistence** | Auto-persist on every change — no manual save button, no multi-tab bugs, no "settings vanished overnight" |
+
+### Tier 4 — Advanced / Stretch (Phase 9+)
+| Feature | Why it's here |
+|---|---|
+| Backtester (`src/utils/backtest.js`) | Replay historical days using same indicator math — win rate, R:R, by day type. Validates the system with the same math the live chart uses. |
+| Weekly gap tracking panel | A panel showing unfilled QQQ weekly gaps would be uniquely useful |
 | Volume profile (horizontal) | Price levels with most traded volume = strongest S/R |
-| Price alert system | Browser notification when price hits a user-defined level |
-| Multi-symbol watchlist | Not just QQQ — NVDA, TSLA, SPY, etc. |
+| Bollinger Bands overlay | Mean reversion bands, complements VWAP σ bands |
+| RSI divergence detection | Auto-annotate when price makes new high but RSI doesn't (and vice versa) |
+| Alert sets per preset | Tie alert configurations to presets — huge pain point on every platform |
+| Instrument linking (multi-chart) | Change symbol in one panel, all linked panels follow — thinkorswim's beloved feature |
+| Cloud sync / preset export | Multi-device persistence, preset sharing between traders |
 
 ---
 
@@ -160,6 +168,8 @@ Client state (Zustand store):
   - selectedTimeframe: '5Min'
   - selectedSymbol: 'QQQ'
   - indicators: { ema: true, vwap: true, rvol: true, rsi: true, macd: true, levels: true, sr: true }
+  - activePreset: 'full-terminal'        // currently applied preset name
+  - presets: { ... }                     // saved presets (persisted to localStorage)
 
 Component state (useState — local only):
   - Hover states, animation, tooltip position
@@ -203,6 +213,9 @@ Component state (useState — local only):
 | `src/hooks/useToast.js` | Zustand toast notification store (add/remove/auto-dismiss) |
 | `src/hooks/useViewportPersistence.js` | Preserves chart zoom/scroll across live data updates |
 | `src/hooks/useKeyboardShortcuts.js` | Global keyboard shortcuts (1-6 for timeframes) |
+| `src/store/usePresetsStore.js` | *(Phase 8)* Zustand preset store — save/load/rename/delete named presets, localStorage persistence |
+| `src/components/ui/PresetSelector.jsx` | *(Phase 8)* Sidebar dropdown — switch presets, "Save Current as...", rename/delete |
+| `src/constants/presets.js` | *(Phase 8)* Default preset definitions (Full Terminal, Clean, Scalp, Swing) |
 | `src/constants/chart.js` | All colors, periods, timeframe configs |
 | `src/main.jsx` | App entry: QueryClientProvider, validateEnv() call |
 | `src/App.jsx` | Root layout and routing |
@@ -211,7 +224,7 @@ Component state (useState — local only):
 
 ## Current Status
 
-- [x] Project initialized (Vite 7 + React 18, scaffolded directly in Loompia/)
+- [x] Project initialized (Vite 7 + React 18, scaffolded directly in Lumpia/)
 - [x] Dependencies installed (lightweight-charts v5, axios, zustand, @tanstack/react-query v5, tailwind, vitest)
 - [x] Git initialized, first commit on `main` — 36 files, 33/33 tests passing, clean build
 - [x] `.env` configured with Alpaca paper keys
@@ -228,6 +241,7 @@ Component state (useState — local only):
 - [x] Full project health audit (reusable audit.md template, 8-category assessment)
 - [x] P0–P3 audit fixes: ErrorBoundary, input validation, security headers, shared timezone.js, mini chart extraction, alert hook extraction, WS auto-recovery, dead code cleanup, doc sync
 - [x] 82/82 tests passing, build clean
+- [ ] Phase 8 — Saved chart presets (lightweight layout system with default + custom presets)
 
 ---
 
@@ -236,7 +250,7 @@ Component state (useState — local only):
 | Date | What was done |
 |---|---|
 | 2026-03-13 | Project scoped, initial structure and all docs written |
-| 2026-03-13 | Deep research: compared Nick's system vs. ORB research, Minervini, ATR methodology, 2026 React stack. Stack upgraded to v5 + Zustand + TanStack Query. All docs finalized. |
+| 2026-03-13 | Deep research: compared the trading system vs. ORB research, Minervini, ATR methodology, 2026 React stack. Stack upgraded to v5 + Zustand + TanStack Query. All docs finalized. |
 | 2026-03-13 | Phase 1 fully built: all indicator math, data layer, chart components, overlays, 33 unit tests, first git commit. Blocked on .env setup — Alpaca key UI unclear. |
 | 2026-03-13 | Phase 3 built: RSI/MACD panes, ATR gauge, day type banner, sidebar layout, indicator tabs, visibility toggles, DST fixes. Committed. |
 | 2026-03-13 | Alert system (Tier 3): NotificationBell in header, price-level alerts, candle-streak alerts (N consecutive same-color candles), browser notifications, Zustand store. |
@@ -255,3 +269,4 @@ Component state (useState — local only):
 | 2026-03-15 | Keyboard shortcut stability: debounced rapid keypresses (150ms) in useKeyboardShortcuts to prevent chart blackout from rapid timeframe spam. Added cancelQueries() before invalidation to abort stale in-flight fetches. Added keepPreviousData to useAlpacaBars so chart shows stale data during transitions instead of flashing black. Build clean. |
 | 2026-03-15 | Code health audit: 3 bug fixes (ResizeObserver null guards in CandlestickChart + IndicatorTabView, toast ID collision → crypto.randomUUID()), 3 smell fixes (shared normalizeBar utility deduplicating 3 files, LevelOverlay accepts pre-computed byDay prop, SettingsModal Escape key close). 77/77 tests, build clean. |
 | 2026-03-15 | Full project health audit: created reusable audit.md template (10 categories), ran 8 parallel agents across build/architecture/code quality/security/performance/resilience/testing/docs. P0 fixes: React ErrorBoundary, /api/bars input validation, vercel.json security headers. P1 fixes: shared timezone.js, chart.js constants wired into indicators, console gating, dead file deletion, RSI Infinity fix, doc signature sync. P2 fixes: RSIMiniChart/MACDMiniChart extracted, useToast moved to store/, useAlertChecker hook extracted from NotificationBell, App.jsx Zustand subscriptions narrowed. P3: WS auto-recovery after max retries. P4: normalizeBar tests added. 82/82 tests, build clean. |
+| 2026-03-15 | Phase 8 design: researched TradingView/thinkorswim/NinjaTrader/Webull/Sierra Chart layout systems. Consensus: layout = indicator config + style + timeframe, symbol floats freely. #1 trader complaint = settings not persisting. Designed lightweight preset system (Zustand + localStorage, sidebar dropdown, 4 default presets). Updated project.md, tasks.md, CLAUDE.md with Phase 8 plan. |

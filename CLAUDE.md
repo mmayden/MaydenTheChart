@@ -1,4 +1,4 @@
-# Loompia — Claude Session Instructions
+# Lumpia — Claude Session Instructions
 
 ## Start of every session
 Read these files in order before doing anything else:
@@ -33,7 +33,7 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - Level math: `src/utils/levels.js`
 - S/R detection: `src/utils/supportResistance.js`
 - Zustand store: `src/store/useChartStore.js`
-- Constants (Nick's EMA colors etc): `src/constants/chart.js`
+- Constants (EMA colors etc): `src/constants/chart.js`
 - Main chart: `src/components/chart/CandlestickChart.jsx`
 - Symbol input + autocomplete: `src/components/chart/SymbolInput.jsx`
 - Crosshair OHLCV legend: `src/components/ui/CrosshairLegend.jsx`
@@ -43,6 +43,9 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - RSI/MACD toggle + mini charts: `src/components/ui/IndicatorTabView.jsx` + `RSIMiniChart.jsx` + `MACDMiniChart.jsx`
 - Keyboard shortcuts (1-6 timeframes): `src/hooks/useKeyboardShortcuts.js`
 - Sidebar indicator toggles (overlays only): `src/components/ui/IndicatorToggle.jsx`
+- Preset store (Phase 8): `src/store/usePresetsStore.js`
+- Preset selector UI (Phase 8): `src/components/ui/PresetSelector.jsx`
+- Default preset definitions (Phase 8): `src/constants/presets.js`
 - Alert system: `src/store/useAlertsStore.js` + `src/components/ui/NotificationBell.jsx` + `src/hooks/useAlertChecker.js`
 - Error boundary: `src/components/ui/ErrorBoundary.jsx`
 - Logo: `src/components/ui/Logo.jsx`

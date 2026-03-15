@@ -1,6 +1,6 @@
 /**
  * VWAPOverlay — VWAP line + 1σ and 2σ bands.
- * Only shown on intraday timeframes per Nick's Rule 6.
+ * Only shown on intraday timeframes per the trading system rules.
  * Hidden automatically on 4h/1D.
  */
 
