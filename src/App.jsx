@@ -16,6 +16,7 @@
 
 import { useRef, useState, useEffect, useMemo } from 'react'
 import { useAlpacaBars } from './hooks/useAlpacaBars'
+import { useDailyBars } from './hooks/useDailyBars'
 import { useAlpacaSocket } from './hooks/useAlpacaSocket'
 import { useChartStore } from './store/useChartStore'
 import { TIMEFRAME_CONFIG } from './constants/chart'
@@ -52,6 +53,7 @@ export default function App() {
   const theme             = useChartStore((s) => s.theme)
 
   const { data: bars, isLoading, isError, error, dataUpdatedAt } = useAlpacaBars()
+  const { data: dailyBars } = useDailyBars()
   const selectedSymbol = useChartStore((s) => s.selectedSymbol)
 
   // Live WebSocket — connects during market hours, injects bars into TanStack cache
@@ -78,15 +80,18 @@ export default function App() {
   }, [])
 
   // ── ATR gauge values ────────────────────────────────────────────────────────
+  // ATR(14) must come from daily bars so the "budget" is the 14-day average
+  // true range — not 14 intraday candles. Today's range used comes from the
+  // current timeframe's bars (intraday session high − low).
   const atrGauge = useMemo(() => {
-    if (!bars?.length) return null
-    const { series: atrSeries } = atr(bars, 14)
+    if (!dailyBars?.length || !bars?.length) return null
+    const { series: atrSeries } = atr(dailyBars, 14)
     if (!atrSeries.length) return null
     const atr14 = atrSeries[atrSeries.length - 1].value
     const byDay = groupBarsByDay(bars)
     const days  = Array.from(byDay.keys()).sort()
     return getDailyRangeStatus(byDay.get(days[days.length - 1]) ?? [], atr14)
-  }, [bars])
+  }, [dailyBars, bars])
 
   // ── Day type classification ─────────────────────────────────────────────────
   const dayType = useMemo(() => {

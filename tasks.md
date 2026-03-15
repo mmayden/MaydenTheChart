@@ -151,6 +151,15 @@
 
 ---
 
+## ✅ ATR Gauge Fix — Daily ATR(14) (2026-03-14)
+
+- ✅ ATR gauge was computing ATR(14) from intraday bars (e.g. 14 five-minute candles) instead of 14 daily candles
+- ✅ Re-added `useDailyBars` import to `App.jsx` — needed for ATR budget calculation (was removed in Phase 7a because macro status bar was the only consumer)
+- ✅ `atrGauge` useMemo now uses `dailyBars` for ATR(14) and intraday `bars` for today's session range
+- ✅ 45/45 tests passing, build clean
+
+---
+
 ## 🔲 Phase 7b — Stretch Goals
 
 - 🔲 `src/utils/backtest.js` — replay historical days using same indicator math, output win rate / R:R / by day type
