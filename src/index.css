@@ -49,6 +49,7 @@ body,
   --hover-bg:     #1f2937;
   --accent:       #60a5fa;
   --accent-dim:   #172554;
+  --symbol-color: #93c5fd;
 }
 
 [data-theme="terminal"] {
@@ -61,6 +62,7 @@ body,
   --hover-bg:     #0e180e;
   --accent:       #50d050;
   --accent-dim:   #0a280a;
+  --symbol-color: #7aff7a;
 }
 
 [data-theme="lumpia"] {
@@ -73,6 +75,7 @@ body,
   --hover-bg:     #181208;
   --accent:       #C85818;
   --accent-dim:   #481808;
+  --symbol-color: #E8A060;
 }
 
 /* Shell backgrounds (root + sidebar) — set via inline style in components */

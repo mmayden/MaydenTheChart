@@ -62,10 +62,10 @@ export function TopNav() {
       className="flex items-center gap-2 px-3 h-11 border-b border-theme shrink-0"
       style={{ backgroundColor: 'var(--bg-surface)' }}
     >
-      {/* Mobile hamburger */}
+      {/* Sidebar toggle */}
       <button
         onClick={toggleSidebar}
-        className="md:hidden flex items-center justify-center w-8 h-8 rounded text-theme-muted hover:text-theme hover:bg-theme-hover transition-colors touch-target"
+        className="flex items-center justify-center w-8 h-8 rounded text-theme-muted hover:text-theme hover:bg-theme-hover transition-colors touch-target"
         title="Toggle sidebar"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">

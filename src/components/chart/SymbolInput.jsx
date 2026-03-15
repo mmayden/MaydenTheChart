@@ -22,7 +22,7 @@ const SYMBOL_FONT = {
   fontSize: '1.3rem',
   fontWeight: 800,
   letterSpacing: '0.12em',
-  color: 'var(--text-primary)',
+  color: 'var(--symbol-color)',
 }
 
 const USAGE_KEY = 'cheechart-symbol-usage'

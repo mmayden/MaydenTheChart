@@ -13,9 +13,9 @@ import { IndicatorToggle } from '../ui/IndicatorToggle'
 import { ATRGauge } from '../ui/ATRGauge'
 
 export function Sidebar({ atrGauge }) {
-  const sidebarOpen   = useChartStore((s) => s.sidebarOpen)
+  const sidebarOpen    = useChartStore((s) => s.sidebarOpen)
   const setSidebarOpen = useChartStore((s) => s.setSidebarOpen)
-  const theme         = useChartStore((s) => s.theme)
+  const theme          = useChartStore((s) => s.theme)
 
   return (
     <>
@@ -31,18 +31,10 @@ export function Sidebar({ atrGauge }) {
         className={`
           flex flex-col shrink-0 border-r border-theme transition-all duration-200 overflow-hidden z-40
           fixed md:relative inset-y-0 left-0
-          ${sidebarOpen ? 'w-48 translate-x-0' : 'w-0 -translate-x-full md:w-10 md:translate-x-0'}
+          ${sidebarOpen ? 'w-48 translate-x-0' : 'w-0 -translate-x-full md:w-0 md:translate-x-0'}
         `}
         style={{ backgroundColor: 'var(--bg-surface)' }}
       >
-        {/* Collapse toggle — desktop only */}
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="hidden md:flex items-center justify-center h-11 border-b border-theme text-theme hover:text-theme hover:bg-theme-hover transition-colors shrink-0 text-xs font-semibold touch-target"
-        >
-          {sidebarOpen ? '◀' : '▶'}
-        </button>
-
         <div
           className="flex flex-col gap-5 px-3 py-4 overflow-y-auto flex-1 transition-opacity duration-200"
           style={{
@@ -52,7 +44,7 @@ export function Sidebar({ atrGauge }) {
           }}
         >
           <div>
-            <div className="text-[10px] tracking-widest text-theme font-semibold uppercase mb-1">Symbol</div>
+            <div className="text-[10px] tracking-widest font-semibold uppercase mb-1" style={{ color: 'var(--symbol-color)' }}>Symbol</div>
             <SymbolInput />
           </div>
 
@@ -78,7 +70,7 @@ export function Sidebar({ atrGauge }) {
           </div>
 
           {atrGauge && (
-            <div className="mt-auto" data-tour="atr-gauge">
+            <div data-tour="atr-gauge">
               <div className="h-px bg-theme-border mb-4" />
               <ATRGauge
                 atrValue={atrGauge.atrValue}
