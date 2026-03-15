@@ -11,6 +11,7 @@
 import { create } from 'zustand'
 import { DEFAULT_PRESETS, DEFAULT_PRESET_ID } from '../constants/presets'
 import { useChartStore } from './useChartStore'
+import { validatePreset } from '../utils/validate'
 
 const STORAGE_KEY = 'cheechart-presets'
 const ACTIVE_KEY  = 'cheechart-active-preset'
@@ -20,8 +21,14 @@ function loadPresets() {
   try {
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY))
     if (stored && typeof stored === 'object') {
+      // Validate each stored preset before merging
+      const validated = {}
+      for (const [id, preset] of Object.entries(stored)) {
+        const clean = validatePreset(preset)
+        if (clean) validated[id] = clean
+      }
       // Always layer defaults underneath so they can't be deleted from storage
-      return { ...DEFAULT_PRESETS, ...stored }
+      return { ...DEFAULT_PRESETS, ...validated }
     }
   } catch { /* corrupt or missing — use defaults */ }
   return { ...DEFAULT_PRESETS }

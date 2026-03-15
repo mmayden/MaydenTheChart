@@ -10,7 +10,7 @@
  *   vwap      — VWAP bounce (price touches VWAP and reverses)
  */
 
-import { ema, rsi, relativeVolume } from './indicators'
+import { ema, rsi, relativeVolume, vwapWithBands } from './indicators'
 import { groupBarsByDay, getPreviousLevels, getORBZone, classifyDayType } from './levels'
 import { EMA_PERIODS } from '../constants/chart'
 
@@ -156,6 +156,162 @@ export function backtestEMACross(bars) {
   }
 
   return { trades, stats: computeStats(trades) }
+}
+
+// ── VWAP Bounce Strategy ──────────────────────────────────────────────────────
+
+/**
+ * Backtest VWAP bounce strategy on intraday bars.
+ *
+ * Rules:
+ *   - Long when price touches VWAP from above and bounces (close > VWAP after touch)
+ *   - Short when price touches VWAP from below and rejects
+ *   - Exit at end of day
+ *   - Optional: require bullish day type for longs, bearish for shorts
+ *
+ * @param {Array} bars - sorted oldest → newest, intraday bars
+ * @param {Object} options
+ * @param {boolean} options.requireTrend - require aligned day type
+ * @param {number} options.touchThresholdPct - how close to VWAP counts as "touch" (default 0.1%)
+ * @returns {{ trades: Array, stats: Object }}
+ */
+export function backtestVWAPBounce(bars, { requireTrend = false, touchThresholdPct = 0.1 } = {}) {
+  if (!bars?.length) return { trades: [], stats: emptyStats() }
+
+  const byDay  = groupBarsByDay(bars)
+  const trades = []
+  const days   = Array.from(byDay.keys()).sort()
+
+  for (let d = 1; d < days.length; d++) {
+    const dayBars = byDay.get(days[d])
+    if (!dayBars || dayBars.length < 10) continue
+
+    // Compute VWAP for this day's bars
+    const vwapResult = vwapWithBands(dayBars)
+    const vwapSeries = vwapResult.vwap
+    if (!vwapSeries.length) continue
+
+    // Build VWAP lookup
+    const vwapMap = new Map(vwapSeries.map((v) => [v.time, v.value]))
+
+    // Day type filter
+    let dayType = null
+    if (requireTrend) {
+      const prevDayBars = byDay.get(days[d - 1])
+      if (prevDayBars?.length) {
+        const { prevHigh, prevLow } = getPreviousLevels(dayBars, byDay)
+        if (prevHigh && prevLow) {
+          dayType = classifyDayType(dayBars, prevHigh, prevLow, byDay)
+        }
+      }
+    }
+
+    let entry = null
+
+    // Skip first 6 bars (30min on 5m) to let VWAP stabilize
+    for (let i = 6; i < dayBars.length - 1; i++) {
+      const bar = dayBars[i]
+      const vwap = vwapMap.get(bar.time)
+      if (!vwap) continue
+
+      const threshold = vwap * (touchThresholdPct / 100)
+      const touchedVWAP = Math.abs(bar.low - vwap) < threshold || Math.abs(bar.high - vwap) < threshold
+
+      if (!touchedVWAP || entry) continue
+
+      // Bounce detection: bar closes away from VWAP after touching
+      const bullBounce = bar.low <= vwap + threshold && bar.close > vwap
+      const bearBounce = bar.high >= vwap - threshold && bar.close < vwap
+
+      if (bullBounce) {
+        if (requireTrend && dayType?.type === 'trend-bear') continue
+        entry = { type: 'long', price: bar.close, time: bar.time }
+      } else if (bearBounce) {
+        if (requireTrend && dayType?.type === 'trend-bull') continue
+        entry = { type: 'short', price: bar.close, time: bar.time }
+      }
+    }
+
+    if (!entry) continue
+
+    const exitBar = dayBars[dayBars.length - 1]
+    const pnl = entry.type === 'long'
+      ? exitBar.close - entry.price
+      : entry.price - exitBar.close
+
+    trades.push({
+      date: days[d],
+      type: entry.type,
+      entry: entry.price,
+      exit: exitBar.close,
+      pnl,
+      pnlPct: ((pnl / entry.price) * 100),
+      result: pnl > 0 ? 'win' : pnl < 0 ? 'loss' : 'breakeven',
+      dayType: dayType?.type ?? null,
+    })
+  }
+
+  return { trades, stats: computeStats(trades) }
+}
+
+// ── Day Type Breakdown ────────────────────────────────────────────────────────
+
+/**
+ * Break down trade stats by day type (trend-bull, trend-bear, chop, range).
+ *
+ * @param {Array} trades - trades array with dayType field
+ * @returns {Object} - { 'trend-bull': stats, 'trend-bear': stats, ... }
+ */
+export function statsByDayType(trades) {
+  const groups = {}
+  for (const t of trades) {
+    const dt = t.dayType ?? 'unknown'
+    if (!groups[dt]) groups[dt] = []
+    groups[dt].push(t)
+  }
+  const result = {}
+  for (const [dt, trs] of Object.entries(groups)) {
+    result[dt] = computeStats(trs)
+  }
+  return result
+}
+
+/**
+ * Add day type classification to ORB/EMA trade results retroactively.
+ */
+export function enrichTradesWithDayType(bars, trades) {
+  if (!bars?.length || !trades?.length) return trades
+
+  const byDay = groupBarsByDay(bars)
+  const days  = Array.from(byDay.keys()).sort()
+
+  return trades.map((t) => {
+    if (t.dayType) return t
+    const dayIdx = days.indexOf(t.date)
+    if (dayIdx < 1) return { ...t, dayType: 'unknown' }
+    const dayBars = byDay.get(t.date)
+    if (!dayBars?.length) return { ...t, dayType: 'unknown' }
+    const { prevHigh, prevLow } = getPreviousLevels(dayBars, byDay)
+    if (!prevHigh || !prevLow) return { ...t, dayType: 'unknown' }
+    const dt = classifyDayType(dayBars, prevHigh, prevLow, byDay)
+    return { ...t, dayType: dt?.type ?? 'unknown' }
+  })
+}
+
+// ── Equity Curve ──────────────────────────────────────────────────────────────
+
+/**
+ * Compute cumulative P&L series from trades for equity curve visualization.
+ *
+ * @param {Array} trades - trades array with pnlPct
+ * @returns {Array<{date: string, cumPnl: number}>}
+ */
+export function equityCurve(trades) {
+  let cum = 0
+  return trades.map((t) => {
+    cum += t.pnlPct
+    return { date: t.date, cumPnl: parseFloat(cum.toFixed(2)) }
+  })
 }
 
 // ── Stats computation ─────────────────────────────────────────────────────────

@@ -1,37 +1,179 @@
 /**
- * App.jsx — Root layout and routing shell.
+ * App.jsx — Single-page chart terminal.
  *
  * Layout:
  *   ┌──────────────────────────────────────────────────────────────┐
- *   │  TopNav: Logo | [Chart] [Dashboard] | ⌘K | 🔔 | ⚙         │
- *   ├──────────────────────────────────────────────────────────────┤
- *   │                                                              │
- *   │   <Route> content (ChartView or DashboardView)              │
- *   │                                                              │
- *   └──────────────────────────────────────────────────────────────┘
+ *   │  TopNav: Logo | panel toggles | ⌘K | ⚙                      │
+ *   ├────────┬──────────────────────────────────────┬──────────────┤
+ *   │ Side   │  Chart + overlays + RSI/MACD + status│  RightPanel  │
+ *   │ bar    │                                      │  (one at a   │
+ *   │        │                                      │   time)      │
+ *   └────────┴──────────────────────────────────────┴──────────────┘
  *
- * Shared overlays: SettingsModal, CommandPalette, AlertsPanel, ToastContainer.
+ * No router. Chart always visible. Tools live in slide-out right panels.
  */
 
-import { Routes, Route } from 'react-router-dom'
-import { useChartStore } from './store/useChartStore'
+import { useRef, useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react'
+import { useAlpacaBars } from './hooks/useAlpacaBars'
+import { useDailyBars } from './hooks/useDailyBars'
+import { useAlpacaSocket } from './hooks/useAlpacaSocket'
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
+import { useAlertChecker } from './hooks/useAlertChecker'
+import { useSwipeGesture } from './hooks/useSwipeGesture'
 import { useURLState } from './hooks/useURLState'
+import { useChartStore } from './store/useChartStore'
+import { usePresetsStore } from './store/usePresetsStore'
+import { useToast } from './store/useToastStore'
+import { TIMEFRAME_CONFIG } from './constants/chart'
+import { atr, ema, vwapWithBands, rsi, macd, getDailyRangeStatus } from './utils/indicators'
+import { captureSnapshot, copyToClipboard } from './utils/snapshot'
+import { getPreviousLevels, classifyDayType, groupBarsByDay } from './utils/levels'
+import { confluenceScore } from './utils/confluence'
 
 import { TopNav } from './components/layout/TopNav'
-import { AlertsPanel } from './components/panels/AlertsPanel'
-import { SettingsModal } from './components/ui/SettingsModal'
-import { CommandPalette } from './components/ui/CommandPalette'
+import { Sidebar } from './components/layout/Sidebar'
+import { RightPanel } from './components/layout/RightPanel'
+import { CandlestickChart } from './components/chart/CandlestickChart'
+import { PriceDisplay } from './components/chart/PriceDisplay'
+import { EMAOverlay } from './components/indicators/EMAOverlay'
+import { VWAPOverlay } from './components/indicators/VWAPOverlay'
+import { LevelOverlay } from './components/indicators/LevelOverlay'
+import { SROverlay } from './components/indicators/SROverlay'
+import { BollingerOverlay } from './components/indicators/BollingerOverlay'
+import { StatusBar } from './components/ui/StatusBar'
+import { DayTypeBanner } from './components/ui/DayTypeBanner'
+import { ConfluenceBar } from './components/ui/ConfluenceBar'
+import { MTFStrip } from './components/ui/MTFStrip'
+import { IndicatorTabView } from './components/ui/IndicatorTabView'
+import { CrosshairLegend } from './components/ui/CrosshairLegend'
 import { ToastContainer } from './components/ui/ToastContainer'
-import { ChartView } from './views/ChartView'
-import { DashboardView } from './views/DashboardView'
+import { OnboardingTour } from './components/ui/OnboardingTour'
+
+// Lazy-load on-demand overlays — not rendered until user opens them
+const SettingsModal  = lazy(() => import('./components/ui/SettingsModal').then(m => ({ default: m.SettingsModal })))
+const CommandPalette = lazy(() => import('./components/ui/CommandPalette').then(m => ({ default: m.CommandPalette })))
 
 export default function App() {
-  const theme        = useChartStore((s) => s.theme)
-  const settingsOpen = useChartStore((s) => s.settingsOpen)
-  const setSettingsOpen = useChartStore((s) => s.setSettingsOpen)
+  const chartRef = useRef(null)
+  const [chart, setChart]             = useState(null)
+  const [candleSeries, setCandleSeries] = useState(null)
+
+  const theme             = useChartStore((s) => s.theme)
+  const settingsOpen      = useChartStore((s) => s.settingsOpen)
+  const setSettingsOpen   = useChartStore((s) => s.setSettingsOpen)
+  const selectedTimeframe = useChartStore((s) => s.selectedTimeframe)
+  const selectedSymbol    = useChartStore((s) => s.selectedSymbol)
+  const showEma           = useChartStore((s) => s.indicators.ema)
+  const showVwap          = useChartStore((s) => s.indicators.vwap)
+  const showRvol          = useChartStore((s) => s.indicators.rvol)
+  const showLevels        = useChartStore((s) => s.indicators.levels)
+  const showSr            = useChartStore((s) => s.indicators.sr)
+  const showBollinger     = useChartStore((s) => s.indicators.bollinger)
+
+  const { data: bars, isLoading, isError, error, dataUpdatedAt, refetch } = useAlpacaBars()
+  const { data: dailyBars } = useDailyBars()
 
   // Sync URL params with store
   useURLState()
+
+  // Apply persisted preset on mount
+  useEffect(() => {
+    const { activePresetId, applyPreset } = usePresetsStore.getState()
+    if (activePresetId) applyPreset(activePresetId)
+  }, [])
+
+  // Live WebSocket + keyboard shortcuts + alert checker
+  useAlpacaSocket()
+  useKeyboardShortcuts()
+  useAlertChecker(bars, selectedTimeframe)
+
+  // Swipe gestures — open/close sidebar on touch devices
+  const openSidebar  = useCallback(() => useChartStore.getState().setSidebarOpen(true), [])
+  const closeSidebar = useCallback(() => useChartStore.getState().setSidebarOpen(false), [])
+  useSwipeGesture({ onSwipeRight: openSidebar, onSwipeLeft: closeSidebar })
+
+  // Chart snapshot — listen for cheechart:snapshot custom event
+  const toast = useToast()
+  useEffect(() => {
+    async function handleSnapshot() {
+      const chartInstance = chartRef.current?.chart?.()
+      if (!chartInstance) {
+        toast.add({ message: 'Chart not ready', type: 'warning' })
+        return
+      }
+      try {
+        const canvas = chartInstance.takeScreenshot()
+        const { selectedSymbol: sym, selectedTimeframe: tf } = useChartStore.getState()
+        const blob = await captureSnapshot(canvas, { symbol: sym, timeframe: tf })
+        if (!blob) {
+          toast.add({ message: 'Snapshot failed', type: 'error' })
+          return
+        }
+        const method = await copyToClipboard(blob, `cheechart-${sym}-${tf}.png`)
+        toast.add({
+          message: method === 'clipboard' ? 'Snapshot copied to clipboard' : 'Snapshot downloaded',
+          type: 'success',
+        })
+      } catch {
+        toast.add({ message: 'Snapshot failed', type: 'error' })
+      }
+    }
+    window.addEventListener('cheechart:snapshot', handleSnapshot)
+    return () => window.removeEventListener('cheechart:snapshot', handleSnapshot)
+  }, [toast])
+
+  const tfConfig = TIMEFRAME_CONFIG[selectedTimeframe]
+
+  // Chart instance detection (polls for HMR resilience)
+  useEffect(() => {
+    let lastChart = null
+    const id = setInterval(() => {
+      const c  = chartRef.current?.chart?.()
+      const cs = chartRef.current?.candleSeries?.()
+      if (c && cs && c !== lastChart) {
+        lastChart = c
+        setChart(c)
+        setCandleSeries(cs)
+      }
+    }, 100)
+    return () => clearInterval(id)
+  }, [])
+
+  // Pre-compute groupBarsByDay once
+  const byDay = useMemo(() => {
+    if (!bars?.length) return null
+    return groupBarsByDay(bars)
+  }, [bars])
+
+  // ATR gauge
+  const atrGauge = useMemo(() => {
+    if (!dailyBars?.length || !byDay) return null
+    const { series: atrSeries } = atr(dailyBars, 14)
+    if (!atrSeries.length) return null
+    const atr14 = atrSeries[atrSeries.length - 1].value
+    const days  = Array.from(byDay.keys()).sort()
+    return getDailyRangeStatus(byDay.get(days[days.length - 1]) ?? [], atr14)
+  }, [dailyBars, byDay])
+
+  // Day type classification
+  const dayType = useMemo(() => {
+    if (!byDay) return null
+    const { prevHigh, prevLow } = getPreviousLevels(bars, byDay)
+    if (!prevHigh || !prevLow) return null
+    return classifyDayType(bars, prevHigh, prevLow, byDay)
+  }, [bars, byDay])
+
+  // Confluence score — synthesize all indicator signals
+  const confluence = useMemo(() => {
+    if (!bars?.length) return null
+    const ema9Signal  = ema(bars, 9).signal
+    const ema48Signal = ema(bars, 48).signal
+    const ema200Signal = ema(bars, 200).signal
+    const vwapSignal  = vwapWithBands(bars).signal
+    const rsiSignal   = rsi(bars).signal
+    const macdSignal  = macd(bars).signal
+    return confluenceScore({ dayType, ema9Signal, ema48Signal, ema200Signal, vwapSignal, atrGauge, rsiSignal, macdSignal })
+  }, [bars, dayType, atrGauge])
 
   return (
     <div
@@ -39,20 +181,108 @@ export default function App() {
       className="flex flex-col h-screen overflow-hidden font-mono"
       style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}
     >
-      {/* Shared overlays */}
-      {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
-      <CommandPalette />
-      <AlertsPanel />
+      {/* Shared overlays (lazy-loaded) */}
+      <Suspense fallback={null}>
+        {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
+        <CommandPalette />
+      </Suspense>
       <ToastContainer />
+      <OnboardingTour />
 
       {/* Top navigation */}
       <TopNav />
 
-      {/* Route content */}
-      <Routes>
-        <Route path="/" element={<ChartView />} />
-        <Route path="/dashboard" element={<DashboardView />} />
-      </Routes>
+      {/* Main content area: Sidebar + Chart + RightPanel */}
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+
+        {/* Sidebar */}
+        <Sidebar atrGauge={atrGauge} />
+
+        {/* Chart area */}
+        <div className="flex flex-col flex-1 min-w-0">
+
+          {/* Chart sub-header: price + day type */}
+          <div className="flex items-center gap-4 px-4 py-2 border-b border-theme shrink-0">
+            {bars && <PriceDisplay bars={bars} byDay={byDay} />}
+            <ConfluenceBar confluence={confluence} />
+            <MTFStrip />
+            <div className="ml-auto">
+              <DayTypeBanner dayType={dayType} />
+            </div>
+          </div>
+
+          {/* Chart */}
+          <div className="flex-1 relative overflow-hidden min-h-0">
+
+            {isLoading && (
+              <div
+                className="absolute inset-0 flex items-center justify-center z-10 transition-opacity duration-300"
+                style={{ backgroundColor: bars ? 'rgba(10, 10, 10, 0.6)' : '#0a0a0a' }}
+              >
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                  <span className="text-theme-muted text-sm">Loading {selectedSymbol}…</span>
+                </div>
+              </div>
+            )}
+
+            {isError && (
+              <div className="absolute inset-0 flex items-center justify-center z-10 bg-[#0a0a0a]">
+                <div className="flex flex-col items-center gap-2 max-w-md text-center px-8">
+                  <span className="text-red-400 text-sm font-bold">Data Error</span>
+                  <span className="text-theme-muted text-xs">
+                    {error?.message ?? 'Failed to load bars from Alpaca.'}
+                  </span>
+                  <button
+                    onClick={() => refetch()}
+                    className="mt-3 px-4 py-1.5 text-xs font-mono font-semibold rounded border border-theme-mid text-theme hover:border-theme-mid hover:bg-theme-hover transition-colors"
+                  >
+                    Retry
+                  </button>
+                  <span className="text-theme-muted text-xs mt-1">
+                    Check your .env has valid Alpaca paper trading keys.
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <CandlestickChart ref={chartRef} bars={bars ?? []} theme={theme} dataUpdatedAt={dataUpdatedAt} showRvol={showRvol} />
+
+            {chart && candleSeries && bars && (
+              <>
+                <EMAOverlay chart={chart} bars={bars} visible={showEma} />
+                {tfConfig.showVWAP && (
+                  <VWAPOverlay chart={chart} bars={bars} visible={showVwap} />
+                )}
+                <LevelOverlay
+                  chart={chart}
+                  candleSeries={candleSeries}
+                  bars={bars}
+                  byDay={byDay}
+                  showORB={tfConfig.showORB}
+                  visible={showLevels}
+                />
+                <SROverlay candleSeries={candleSeries} bars={bars} visible={showSr} />
+                <BollingerOverlay chart={chart} bars={bars} visible={showBollinger} />
+                <CrosshairLegend chart={chart} bars={bars} theme={theme} />
+              </>
+            )}
+          </div>
+
+          {/* Indicator tab strip (RSI / MACD) */}
+          <IndicatorTabView bars={bars} />
+
+          {/* Status bar */}
+          <div className="flex items-center px-4 py-1.5 border-t border-theme shrink-0">
+            <StatusBar lastUpdated={dataUpdatedAt} />
+          </div>
+
+        </div>
+
+        {/* Right panel (slide-out, one at a time) */}
+        <RightPanel />
+
+      </div>
     </div>
   )
 }

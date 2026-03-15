@@ -7,6 +7,16 @@ export default defineConfig({
     environment: 'node',
     globals: true,
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'lightweight-charts': ['lightweight-charts'],
+          'vendor-api': ['axios', '@tanstack/react-query'],
+        },
+      },
+    },
+  },
   server: {
     // Proxy /api requests to the local dev API server (run with: vercel dev)
     // This lets `npm run dev` work alongside `vercel dev` on port 3000

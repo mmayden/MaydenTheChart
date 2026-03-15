@@ -98,7 +98,7 @@ export function SROverlay({ candleSeries, bars, visible = true }) {
       markers.sort((a, b) => a.time - b.time)
       candleSeries.setMarkers(markers)
     } catch (err) {
-      console.warn('[SROverlay] Error rendering S/R levels:', err)
+      if (import.meta.env.DEV) console.warn('[SROverlay] Error rendering S/R levels:', err)
     }
 
     return () => {

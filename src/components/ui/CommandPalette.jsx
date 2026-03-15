@@ -1,20 +1,19 @@
 /**
  * CommandPalette — Cmd+K search overlay.
  *
- * Quick access to: symbols, timeframes, indicators, presets, navigation, settings.
+ * Quick access to: symbols, timeframes, indicators, presets, panels, settings.
  * Modern command palette pattern (VS Code, Linear, Notion, Vercel).
  */
 
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useChartStore } from '../../store/useChartStore'
 import { usePresetsStore } from '../../store/usePresetsStore'
 import { SYMBOL_SUGGESTIONS, TIMEFRAME_CONFIG, TIMEFRAME_ORDER } from '../../constants/chart'
 
 // ── Command definitions ─────────────────────────────────────────────────────
 
-function buildCommands(navigate) {
-  const { setSymbol, setTimeframe, toggleIndicator, indicators, setSettingsOpen, toggleAlertsPanel } = useChartStore.getState()
+function buildCommands() {
+  const { setSymbol, setTimeframe, toggleIndicator, indicators, setSettingsOpen, setActivePanel } = useChartStore.getState()
   const { applyPreset, getOrderedPresets } = usePresetsStore.getState()
 
   const commands = []
@@ -64,16 +63,18 @@ function buildCommands(navigate) {
     })
   })
 
-  // Navigation
+  // Panels
   commands.push(
-    { id: 'nav:chart',     label: 'Chart View',     category: 'Navigate', action: () => navigate('/') },
-    { id: 'nav:dashboard', label: 'Dashboard',      category: 'Navigate', action: () => navigate('/dashboard') },
+    { id: 'panel:backtest',  label: 'Open Backtest',  category: 'Panel', action: () => setActivePanel('backtest') },
+    { id: 'panel:journal',   label: 'Open Journal',   category: 'Panel', action: () => setActivePanel('journal') },
+    { id: 'panel:watchlist', label: 'Open Watchlist',  category: 'Panel', action: () => setActivePanel('watchlist') },
+    { id: 'panel:alerts',    label: 'Open Alerts',     category: 'Panel', action: () => setActivePanel('alerts') },
   )
 
   // Actions
   commands.push(
-    { id: 'action:settings', label: 'Open Settings',  category: 'Action', action: () => setSettingsOpen(true) },
-    { id: 'action:alerts',   label: 'Toggle Alerts',  category: 'Action', action: () => toggleAlertsPanel() },
+    { id: 'action:settings',  label: 'Open Settings',   category: 'Action', action: () => setSettingsOpen(true) },
+    { id: 'action:snapshot',  label: 'Chart Snapshot',   category: 'Action', action: () => window.dispatchEvent(new CustomEvent('cheechart:snapshot')) },
   )
 
   return commands
@@ -84,7 +85,6 @@ function buildCommands(navigate) {
 export function CommandPalette() {
   const open    = useChartStore((s) => s.commandPaletteOpen)
   const setOpen = useChartStore((s) => s.setCommandPaletteOpen)
-  const navigate = useNavigate()
 
   const [query, setQuery]           = useState('')
   const [selectedIdx, setSelectedIdx] = useState(0)
@@ -94,8 +94,8 @@ export function CommandPalette() {
   // Build commands fresh each time palette opens
   const commands = useMemo(() => {
     if (!open) return []
-    return buildCommands(navigate)
-  }, [open, navigate])
+    return buildCommands()
+  }, [open])
 
   // Filter by query
   const filtered = useMemo(() => {
@@ -175,12 +175,12 @@ export function CommandPalette() {
       {/* Palette */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-lg rounded-xl border border-gray-700 shadow-2xl overflow-hidden"
+        className="relative w-full max-w-lg rounded-xl border border-theme-mid shadow-2xl overflow-hidden"
         style={{ backgroundColor: 'var(--bg-base)' }}
       >
         {/* Search input */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-gray-500 shrink-0">
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-theme">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-theme-muted shrink-0">
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
@@ -190,19 +190,19 @@ export function CommandPalette() {
             placeholder="Search commands, symbols, indicators..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="flex-1 bg-transparent text-sm text-gray-100 placeholder-gray-500 focus:outline-none font-mono"
+            className="flex-1 bg-transparent text-sm text-theme placeholder-theme-muted focus:outline-none font-mono"
           />
-          <kbd className="text-[10px] text-gray-500 bg-gray-800 px-1.5 py-0.5 rounded font-mono">ESC</kbd>
+          <kbd className="text-[10px] text-theme-muted bg-theme-border px-1.5 py-0.5 rounded font-mono">ESC</kbd>
         </div>
 
         {/* Results */}
         <div ref={listRef} className="max-h-72 overflow-y-auto py-1">
           {filtered.length === 0 ? (
-            <p className="text-center text-gray-500 text-xs py-6">No results found</p>
+            <p className="text-center text-theme-muted text-xs py-6">No results found</p>
           ) : (
             Object.entries(grouped).map(([category, cmds]) => (
               <div key={category}>
-                <div className="px-4 pt-2 pb-1 text-[10px] tracking-widest text-gray-500 uppercase font-semibold">
+                <div className="px-4 pt-2 pb-1 text-[10px] tracking-widest text-theme-muted uppercase font-semibold">
                   {category}
                 </div>
                 {cmds.map((cmd) => {
@@ -215,8 +215,8 @@ export function CommandPalette() {
                       onMouseEnter={() => setSelectedIdx(idx)}
                       className={`w-full flex items-center gap-3 px-4 py-2 text-left text-sm transition-colors ${
                         idx === selectedIdx
-                          ? 'bg-blue-500/10 text-blue-300'
-                          : 'text-gray-300 hover:bg-gray-800/50'
+                          ? 'bg-blue-500/10 text-accent'
+                          : 'text-theme hover:bg-theme-hover'
                       }`}
                     >
                       <span className="font-mono text-xs">{cmd.label}</span>
@@ -229,10 +229,10 @@ export function CommandPalette() {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center gap-4 px-4 py-2 border-t border-gray-800 text-[10px] text-gray-500">
-          <span><kbd className="bg-gray-800 px-1 rounded">↑↓</kbd> navigate</span>
-          <span><kbd className="bg-gray-800 px-1 rounded">↵</kbd> select</span>
-          <span><kbd className="bg-gray-800 px-1 rounded">esc</kbd> close</span>
+        <div className="flex items-center gap-4 px-4 py-2 border-t border-theme text-[10px] text-theme-muted">
+          <span><kbd className="bg-theme-border px-1 rounded">↑↓</kbd> navigate</span>
+          <span><kbd className="bg-theme-border px-1 rounded">↵</kbd> select</span>
+          <span><kbd className="bg-theme-border px-1 rounded">esc</kbd> close</span>
         </div>
       </div>
     </div>

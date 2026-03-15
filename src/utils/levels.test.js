@@ -392,15 +392,15 @@ describe('classifyDayType()', () => {
 
   it('labels match expected strings', () => {
     const bullBars = [bar(DAY1_0930, 400, 415, 398, 412)]
-    expect(classifyDayType(bullBars, PDH, PDL).label).toBe('↑ Trend Day — Bullish')
+    expect(classifyDayType(bullBars, PDH, PDL).label).toBe('Trend Day — Bullish')
 
     const bearBars = [bar(DAY1_0930, 400, 405, 390, 393)]
-    expect(classifyDayType(bearBars, PDH, PDL).label).toBe('↓ Trend Day — Bearish')
+    expect(classifyDayType(bearBars, PDH, PDL).label).toBe('Trend Day — Bearish')
 
     const chopBars = [bar(DAY1_0930, 400, 415, 390, 402)]
-    expect(classifyDayType(chopBars, PDH, PDL).label).toBe('⚡ Chop — Both Levels Broken')
+    expect(classifyDayType(chopBars, PDH, PDL).label).toBe('Chop — Both Levels Broken')
 
     const rangeBars = [bar(DAY1_0930, 400, 405, 398, 402)]
-    expect(classifyDayType(rangeBars, PDH, PDL).label).toBe('↔ Range Day')
+    expect(classifyDayType(rangeBars, PDH, PDL).label).toBe('Range Day')
   })
 })

@@ -299,109 +299,123 @@
 
 ---
 
-## 🔲 Phase 10A — Architecture Consolidation (Single-Page Panel System)
+## ✅ Phase 10A — Architecture Consolidation (Single-Page Panel System) — COMPLETE
 
-**Goal:** Collapse `/dashboard` route into right-panel system. Chart always visible.
-**Why:** Industry converging on single-page panel architectures (Bloomberg, ToS, VS Code).
-Context-switching between routes breaks the charting workflow.
+**197/197 tests passing, build clean**
 
-### Step 1 — Right Panel Shell
-- 🔲 `src/components/layout/RightPanel.jsx` — generic slide-out panel container (reuse AlertsPanel animation)
-- 🔲 Add `activePanel` state to `useChartStore.js` — `null | 'alerts' | 'backtest' | 'journal' | 'watchlist'`
-- 🔲 `setActivePanel(panel)` — toggle: same panel = close, different = switch
-- 🔲 Wire RightPanel into `App.jsx` — renders alongside chart
-
-### Step 2 — Migrate Dashboard Components to Panels
-- 🔲 `src/components/panels/BacktestPanel.jsx` — BacktestCard content in panel format
-- 🔲 `src/components/panels/JournalPanel.jsx` — TradeJournal content in panel format
-- 🔲 `src/components/panels/WatchlistPanel.jsx` — WatchlistCard content in panel format
-- 🔲 Migrate AlertsPanel to use generic RightPanel shell
-
-### Step 3 — Kill Router
-- 🔲 Remove react-router-dom from App.jsx and main.jsx
-- 🔲 Remove `src/views/ChartView.jsx` and `src/views/DashboardView.jsx` — inline into App.jsx
-- 🔲 Update TopNav — replace nav links with panel toggle icons
-- 🔲 Update useURLState.js — remove pathname handling, keep query params
-- 🔲 Update CommandPalette — "Open Panel" commands replace "Navigate"
-- 🔲 Update useKeyboardShortcuts.js — panel toggle shortcuts
-- 🔲 `npm uninstall react-router-dom`
-- 🔲 Verify all tests pass, build clean
+- ✅ `src/store/useChartStore.js` — `activePanel` state replaces `alertsPanelOpen` (`null | 'alerts' | 'backtest' | 'journal' | 'watchlist'`), `setActivePanel()` toggle, `closePanel()`
+- ✅ `src/components/layout/RightPanel.jsx` — generic slide-out panel shell (desktop 340px, mobile full-screen overlay)
+- ✅ `src/components/panels/BacktestPanel.jsx` — ORB/EMA-cross backtester in panel format
+- ✅ `src/components/panels/JournalPanel.jsx` — trade journal CRUD in panel format
+- ✅ `src/components/panels/WatchlistPanel.jsx` — symbol watchlist in panel format
+- ✅ `src/components/panels/AlertsPanel.jsx` — refactored: content-only, RightPanel handles chrome
+- ✅ `src/App.jsx` — single-page: inlined ChartView, wired RightPanel alongside chart
+- ✅ `src/main.jsx` — removed BrowserRouter wrapper
+- ✅ `src/components/layout/TopNav.jsx` — panel toggle icons (backtest/journal/watchlist/alerts) replace Chart/Dashboard nav tabs
+- ✅ `src/components/ui/CommandPalette.jsx` — "Panel" commands replace "Navigate", removed react-router-dom
+- ✅ `src/hooks/useKeyboardShortcuts.js` — A/B/J/W panel toggles, Esc closes active panel
+- ✅ `src/hooks/useURLState.js` — `?panel=backtest` param, removed pathname handling
+- ✅ `src/components/ui/SettingsModal.jsx` — Panels shortcuts section added
+- ✅ `src/store/useChartStore.test.js` — 5 new activePanel tests
+- ✅ Deleted: `src/views/ChartView.jsx`, `src/views/DashboardView.jsx`, `src/views/` directory
+- ✅ `npm uninstall react-router-dom` — dependency removed
 
 ---
 
-## 🔲 Phase 10B — Synthesis Layer ("Damn Factor")
+## ✅ Phase 10B — Synthesis Layer ("Damn Factor") — COMPLETE
 
-**Goal:** Make the chart think. No retail platform synthesizes indicator signals for you.
+**225/225 tests passing, build clean**
 
 ### Confluence Score
-- 🔲 `src/utils/confluence.js` — weighted score:
-  - Day Type (heavy) + EMA Alignment (heavy) + VWAP Position (medium)
-  - ATR Budget (medium) + RSI zone (light) + MACD direction (light)
-- 🔲 Returns: `{ score, bias, level, reasons[], warnings[] }`
-- 🔲 Unit tests (all bull, all bear, mixed, chop day edge cases)
-- 🔲 `src/components/ui/ConfluenceBar.jsx` — 🟢🟡🔴 traffic light + expandable breakdown
-- 🔲 Position: between price display and chart (always visible, prominent)
+- ✅ `src/utils/confluence.js` — weighted score (Day Type 3x, EMA Stack 3x, VWAP 2x, ATR 2x, RSI 1x, MACD 1x)
+- ✅ Returns: `{ score, bias, level, reasons[], warnings[] }`
+- ✅ `src/utils/confluence.test.js` — 19 unit tests (all bull, all bear, mixed, chop, range, ATR warnings, RSI extremes, EMA stack, MACD, partial data, null values, score bounds)
+- ✅ `src/components/ui/ConfluenceBar.jsx` — traffic light pill + expandable dropdown breakdown
+- ✅ Positioned in chart sub-header between PriceDisplay and DayTypeBanner
 
 ### Multi-Timeframe Status Strip
-- 🔲 `src/components/ui/MTFStrip.jsx` — `5m: Bull | 15m: Bull | 4h: Bear | 1D: Neutral`
-- 🔲 Color-coded per EMA alignment
-- 🔲 Data strategy: fetch EMA data for 4 timeframes in parallel via TanStack Query
+- ✅ `src/components/ui/MTFStrip.jsx` — colored dot pills for 5m/15m/1h/4h/1D EMA alignment
+- ✅ `src/hooks/useMTFSignals.js` — TanStack Query parallel fetch across 5 timeframes, 2min staleTime
+- ✅ Green = full bull stack (9>48>200), Red = full bear, Yellow = partial, Gray = mixed
 
 ### Backtester Upgrade
-- 🔲 Blank state → configure params → "Run Backtest" → results
-- 🔲 Configurable params: ORB window/RVOL/direction, EMA periods, stop loss, RSI filter, day type filter
-- 🔲 VWAP Bounce strategy (entry on VWAP touch + reversal, exit on 2σ or EOD)
-- 🔲 Wire `classifyDayType()` and `rsi()` (already imported but unused)
-- 🔲 Day type breakdown table in results
-- 🔲 Equity curve: mini lightweight-charts line chart of cumulative P&L%
-- 🔲 Clean up dead imports, add tests
+- ✅ `backtestVWAPBounce()` — VWAP touch + bounce strategy with optional day type filter
+- ✅ `enrichTradesWithDayType()` — retroactively classifies trades by day type
+- ✅ `statsByDayType()` — breakdown stats grouped by trend-bull/bear/chop/range
+- ✅ `equityCurve()` — cumulative P&L series for visualization
+- ✅ BacktestPanel: 3 strategies (ORB/EMA Cross/VWAP Bounce), SVG equity curve, collapsible day type breakdown
+- ✅ 9 new backtest tests (VWAP Bounce shape/stats, equityCurve, statsByDayType, enrichTrades)
 
 ---
 
-## 🔲 Phase 10C — Panel Content Upgrades
+## ✅ Phase 10C — Panel Content Upgrades — COMPLETE
 
-**Goal:** Make each panel worth opening.
+**225/225 tests passing, build clean**
 
 ### Watchlist with Live Prices
-- 🔲 `api/snapshot.js` — Vercel proxy for Alpaca `/v2/snapshot`
-- 🔲 `src/hooks/useWatchlistQuotes.js` — TanStack Query, latest quotes per watched symbol
-- 🔲 WatchlistPanel: symbol + price + daily % change (green/red), click → chart updates
-- 🔲 Auto-refresh (30s interval)
+- ✅ `api/snapshot.js` — Vercel serverless proxy for Alpaca snapshots endpoint (multi-symbol, validates input, computes change/changePct)
+- ✅ `src/hooks/useWatchlistQuotes.js` — TanStack Query hook, 30s auto-refresh, only active when watchlist panel open
+- ✅ WatchlistPanel: symbol + live price + daily % change (green/red), click to switch chart, loading spinner
 
 ### Journal Analytics
-- 🔲 Stats: win rate by setup type, best/worst setup, current/longest streak
-- 🔲 Rating correlation (higher-rated trades → higher win rate?)
-- 🔲 Filter tabs: by setup type + by result (Win/Loss/All)
-- 🔲 Heat calendar: GitHub-style contribution graph of daily P&L (green=profit, red=loss)
+- ✅ Win rate by setup type (clickable to filter entries)
+- ✅ Current/longest streak tracking
+- ✅ Rating correlation (win rate per rating level 1-5)
+- ✅ Filter tabs: All/Win/Loss + setup type filter
+- 🔲 Heat calendar deferred to Phase 11 (nice-to-have, not critical)
 
 ### QOL Enhancements
-- 🔲 Sound alerts: optional subtle audio ping on alert triggers (Bloomberg-style, off by default)
-- 🔲 Session stats in status bar: "Today: 2 trades, +0.8%" from journal entries for current day
+- ✅ Sound alerts: Web Audio API ping (880Hz A5, 300ms decay), off by default, toggle in Settings → Appearance
+- ✅ `soundAlerts` preference in useChartStore (localStorage persisted)
+- ✅ Session stats in status bar: "Today: Nt NW NL" from journal entries for current day
 
 ---
 
-## 🔲 Phase 11 — Polish + Mobile
+## ✅ Phase 11 — Polish + Mobile + Security Hardening — COMPLETE
 
-### Onboarding
-- 🔲 First-visit tooltip tour: Day Type → ATR gauge → Presets → Cmd+K
-- 🔲 Dismissible, localStorage flag, never shows again
+**257/257 tests passing, build clean. Main bundle 226KB + 164KB lightweight-charts + 81KB vendor-api (6 lazy chunks).**
 
-### Mobile
-- 🔲 Touch targets 44px+ minimum
-- 🔲 Panels → full-screen overlays on <768px
-- 🔲 Swipe gestures: right for sidebar, left for panel
-- 🔲 Chart fills viewport
+### 11A — Security Hardening + Code Splitting
+- ✅ `src/utils/validate.js` — localStorage schema validation (presets, journal, watchlist, symbol usage)
+- ✅ `src/utils/validate.test.js` — 29 unit tests
+- ✅ Wired validators into `usePresetsStore`, `useJournalStore`, `WatchlistPanel`, `SymbolInput`
+- ✅ API error sanitization: `api/bars.js` + `api/snapshot.js` never leak upstream status codes
+- ✅ Notification API feature detection guard in `useAlertChecker.js`
+- ✅ Code splitting: `React.lazy()` for 4 right panels + SettingsModal + CommandPalette
+- ✅ Vite `manualChunks`: lightweight-charts (164KB) + vendor-api (81KB) in separate chunks
+- ✅ `vercel.json` CSP updated: `worker-src 'self'; manifest-src 'self'; img-src 'self' data: blob:`
 
-### Chart Snapshot
-- 🔲 Cmd+Shift+S captures chart as PNG with all indicators
-- 🔲 Copy to clipboard or download
+### 11B — CSS Theme Refactor + Touch + Snapshot
+- ✅ Eliminated 33 `!important` CSS overrides → 16 semantic utility classes (`.border-theme`, `.text-theme-muted`, etc.)
+- ✅ Touch targets: `@media (pointer: coarse)` 44px minimum on all interactive elements
+- ✅ `src/hooks/useSwipeGesture.js` — horizontal swipe detection, wired in App.jsx (right=open sidebar, left=close)
+- ✅ `src/utils/snapshot.js` — chart screenshot with watermark + clipboard/download
+- ✅ Cmd+Shift+S keyboard shortcut → `cheechart:snapshot` custom event
+- ✅ "Chart Snapshot" command in CommandPalette, shortcut in SettingsModal
 
-### PWA
-- 🔲 manifest.json + service worker
-- 🔲 Installable to home screen
+### 11C — PWA + Onboarding
+- ✅ `public/manifest.json` — PWA manifest (standalone display, theme #0a0a0a)
+- ✅ `public/sw.js` — network-first service worker (API bypasses cache, static assets cached)
+- ✅ `public/icons/icon-192.png`, `icon-512.png` — placeholder icons
+- ✅ `index.html` — manifest link, theme-color meta, apple-touch-icon
+- ✅ `src/main.jsx` — service worker registration on load
+- ✅ `vercel.json` — rewrite exceptions for sw.js, manifest.json, icons
+- ✅ `src/components/ui/OnboardingTour.jsx` — 4-step tooltip tour (Day Type → ATR → Presets → Cmd+K)
+- ✅ `data-tour` attributes on DayTypeBanner, Sidebar (presets + ATR), TopNav (Cmd+K)
 
-### Theme Refactor
-- 🔲 CSS variable-first approach, eliminate ~40 lines of !important overrides
+---
+
+## 📌 Deferred — Mobile Polish (low priority)
+
+> **Pin:** Mobile UX works but is not the focus. Touch targets + swipe gestures are in place.
+> Revisit after core desktop features are complete (Phase 12+).
+
+- 🔲 Mobile-specific layout testing + QA pass across iOS Safari / Chrome Android
+- 🔲 Panel transitions/animations for mobile overlays
+- 🔲 Responsive chart sub-header (confluence bar + MTF strip overflow on narrow screens)
+- 🔲 Onboarding tour mobile variant (currently welcome toast only)
+- 🔲 Real PWA icons (replace placeholder 1x1 PNGs with branded 192/512 icons)
+- 🔲 Lighthouse PWA audit pass
 
 ---
 
@@ -410,7 +424,6 @@ Context-switching between routes breaks the charting workflow.
 - 🔲 Screener — scan watchlist for active setups
 - 🔲 Trade replay — step through historical days bar-by-bar with simulated trades
 - 🔲 Chart annotations — notes/arrows on chart, saved per symbol
-- 🔲 Snapshot sharing — one-click chart screenshot
 - 🔲 Weekly gap tracking panel
 - 🔲 Volume profile (horizontal bars)
 - 🔲 RSI divergence chart markers (math exists)

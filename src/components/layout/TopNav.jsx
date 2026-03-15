@@ -1,118 +1,144 @@
 /**
- * TopNav — Shared top navigation bar across all views.
+ * TopNav — Shared top navigation bar.
  *
  * Layout:
- *   [☰ mobile] [Logo] [Chart] [Dashboard]  --- spacer ---  [⌘K search] [🔔 Bell] [⚙ Settings]
+ *   [☰ mobile] [Logo]  --- spacer ---  [panel toggles] [⌘K search] [⚙ Settings]
+ *
+ * Panel toggle icons replace the old Chart/Dashboard navigation tabs.
  */
 
-import { useLocation, useNavigate } from 'react-router-dom'
 import Logo from '../ui/Logo'
 import { useChartStore } from '../../store/useChartStore'
 import { useAlertsStore } from '../../store/useAlertsStore'
 
-const NAV_ITEMS = [
-  { path: '/',          label: 'Chart' },
-  { path: '/dashboard', label: 'Dashboard' },
+const PANEL_BUTTONS = [
+  {
+    id: 'backtest',
+    title: 'Backtest',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+      </svg>
+    ),
+  },
+  {
+    id: 'journal',
+    title: 'Journal',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+      </svg>
+    ),
+  },
+  {
+    id: 'watchlist',
+    title: 'Watchlist',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="8" y1="6" x2="21" y2="6" />
+        <line x1="8" y1="12" x2="21" y2="12" />
+        <line x1="8" y1="18" x2="21" y2="18" />
+        <line x1="3" y1="6" x2="3.01" y2="6" />
+        <line x1="3" y1="12" x2="3.01" y2="12" />
+        <line x1="3" y1="18" x2="3.01" y2="18" />
+      </svg>
+    ),
+  },
 ]
 
 export function TopNav() {
-  const location = useLocation()
-  const navigate = useNavigate()
-
-  const toggleAlertsPanel     = useChartStore((s) => s.toggleAlertsPanel)
-  const alertsPanelOpen       = useChartStore((s) => s.alertsPanelOpen)
-  const setSettingsOpen       = useChartStore((s) => s.setSettingsOpen)
+  const activePanel          = useChartStore((s) => s.activePanel)
+  const setActivePanel       = useChartStore((s) => s.setActivePanel)
+  const setSettingsOpen      = useChartStore((s) => s.setSettingsOpen)
   const setCommandPaletteOpen = useChartStore((s) => s.setCommandPaletteOpen)
-  const toggleSidebar         = useChartStore((s) => s.toggleSidebar)
+  const toggleSidebar        = useChartStore((s) => s.toggleSidebar)
 
   const alerts      = useAlertsStore((s) => s.alerts)
   const activeCount = alerts.filter((a) => !a.triggered).length
 
-  const isChart = location.pathname === '/'
-
   return (
     <nav
-      className="flex items-center gap-2 px-3 h-11 border-b border-gray-800 shrink-0"
+      className="flex items-center gap-2 px-3 h-11 border-b border-theme shrink-0"
       style={{ backgroundColor: 'var(--bg-surface)' }}
     >
-      {/* Mobile hamburger — only on chart view */}
-      {isChart && (
-        <button
-          onClick={toggleSidebar}
-          className="md:hidden flex items-center justify-center w-8 h-8 rounded text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition-colors"
-          title="Toggle sidebar"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </svg>
-        </button>
-      )}
+      {/* Mobile hamburger */}
+      <button
+        onClick={toggleSidebar}
+        className="md:hidden flex items-center justify-center w-8 h-8 rounded text-theme-muted hover:text-theme hover:bg-theme-hover transition-colors touch-target"
+        title="Toggle sidebar"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
 
       <Logo />
 
-      {/* Navigation tabs */}
-      <div className="flex items-center gap-1 ml-3">
-        {NAV_ITEMS.map(({ path, label }) => {
-          const active = location.pathname === path
-          return (
-            <button
-              key={path}
-              onClick={() => navigate(path)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded transition-colors ${
-                active
-                  ? 'text-blue-400 bg-blue-950'
-                  : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
-              }`}
-            >
-              {label}
-            </button>
-          )
-        })}
+      <div className="flex-1" />
+
+      {/* Panel toggle icons */}
+      <div className="flex items-center gap-0.5">
+        {PANEL_BUTTONS.map(({ id, title, icon }) => (
+          <button
+            key={id}
+            onClick={() => setActivePanel(id)}
+            className={`flex items-center justify-center w-8 h-8 rounded transition-colors touch-target ${
+              activePanel === id
+                ? 'bg-blue-500/10 text-accent'
+                : 'text-theme-muted hover:text-theme hover:bg-theme-hover'
+            }`}
+            title={title}
+          >
+            {icon}
+          </button>
+        ))}
+
+        {/* Alerts bell (with badge) */}
+        <button
+          onClick={() => setActivePanel('alerts')}
+          className={`relative flex items-center justify-center w-8 h-8 rounded transition-colors touch-target ${
+            activePanel === 'alerts'
+              ? 'bg-yellow-500/10 text-yellow-300'
+              : 'text-yellow-400 hover:bg-theme-hover hover:text-yellow-300'
+          }`}
+          title="Alerts"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="w-4 h-4">
+            <path strokeLinecap="round" strokeLinejoin="round"
+              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+            />
+          </svg>
+          {activeCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-3.5 h-3.5 rounded-full bg-red-500 text-[8px] font-bold text-white leading-none">
+              {activeCount > 9 ? '9+' : activeCount}
+            </span>
+          )}
+        </button>
       </div>
 
-      <div className="flex-1" />
+      {/* Divider */}
+      <div className="w-px h-5 bg-theme-border mx-1" />
 
       {/* Command palette trigger */}
       <button
+        data-tour="cmd-k"
         onClick={() => setCommandPaletteOpen(true)}
-        className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded border border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600 transition-colors text-xs"
+        className="flex items-center justify-center w-7 h-7 rounded text-theme-muted hover:text-theme hover:bg-theme-hover transition-colors touch-target"
+        title="Search (⌘K)"
       >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
           <circle cx="11" cy="11" r="8" />
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
-        <span className="hidden md:inline">Search</span>
-        <kbd className="text-[10px] bg-gray-800 px-1 rounded font-mono">⌘K</kbd>
-      </button>
-
-      {/* Alerts bell */}
-      <button
-        onClick={toggleAlertsPanel}
-        className={`relative flex items-center justify-center w-8 h-8 rounded transition-colors ${
-          alertsPanelOpen
-            ? 'bg-yellow-500/10 text-yellow-300'
-            : 'text-yellow-400 hover:bg-gray-800 hover:text-yellow-300'
-        }`}
-        title="Alerts"
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="w-4 h-4">
-          <path strokeLinecap="round" strokeLinejoin="round"
-            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-          />
-        </svg>
-        {activeCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-3.5 h-3.5 rounded-full bg-red-500 text-[8px] font-bold text-white leading-none">
-            {activeCount > 9 ? '9+' : activeCount}
-          </span>
-        )}
       </button>
 
       {/* Settings */}
       <button
         onClick={() => setSettingsOpen(true)}
-        className="flex items-center justify-center w-7 h-7 rounded text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-colors"
+        className="flex items-center justify-center w-7 h-7 rounded text-theme-muted hover:text-theme hover:bg-theme-hover transition-colors touch-target"
         title="Settings"
       >
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

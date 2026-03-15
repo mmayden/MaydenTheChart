@@ -156,7 +156,7 @@ export function getORBZone(bars, orbMinutes = 15, byDay = null) {
  */
 export function classifyDayType(bars, prevHigh, prevLow, byDay = null) {
   if (!bars || bars.length === 0 || prevHigh == null || prevLow == null) {
-    return { type: 'range', brokePDH: false, brokePDL: false, label: '↔ Range Day', color: '#6b7280' }
+    return { type: 'range', brokePDH: false, brokePDL: false, label: 'Range Day', color: '#6b7280' }
   }
 
   const grouped   = byDay ?? groupBarsByDay(bars)
@@ -168,13 +168,13 @@ export function classifyDayType(bars, prevHigh, prevLow, byDay = null) {
   const brokePDL = todayBars.some((b) => b.low  < prevLow)
 
   if (brokePDH && !brokePDL) {
-    return { type: 'trend-bull', brokePDH, brokePDL, label: '↑ Trend Day — Bullish', color: '#22c55e' }
+    return { type: 'trend-bull', brokePDH, brokePDL, label: 'Trend Day — Bullish', color: '#22c55e' }
   }
   if (brokePDL && !brokePDH) {
-    return { type: 'trend-bear', brokePDH, brokePDL, label: '↓ Trend Day — Bearish', color: '#ef4444' }
+    return { type: 'trend-bear', brokePDH, brokePDL, label: 'Trend Day — Bearish', color: '#ef4444' }
   }
   if (brokePDH && brokePDL) {
-    return { type: 'chop', brokePDH, brokePDL, label: '⚡ Chop — Both Levels Broken', color: '#f59e0b' }
+    return { type: 'chop', brokePDH, brokePDL, label: 'Chop — Both Levels Broken', color: '#f59e0b' }
   }
-  return { type: 'range', brokePDH, brokePDL, label: '↔ Range Day', color: '#6b7280' }
+  return { type: 'range', brokePDH, brokePDL, label: 'Range Day', color: '#6b7280' }
 }

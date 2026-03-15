@@ -50,17 +50,26 @@ export const useChartStore = create((set) => ({
   setIndicators: (indicators) => set({ indicators }),
 
   // ─── UI panel states ───────────────────────────────────────────────────────
-  alertsPanelOpen:     false,
+  // Right panel: null | 'alerts' | 'backtest' | 'journal' | 'watchlist'
+  activePanel:         null,
   settingsOpen:        false,
   commandPaletteOpen:  false,
   sidebarOpen:         (() => { try { return window.innerWidth >= 768 } catch { return true } })(),
 
-  toggleAlertsPanel:     () => set((s) => ({ alertsPanelOpen: !s.alertsPanelOpen })),
-  setAlertsPanelOpen:    (open) => set({ alertsPanelOpen: open }),
+  /** Toggle: same panel = close, different panel = switch. */
+  setActivePanel:        (panel) => set((s) => ({ activePanel: s.activePanel === panel ? null : panel })),
+  closePanel:            () => set({ activePanel: null }),
   setSettingsOpen:       (open) => set({ settingsOpen: open }),
   setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
   setSidebarOpen:        (open) => set({ sidebarOpen: open }),
   toggleSidebar:         () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
+
+  // ─── Sound alerts ─────────────────────────────────────────────────────────
+  soundAlerts: (() => { try { return localStorage.getItem('lumpia-sound-alerts') === 'true' } catch { return false } })(),
+  setSoundAlerts: (enabled) => {
+    try { localStorage.setItem('lumpia-sound-alerts', String(enabled)) } catch { /* storage unavailable */ }
+    set({ soundAlerts: enabled })
+  },
 
   // ─── WebSocket state ───────────────────────────────────────────────────────
   wsStatus: 'disconnected', // 'connecting' | 'authenticated' | 'subscribed' | 'disconnected' | 'error'

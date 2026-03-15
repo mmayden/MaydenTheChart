@@ -1,0 +1,23 @@
+{
+  "name": "Cheechart — Day Trading Terminal",
+  "short_name": "Cheechart",
+  "description": "Real-time charting terminal for day traders. Indicators, backtesting, alerts, and multi-timeframe analysis.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

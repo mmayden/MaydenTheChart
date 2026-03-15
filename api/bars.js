@@ -77,8 +77,14 @@ export default async function handler(req, res) {
       const response = await fetch(`${baseUrl}?${params}`, { headers })
 
       if (!response.ok) {
-        console.error('[bars] Alpaca API error:', response.status, await response.text())
-        return res.status(response.status).json({ error: `Upstream API error (${response.status})` })
+        const text = await response.text()
+        console.error('[bars] Alpaca API error:', response.status, text)
+        // Generic error to client — never leak upstream status codes or details
+        const clientStatus = response.status === 404 ? 404 : 502
+        const clientMsg = response.status === 404
+          ? 'Symbol not found or no data available'
+          : 'Market data temporarily unavailable'
+        return res.status(clientStatus).json({ error: clientMsg })
       }
 
       const data = await response.json()

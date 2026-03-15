@@ -15,7 +15,7 @@ export const DEFAULT_PRESETS = {
   'clean': {
     id: 'clean',
     name: 'Clean',
-    icon: '◇',
+    icon: null,
     isDefault: true,
     indicators: {
       ema: false,
@@ -32,7 +32,7 @@ export const DEFAULT_PRESETS = {
   'full': {
     id: 'full',
     name: 'Full',
-    icon: '◈',
+    icon: null,
     isDefault: true,
     indicators: {
       ema: true,
@@ -49,7 +49,7 @@ export const DEFAULT_PRESETS = {
   'scalp': {
     id: 'scalp',
     name: 'Scalp',
-    icon: '⚡',
+    icon: null,
     isDefault: true,
     indicators: {
       ema: true,
@@ -66,7 +66,7 @@ export const DEFAULT_PRESETS = {
   'swing': {
     id: 'swing',
     name: 'Swing',
-    icon: '◆',
+    icon: null,
     isDefault: true,
     indicators: {
       ema: true,

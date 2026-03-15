@@ -26,6 +26,7 @@ export function DayTypeBanner({ dayType }) {
 
   return (
     <div
+      data-tour="day-type"
       className="flex items-center gap-2 px-3 py-1 rounded text-xs font-mono font-bold tracking-wide"
       style={{ backgroundColor: bg, color, border: `1px solid ${color}33` }}
     >

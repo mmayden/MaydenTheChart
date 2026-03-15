@@ -5,6 +5,11 @@
  *   1-6    → switch timeframe (1=1m, 2=5m, 3=15m, 4=1h, 5=4h, 6=1D)
  *   [/]    → cycle presets (prev/next)
  *   Cmd+K  → open command palette (works even in inputs)
+ *   A      → toggle Alerts panel
+ *   B      → toggle Backtest panel
+ *   J      → toggle Journal panel
+ *   W      → toggle Watchlist panel
+ *   Esc    → close active panel
  *
  * Shortcuts are disabled when an input/textarea is focused so they
  * don't interfere with typing (e.g. symbol input, alert forms).
@@ -21,6 +26,7 @@ import { usePresetsStore } from '../store/usePresetsStore'
 import { TIMEFRAME_ORDER } from '../constants/chart'
 
 const TF_KEYS = { '1': 0, '2': 1, '3': 2, '4': 3, '5': 4, '6': 5 }
+const PANEL_KEYS = { a: 'alerts', b: 'backtest', j: 'journal', w: 'watchlist' }
 const DEBOUNCE_MS = 150
 
 export function useKeyboardShortcuts() {
@@ -37,12 +43,35 @@ export function useKeyboardShortcuts() {
         return
       }
 
+      // ── Chart snapshot (Cmd+Shift+S / Ctrl+Shift+S) — works even in inputs ──
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 's') {
+        e.preventDefault()
+        window.dispatchEvent(new CustomEvent('cheechart:snapshot'))
+        return
+      }
+
       // Don't capture when typing in inputs
       const tag = e.target.tagName
       if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return
 
       // Don't capture with modifier keys (Ctrl+1, etc.)
       if (e.ctrlKey || e.metaKey || e.altKey) return
+
+      // ── Escape → close active panel ───────────────────────────────
+      if (e.key === 'Escape') {
+        const { activePanel, closePanel } = useChartStore.getState()
+        if (activePanel) {
+          closePanel()
+          return
+        }
+      }
+
+      // ── Panel shortcuts (a/b/j/w) ────────────────────────────────
+      const panelKey = PANEL_KEYS[e.key.toLowerCase()]
+      if (panelKey) {
+        useChartStore.getState().setActivePanel(panelKey)
+        return
+      }
 
       // ── Timeframe shortcuts (1-6) ───────────────────────────────
       const tfIndex = TF_KEYS[e.key]

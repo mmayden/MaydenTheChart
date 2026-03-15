@@ -211,7 +211,7 @@ Settings persistence, live data, and keyboard-first UX.
 | **Alert system** | Price-level and candle-streak alerts with browser notifications |
 | **Multi-symbol support** | Dynamic symbol input with autocomplete (~80 tickers) |
 
-### Tier 4 — Synthesis Layer (Phase 10) 🔄 CURRENT
+### Tier 4 — Synthesis Layer (Phase 10) ✅ COMPLETE
 This is what makes friends say "damn." The chart has all the data — now make it *think*.
 
 | Feature | Why it's here | Competitive edge |
@@ -225,16 +225,18 @@ This is what makes friends say "damn." The chart has all the data — now make i
 | **Session Stats** | "Today: 2 trades, +0.8%" in status bar from journal entries | Connects journal to live session — always visible |
 | **Sound Alerts** | Optional Bloomberg-style audio ping on alert triggers | Makes the app feel alive during market hours |
 
-### Tier 5 — Polish + Mobile (Phase 11)
-Make it sticky and portable.
+### Tier 5 — Polish + Mobile + Security (Phase 11) ✅ COMPLETE
+Make it sticky, portable, and hardened.
 
 | Feature | Why it's here |
 |---|---|
-| **First-visit onboarding** | 4-step tooltip tour highlighting Day Type, ATR gauge, presets, Cmd+K. No platform explains itself well. |
-| **Mobile polish pass** | Touch targets 44px+, swipe gestures (right=sidebar, left=panel), chart fills viewport |
-| **PWA manifest** | Installable to home screen, feels like a native app |
-| **CSS theme refactor** | Replace Tailwind !important overrides with CSS variable-first approach |
-| **Chart annotations** | Click to add notes/arrows directly on chart, saved per symbol |
+| **Security hardening** | localStorage schema validation at all trust boundaries, API error sanitization, Notification API guard, CSP headers |
+| **Code splitting** | React.lazy() for 6 components, manualChunks for lightweight-charts + vendor-api — bundle 501KB → 226KB main + 164KB charts + 81KB vendor |
+| **CSS theme refactor** | Eliminated 33 !important overrides → 16 semantic utility classes powered by CSS variables |
+| **Mobile polish pass** | Touch targets 44px+ via `@media (pointer: coarse)`, swipe gestures (right=sidebar, left=close), chart fills viewport |
+| **Chart snapshot** | Cmd+Shift+S captures chart as PNG with watermark, copies to clipboard (download fallback). Command palette + settings reference. |
+| **PWA manifest** | Installable to home screen — manifest.json, network-first service worker, apple-touch-icon |
+| **First-visit onboarding** | 4-step tooltip tour highlighting Day Type, ATR gauge, presets, Cmd+K. Mobile gets welcome toast. |
 
 ### Tier 6 — Future Differentiators (Phase 12+)
 The nuclear options — each one could be a product on its own.
@@ -243,11 +245,11 @@ The nuclear options — each one could be a product on its own.
 |---|---|
 | **Screener** | Scan watchlist for active setups ("QQQ: ORB breakout + RVOL 2.1x"). No free tool does this. |
 | **Trade replay mode** | Step through historical days bar-by-bar with indicators updating live. Webull's replay is visual-only — ours would have simulated trades + stats. |
+| **Chart annotations** | Click to add notes/arrows directly on chart, saved per symbol |
 | **Weekly gap tracking** | Panel showing unfilled QQQ weekly gaps with distance from current price |
 | **Volume profile (horizontal)** | Price levels with most traded volume = strongest S/R |
 | **Alert sets per preset** | Tie alert configurations to presets — huge pain point on every platform |
 | **Cloud sync / preset export** | Multi-device persistence, preset sharing between traders |
-| **Snapshot sharing** | One-click chart screenshot with all indicators, copyable/shareable |
 
 ---
 
@@ -295,11 +297,14 @@ Component state (useState — local only):
 | `src/services/websocket.js` | Alpaca WebSocket connection manager — auth, subscribe, reconnect with exponential backoff |
 | `api/bars.js` | Vercel serverless proxy — Alpaca API (keys server-only, pagination) |
 | `api/ws-auth.js` | Vercel serverless function — returns Alpaca WS credentials, protected by bearer token |
+| `api/snapshot.js` | Vercel serverless proxy — Alpaca snapshots for watchlist live prices |
+| `public/manifest.json` | PWA manifest (standalone display, icons, theme) |
+| `public/sw.js` | Network-first service worker (API bypass, static asset cache) |
 
 ### Stores (Zustand)
 | File | Purpose |
 |---|---|
-| `src/store/useChartStore.js` | Primary UI state — timeframe, symbol, indicator toggles, active panel, theme, WS status |
+| `src/store/useChartStore.js` | Primary UI state — timeframe, symbol, indicator toggles, active panel, theme, sound alerts, WS status |
 | `src/store/usePresetsStore.js` | Preset CRUD — save/load/rename/delete named presets, localStorage persistence |
 | `src/store/useAlertsStore.js` | Alert definitions, triggered state |
 | `src/store/useJournalStore.js` | Trade journal CRUD + stats (localStorage persisted) |
@@ -314,7 +319,9 @@ Component state (useState — local only):
 | `src/hooks/useKeyboardShortcuts.js` | Global keyboard shortcuts (1-6 timeframes, [/] presets, Cmd+K, panel toggles) |
 | `src/hooks/useViewportPersistence.js` | Preserves chart zoom/scroll across live data updates |
 | `src/hooks/useAlertChecker.js` | Checks alert conditions against incoming bar data |
-| `src/hooks/useURLState.js` | Bidirectional URL state sync (?s=QQQ&tf=5m&p=full) |
+| `src/hooks/useSwipeGesture.js` | Horizontal swipe detection for sidebar open/close on touch devices |
+| `src/hooks/useURLState.js` | Bidirectional URL state sync (?s=QQQ&tf=5m&p=full&panel=backtest) |
+| `src/hooks/useMTFSignals.js` | Multi-timeframe EMA signals — parallel TanStack Query fetches across 5m/15m/1h/4h/1D |
 
 ### Indicator Math (pure functions)
 | File | Purpose |
@@ -322,16 +329,17 @@ Component state (useState — local only):
 | `src/utils/indicators.js` | Pure math: EMA, VWAP, ATR, Bollinger, RSI, MACD — every function returns `{ series, signal }` |
 | `src/utils/levels.js` | Previous H/L detection, ORB zone, open of day, day type classification |
 | `src/utils/supportResistance.js` | Pivot point S/R detection algorithm |
-| `src/utils/confluence.js` | *(Phase 10)* Weighted confluence score — synthesizes all indicator signals |
-| `src/utils/backtest.js` | Backtest harness — ORB, EMA-cross, VWAP Bounce strategies |
+| `src/utils/confluence.js` | Weighted confluence score — synthesizes all indicator signals into score/bias/level |
+| `src/utils/backtest.js` | Backtest harness — ORB, EMA-cross, VWAP Bounce strategies + equity curve + day type breakdown |
 | `src/utils/timezone.js` | Shared ET timezone utilities (toETDateString, toETTime) |
 | `src/utils/normalizeBar.js` | Shared Alpaca bar → lightweight-charts bar normalizer |
-| `src/utils/validateEnv.js` | Validate required VITE_* env vars on startup |
+| `src/utils/validate.js` | localStorage schema validation (presets, journal, watchlist, symbol usage) |
+| `src/utils/snapshot.js` | Chart screenshot capture, watermark, clipboard/download export |
 
 ### App Shell
 | File | Purpose |
 |---|---|
-| `src/main.jsx` | App entry: QueryClientProvider, validateEnv() call |
+| `src/main.jsx` | App entry: ErrorBoundary, QueryClientProvider |
 | `src/App.jsx` | Single-page shell: TopNav + Sidebar + Chart + Right Panel + overlays |
 | `src/constants/chart.js` | All colors, periods, timeframe configs, symbol suggestions |
 | `src/constants/presets.js` | Default preset definitions (Clean, Full, Scalp, Swing) |
@@ -341,7 +349,7 @@ Component state (useState — local only):
 |---|---|
 | `src/components/layout/TopNav.jsx` | Top navigation (Logo, panel toggles, ⌘K, bell, settings) |
 | `src/components/layout/Sidebar.jsx` | Left sidebar — symbol, timeframe, presets, indicators, ATR gauge |
-| `src/components/layout/RightPanel.jsx` | *(Phase 10)* Generic right panel shell — renders active panel content |
+| `src/components/layout/RightPanel.jsx` | Generic right panel shell — renders active panel content |
 
 ### Chart Components
 | File | Purpose |
@@ -364,27 +372,28 @@ Component state (useState — local only):
 | File | Purpose |
 |---|---|
 | `src/components/panels/AlertsPanel.jsx` | Alert management (price-level + candle-streak) |
-| `src/components/panels/BacktestPanel.jsx` | *(Phase 10)* Configurable backtester with equity curve + day type breakdown |
-| `src/components/panels/JournalPanel.jsx` | *(Phase 10)* Trade journal + performance analytics |
-| `src/components/panels/WatchlistPanel.jsx` | *(Phase 10)* Watchlist with live prices + daily % change |
+| `src/components/panels/BacktestPanel.jsx` | Backtester — ORB/EMA-cross/VWAP Bounce, equity curve, day type breakdown |
+| `src/components/panels/JournalPanel.jsx` | Trade journal — log entries, analytics (streaks, setup breakdown, rating corr), filter tabs |
+| `src/components/panels/WatchlistPanel.jsx` | Symbol watchlist with live prices — add/remove, click to switch chart |
 
 ### UI Components
 | File | Purpose |
 |---|---|
-| `src/components/ui/ConfluenceBar.jsx` | *(Phase 10)* Weighted setup quality readout — traffic light + expandable breakdown |
-| `src/components/ui/MTFStrip.jsx` | *(Phase 10)* Multi-timeframe EMA alignment strip |
+| `src/components/ui/ConfluenceBar.jsx` | Weighted setup quality readout — traffic light pill + expandable breakdown |
+| `src/components/ui/MTFStrip.jsx` | Multi-timeframe EMA alignment strip (5m/15m/1h/4h/1D) |
 | `src/components/ui/IndicatorTabView.jsx` | RSI + MACD toggle buttons and mini charts below main chart |
 | `src/components/ui/ATRGauge.jsx` | Daily range used vs ATR budget gauge |
 | `src/components/ui/DayTypeBanner.jsx` | Trend / Range / Chop live classification |
 | `src/components/ui/IndicatorToggle.jsx` | Sidebar show/hide toggles for chart overlays |
 | `src/components/ui/PresetSelector.jsx` | Sidebar preset grid — switch, save, rename, delete |
 | `src/components/ui/CommandPalette.jsx` | Cmd+K search overlay (symbols, timeframes, indicators, panels) |
-| `src/components/ui/SettingsModal.jsx` | Themes + keyboard shortcuts reference |
+| `src/components/ui/SettingsModal.jsx` | Themes + keyboard shortcuts + sound alerts toggle |
 | `src/components/ui/CrosshairLegend.jsx` | OHLCV data overlay on crosshair hover (ref-based, no re-renders) |
 | `src/components/ui/ToastContainer.jsx` | Fixed bottom-right toast notification renderer |
-| `src/components/ui/StatusBar.jsx` | WebSocket/Polling status + last updated time |
+| `src/components/ui/StatusBar.jsx` | WebSocket/Polling status + last updated time + session stats |
 | `src/components/ui/ErrorBoundary.jsx` | React error boundary with fallback UI |
 | `src/components/ui/Logo.jsx` | Boogaloo font logo with BETA badge |
+| `src/components/ui/OnboardingTour.jsx` | 4-step first-visit tooltip tour (Day Type → ATR → Presets → Cmd+K) |
 
 ### Docs
 | File | Purpose |
@@ -399,7 +408,7 @@ Component state (useState — local only):
 
 ## Current Status
 
-**192/192 tests passing, build clean.**
+**257/257 tests passing, build clean. Main bundle 226KB + 164KB lightweight-charts + 81KB vendor-api (6 lazy chunks).**
 
 ### Completed
 - [x] Phases 1–4: Core chart, indicators, levels, S/R detection, ATR gauge, day type
@@ -407,18 +416,18 @@ Component state (useState — local only):
 - [x] Phase 6: Vercel deployment (serverless proxy, cheechart.space, SSL)
 - [x] Phase 7: Multi-symbol support (autocomplete, Alpaca validation, symbol-agnostic)
 - [x] Phase 8: Saved chart presets (4 defaults, custom CRUD, localStorage, 21 tests)
-- [x] Phase 9: Multi-view architecture, command palette, alerts panel, Bollinger Bands, backtester engine, dashboard, mobile responsive
+- [x] Phase 9: Command palette, alerts panel, Bollinger Bands, backtester engine, journal, mobile responsive
+- [x] Phase 10A: Architecture consolidation — single-page panel system, killed react-router-dom
+- [x] Phase 10B: Synthesis layer — confluence score, MTF strip, backtester upgrade
+- [x] Phase 10C: Panel content — watchlist live prices, journal analytics, sound alerts, session stats
+- [x] Phase 11A: Security hardening — localStorage schema validation, API error sanitization, Notification guard, code splitting (501KB → 303KB main)
+- [x] Phase 11B: CSS theme refactor (eliminated 33 !important overrides), touch targets (44px+), swipe gestures, chart snapshot (Cmd+Shift+S)
+- [x] Phase 11C: PWA (manifest, service worker, icons), onboarding tour (4-step tooltip)
 - [x] Alert system: price-level + candle-streak alerts with browser notifications
 - [x] QOL: crosshair legend, toasts, viewport persistence, keyboard shortcuts, error boundary
 - [x] Health audits: security headers, input validation, shared utilities, dead code cleanup
 
-### In Progress
-- [ ] Phase 10A: Architecture consolidation (single-page, panel system, kill router)
-- [ ] Phase 10B: Synthesis layer (confluence score, MTF strip, backtester upgrade)
-- [ ] Phase 10C: Right panel content (watchlist with live prices, journal analytics)
-
 ### Upcoming
-- [ ] Phase 11: Polish + Mobile (onboarding, touch targets, PWA, theme refactor)
 - [ ] Phase 12+: Screener, trade replay, gap tracking, cloud sync
 
 ---
@@ -452,3 +461,8 @@ Component state (useState — local only):
 | 2026-03-15 | UX improvements: saved preset delete confirmation (two-click safety, red-tinted pill capsule), rename/delete buttons in theme-aware pill with larger hit targets. Terminal theme added (sage green #a8d8a8 on deep black #060806, vivid green accent #50d050) — CSS vars, Tailwind overrides, SettingsModal 3-column grid. Hover feedback (brightness-125) on all preset buttons. Build clean. |
 | 2026-03-15 | Phase 9: Multi-view architecture (react-router-dom, ChartView + DashboardView), TopNav shared navigation, Sidebar extracted, Command palette (Cmd+K), AlertsPanel slide-out (replaces dropdown), Bollinger Bands indicator + overlay, RSI divergence detection helper, backtester engine (ORB + EMA-cross), Dashboard with BacktestCard + TradeJournal + WatchlistCard, useJournalStore, URL state sync, keyboard shortcuts expanded ([/] presets, Cmd+K), Settings shortcuts tab, mobile responsive layout. Quality audit: fixed z-index collision, TradeJournal reactivity, added useJournalStore tests. 192/192 tests, build clean. |
 | 2026-03-15 | Strategic assessment + competitive research: 4 parallel research agents analyzed TradingView (1.9/5 Trustpilot, paywall rage, Pine Script lock-in, chart lag), Webull (great mobile, 56 indicators only, no real backtesting, desktop glitchy), thinkorswim (1.3/5 Trustpilot, Schwab migration disaster, deprecated ThinkScript), and 2026 UX trends (single-page panel architectures, AI copilots, command palettes). Decision: collapse `/dashboard` route into right-panel system (single-page, chart-centric). New Phase 10 plan: confluence score, MTF strip, panel architecture, backtester upgrade, watchlist with live prices, journal analytics. Updated project.md, tasks.md, CLAUDE.md, brainstorming.md. |
+| 2026-03-15 | Phase 10A: Architecture consolidation. Replaced `alertsPanelOpen` with unified `activePanel` state (`null\|'alerts'\|'backtest'\|'journal'\|'watchlist'`). Built `RightPanel.jsx` generic shell (desktop slide-out, mobile full-screen overlay). Created `BacktestPanel`, `JournalPanel`, `WatchlistPanel` from dashboard card content. Refactored `AlertsPanel` to render as content-only (shell handles chrome). Killed react-router-dom: inlined ChartView into App.jsx, deleted `src/views/`, `npm uninstall react-router-dom`. TopNav: panel toggle icons (backtest/journal/watchlist/alerts) replace Chart/Dashboard nav tabs. CommandPalette: "Panel" commands replace "Navigate". Keyboard shortcuts: A/B/J/W toggle panels, Esc closes. URL state: `?panel=backtest` param added. SettingsModal: Panels shortcuts section added. 5 new activePanel tests. 197/197 tests, build clean. |
+| 2026-03-15 | Phase 10B: Synthesis layer. `confluence.js` — weighted synthesis of 6 indicator categories (Day Type 3x, EMA Stack 3x, VWAP 2x, ATR 2x, RSI 1x, MACD 1x) → score/bias/level/reasons/warnings. 19 unit tests. `ConfluenceBar.jsx` — traffic light pill + expandable dropdown in chart sub-header. `MTFStrip.jsx` + `useMTFSignals.js` — multi-timeframe EMA alignment (5m/15m/1h/4h/1D) via parallel TanStack Query fetches. BacktestPanel upgraded: 3 strategies (ORB/EMA Cross/VWAP Bounce), SVG equity curve, collapsible day type breakdown. `backtest.js` expanded: `backtestVWAPBounce()`, `enrichTradesWithDayType()`, `statsByDayType()`, `equityCurve()`. 9 new backtest tests. 225/225 tests, build clean. |
+| 2026-03-15 | Phase 10C: Panel content upgrades. `api/snapshot.js` — Vercel serverless proxy for Alpaca snapshots (multi-symbol live prices). `useWatchlistQuotes.js` — TanStack Query with 30s auto-refresh when watchlist panel open. WatchlistPanel upgraded: live price + daily % change per symbol. JournalPanel upgraded: analytics (win rate by setup, current/longest streak, rating correlation), filter tabs (All/Win/Loss), setup type filter. Sound alerts: Web Audio API ping (880Hz, off by default), `soundAlerts` preference in store + Settings toggle. StatusBar: session stats showing today's trades/wins/losses from journal. 225/225 tests, build clean. |
+| 2026-03-15 | Phase 11: Security + Polish + PWA. **11A:** localStorage schema validation (`validate.js` + 29 tests), wired into presets/journal/watchlist/symbol stores. API error sanitization (bars.js + snapshot.js never leak upstream status). Notification API guard. Code splitting — React.lazy for 6 components, manualChunks for lightweight-charts (501KB → 303KB main + 164KB charts). CSP updated for PWA. **11B:** Eliminated 33 CSS !important overrides → 16 semantic utility classes. Touch targets 44px+ via `@media (pointer: coarse)`. Swipe gestures (`useSwipeGesture.js`). Chart snapshot (`snapshot.js` + Cmd+Shift+S + command palette). **11C:** PWA manifest + network-first service worker + icons. Onboarding tour (4-step tooltip, mobile welcome toast). Updated all docs. 257/257 tests, build clean. |
+| 2026-03-15 | UI cleanup: removed emoji prefixes from day type labels (⚡↑↓↔), removed unicode icons from preset definitions (◇◈⚡◆), simplified TopNav search button from wide pill+kbd to icon-only magnifying glass. Added vendor-api manualChunk (226KB main + 164KB charts + 81KB vendor). 257/257 tests, build clean. |

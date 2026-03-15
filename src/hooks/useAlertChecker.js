@@ -10,6 +10,7 @@
 import { useEffect } from 'react'
 import { useAlertsStore } from '../store/useAlertsStore'
 import { useChartStore } from '../store/useChartStore'
+import { ALERT_SOUND_FREQ, ALERT_SOUND_DURATION } from '../constants/chart'
 
 export function getStreak(bars) {
   if (!bars?.length) return { count: 0, direction: null }
@@ -24,18 +25,42 @@ export function getStreak(bars) {
   return { count, direction: lastDir }
 }
 
+/** Play a subtle ping via Web Audio API (no audio file needed). */
+function playAlertSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.frequency.value = ALERT_SOUND_FREQ
+    osc.type = 'sine'
+    gain.gain.setValueAtTime(0.15, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + ALERT_SOUND_DURATION)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + ALERT_SOUND_DURATION)
+  } catch { /* audio unavailable */ }
+}
+
 function fireNotification(title, body) {
+  // Guard: Notification API may be unavailable (some mobile browsers, iframes)
+  if (typeof Notification === 'undefined') return
+
   const send = () => new Notification(title, { body })
   if (Notification.permission === 'granted') {
     send()
   } else if (Notification.permission !== 'denied') {
     Notification.requestPermission().then((p) => { if (p === 'granted') send() })
   }
+
+  // Play sound if enabled
+  const soundEnabled = useChartStore.getState().soundAlerts
+  if (soundEnabled) playAlertSound()
 }
 
 /**
  * Checks all active alerts against current bars. Call once in the component
- * that owns the bars data (ChartView).
+ * that owns the bars data (App.jsx).
  *
  * @param {Array} bars — current bar data
  * @param {string} timeframe — current timeframe label (for notification text)

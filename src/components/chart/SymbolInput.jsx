@@ -15,6 +15,7 @@ import { useChartStore } from '../../store/useChartStore'
 import { useToast } from '../../store/useToastStore'
 import { fetchBars } from '../../services/alpaca'
 import { SYMBOL_SUGGESTIONS } from '../../constants/chart'
+import { validateSymbolUsage } from '../../utils/validate'
 
 const SYMBOL_FONT = {
   fontFamily: "'Inter', sans-serif",
@@ -30,7 +31,8 @@ const MAX_SUGGESTIONS = 8
 /** Read usage counts from localStorage. */
 function getUsageCounts() {
   try {
-    return JSON.parse(localStorage.getItem(USAGE_KEY)) ?? {}
+    const raw = JSON.parse(localStorage.getItem(USAGE_KEY)) ?? {}
+    return validateSymbolUsage(raw)
   } catch {
     return {}
   }

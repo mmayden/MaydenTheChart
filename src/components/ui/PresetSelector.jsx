@@ -99,7 +99,6 @@ export function PresetSelector() {
               }}
               title={preset.name}
             >
-              <span className="opacity-60 text-[9px]">{preset.icon}</span>
               <span className="truncate">{preset.name}</span>
             </button>
           )

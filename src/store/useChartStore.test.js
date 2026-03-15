@@ -5,6 +5,7 @@ const defaultState = {
   theme: 'dark',
   selectedSymbol: 'QQQ',
   selectedTimeframe: '5Min',
+  activePanel: null,
   indicators: {
     ema: true,
     vwap: true,
@@ -118,6 +119,35 @@ describe('useChartStore', () => {
   it('setMarketOpen updates isMarketOpen', () => {
     useChartStore.getState().setMarketOpen(true)
     expect(useChartStore.getState().isMarketOpen).toBe(true)
+  })
+
+  // ─── activePanel ───────────────────────────────────────────────────────────
+
+  it('activePanel defaults to null', () => {
+    expect(useChartStore.getState().activePanel).toBeNull()
+  })
+
+  it('setActivePanel opens a panel', () => {
+    useChartStore.getState().setActivePanel('alerts')
+    expect(useChartStore.getState().activePanel).toBe('alerts')
+  })
+
+  it('setActivePanel toggles same panel off', () => {
+    useChartStore.getState().setActivePanel('alerts')
+    useChartStore.getState().setActivePanel('alerts')
+    expect(useChartStore.getState().activePanel).toBeNull()
+  })
+
+  it('setActivePanel switches to different panel', () => {
+    useChartStore.getState().setActivePanel('alerts')
+    useChartStore.getState().setActivePanel('backtest')
+    expect(useChartStore.getState().activePanel).toBe('backtest')
+  })
+
+  it('closePanel sets activePanel to null', () => {
+    useChartStore.getState().setActivePanel('journal')
+    useChartStore.getState().closePanel()
+    expect(useChartStore.getState().activePanel).toBeNull()
   })
 
   // ─── Independence ──────────────────────────────────────────────────────────

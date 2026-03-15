@@ -20,9 +20,9 @@ export function IndicatorTabView({ bars }) {
   if (!bars?.length) return null
 
   return (
-    <div className="shrink-0 border-t border-gray-800">
+    <div className="shrink-0 border-t border-theme">
       {/* Tab buttons — always visible, clicking toggles on/off */}
-      <div className="flex items-center gap-1 px-3 py-1.5 border-b border-gray-800" style={{ backgroundColor: 'var(--bg-surface, #0d1117)' }}>
+      <div className="flex items-center gap-1 px-3 py-1.5 border-b border-theme" style={{ backgroundColor: 'var(--bg-surface, #0d1117)' }}>
         {['RSI', 'MACD'].map((tab) => {
           const key = tab.toLowerCase()
           const on  = key === 'rsi' ? rsiEnabled : macdEnabled
@@ -33,8 +33,8 @@ export function IndicatorTabView({ bars }) {
               className={[
                 'px-2 py-1 text-xs font-mono font-semibold rounded border transition-colors',
                 on
-                  ? 'border-blue-500 text-blue-300 bg-blue-950'
-                  : 'border-gray-700 text-gray-400 hover:text-gray-300 hover:border-gray-600 hover:bg-gray-800/50',
+                  ? 'border-accent text-accent bg-accent-dim'
+                  : 'border-theme-mid text-theme-muted hover:text-theme hover:border-theme-mid hover:bg-theme-hover',
               ].join(' ')}
             >
               {tab}

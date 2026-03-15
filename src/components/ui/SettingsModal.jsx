@@ -72,6 +72,15 @@ const SHORTCUTS = [
     { keys: ['['],  label: 'Previous preset' },
     { keys: [']'],  label: 'Next preset' },
   ]},
+  { category: 'Panels', items: [
+    { keys: ['A'],  label: 'Toggle Alerts panel' },
+    { keys: ['B'],  label: 'Toggle Backtest panel' },
+    { keys: ['J'],  label: 'Toggle Journal panel' },
+    { keys: ['W'],  label: 'Toggle Watchlist panel' },
+  ]},
+  { category: 'Actions', items: [
+    { keys: ['⌘', '⇧', 'S'],  label: 'Chart snapshot (copy / download)' },
+  ]},
 ]
 
 // ── Sub-components ──────────────────────────────────────────────────────────
@@ -147,8 +156,10 @@ const TABS = [
 // ── Main component ──────────────────────────────────────────────────────────
 
 export function SettingsModal({ onClose }) {
-  const theme    = useChartStore((s) => s.theme)
-  const setTheme = useChartStore((s) => s.setTheme)
+  const theme          = useChartStore((s) => s.theme)
+  const setTheme       = useChartStore((s) => s.setTheme)
+  const soundAlerts    = useChartStore((s) => s.soundAlerts)
+  const setSoundAlerts = useChartStore((s) => s.setSoundAlerts)
   const [activeTab, setActiveTab] = useState('appearance')
 
   useEffect(() => {
@@ -250,6 +261,31 @@ export function SettingsModal({ onClose }) {
                     onSelect={setTheme}
                   />
                 ))}
+              </div>
+
+              {/* Sound alerts toggle */}
+              <div style={{ marginTop: 24 }}>
+                <div style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 10 }}>
+                  Alerts
+                </div>
+                <label style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '10px 12px', borderRadius: 8,
+                  background: 'var(--bg-surface)',
+                  border: '1px solid var(--border)',
+                  cursor: 'pointer',
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={soundAlerts}
+                    onChange={(e) => setSoundAlerts(e.target.checked)}
+                    style={{ accentColor: 'var(--accent)' }}
+                  />
+                  <div>
+                    <div style={{ fontSize: 12, color: 'var(--text-primary)' }}>Sound alerts</div>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>Play a subtle ping when alerts trigger</div>
+                  </div>
+                </label>
               </div>
             </div>
           )}

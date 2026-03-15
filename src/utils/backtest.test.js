@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { backtestORB, backtestEMACross } from './backtest'
+import { backtestORB, backtestEMACross, backtestVWAPBounce, enrichTradesWithDayType, statsByDayType, equityCurve } from './backtest'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -128,5 +128,87 @@ describe('backtestEMACross', () => {
       expect(stats.winRate).toBeLessThanOrEqual(100)
       expect(stats.wins + stats.losses + stats.breakeven).toBe(stats.totalTrades)
     }
+  })
+})
+
+describe('backtestVWAPBounce', () => {
+  it('returns empty on null/empty input', () => {
+    expect(backtestVWAPBounce(null).trades).toHaveLength(0)
+    expect(backtestVWAPBounce([]).trades).toHaveLength(0)
+    expect(backtestVWAPBounce(null).stats.totalTrades).toBe(0)
+  })
+
+  it('returns trades with correct shape', () => {
+    const bars = makeIntradayBars(5, 40)
+    const { trades } = backtestVWAPBounce(bars)
+    trades.forEach((t) => {
+      expect(t).toHaveProperty('date')
+      expect(t).toHaveProperty('type')
+      expect(t).toHaveProperty('entry')
+      expect(t).toHaveProperty('exit')
+      expect(t).toHaveProperty('pnl')
+      expect(t).toHaveProperty('pnlPct')
+      expect(t).toHaveProperty('result')
+      expect(['long', 'short']).toContain(t.type)
+    })
+  })
+
+  it('stats have correct shape', () => {
+    const bars = makeIntradayBars(5, 40)
+    const { stats } = backtestVWAPBounce(bars)
+    expect(stats).toHaveProperty('totalTrades')
+    expect(stats).toHaveProperty('winRate')
+    expect(stats.wins + stats.losses + stats.breakeven).toBe(stats.totalTrades)
+  })
+})
+
+describe('equityCurve', () => {
+  it('computes cumulative P&L', () => {
+    const trades = [
+      { date: '2024-01-01', pnlPct: 1.5 },
+      { date: '2024-01-02', pnlPct: -0.5 },
+      { date: '2024-01-03', pnlPct: 2.0 },
+    ]
+    const curve = equityCurve(trades)
+    expect(curve).toHaveLength(3)
+    expect(curve[0].cumPnl).toBe(1.5)
+    expect(curve[1].cumPnl).toBe(1.0)
+    expect(curve[2].cumPnl).toBe(3.0)
+  })
+
+  it('returns empty for empty trades', () => {
+    expect(equityCurve([])).toHaveLength(0)
+  })
+})
+
+describe('statsByDayType', () => {
+  it('groups trades by day type', () => {
+    const trades = [
+      { pnlPct: 1, result: 'win', dayType: 'trend-bull' },
+      { pnlPct: -0.5, result: 'loss', dayType: 'trend-bull' },
+      { pnlPct: 0.3, result: 'win', dayType: 'chop' },
+    ]
+    const breakdown = statsByDayType(trades)
+    expect(breakdown['trend-bull'].totalTrades).toBe(2)
+    expect(breakdown['chop'].totalTrades).toBe(1)
+  })
+
+  it('handles trades with no day type', () => {
+    const trades = [
+      { pnlPct: 1, result: 'win' },
+    ]
+    const breakdown = statsByDayType(trades)
+    expect(breakdown['unknown'].totalTrades).toBe(1)
+  })
+})
+
+describe('enrichTradesWithDayType', () => {
+  it('returns trades unchanged when no bars', () => {
+    const trades = [{ date: '2024-01-01', pnlPct: 1 }]
+    expect(enrichTradesWithDayType(null, trades)).toBe(trades)
+  })
+
+  it('returns trades unchanged when no trades', () => {
+    expect(enrichTradesWithDayType([], null)).toBeNull()
   })
 })

@@ -68,6 +68,7 @@ different panel = switch. On mobile (<768px), panels become full-screen overlays
 ### Synthesis Layer
 - Confluence bar: `src/components/ui/ConfluenceBar.jsx` — setup quality readout
 - MTF status strip: `src/components/ui/MTFStrip.jsx` — multi-timeframe EMA alignment
+- MTF signals hook: `src/hooks/useMTFSignals.js` — fetches bars across 5m/15m/1h/4h/1D
 
 ### Stores
 - Primary UI state: `src/store/useChartStore.js` (timeframe, symbol, indicators, activePanel, theme)
@@ -77,12 +78,14 @@ different panel = switch. On mobile (<768px), panels become full-screen overlays
 - Toast store: `src/store/useToastStore.js`
 
 ### Hooks
-- Keyboard shortcuts (1-6, [/], Cmd+K, panel toggles): `src/hooks/useKeyboardShortcuts.js`
+- Keyboard shortcuts (1-6, [/], Cmd+K, Cmd+Shift+S, panel toggles): `src/hooks/useKeyboardShortcuts.js`
 - Viewport persistence: `src/hooks/useViewportPersistence.js`
 - WebSocket live feed: `src/hooks/useAlpacaSocket.js` + `src/services/websocket.js`
 - Alert checker: `src/hooks/useAlertChecker.js`
 - Daily bars hook: `src/hooks/useDailyBars.js`
+- MTF signals: `src/hooks/useMTFSignals.js`
 - Watchlist quotes: `src/hooks/useWatchlistQuotes.js`
+- Swipe gestures (touch devices): `src/hooks/useSwipeGesture.js`
 
 ### Right Panels (slide-out, one at a time)
 - Alerts panel: `src/components/panels/AlertsPanel.jsx`
@@ -94,17 +97,25 @@ different panel = switch. On mobile (<768px), panels become full-screen overlays
 - Preset selector UI: `src/components/ui/PresetSelector.jsx`
 - Default preset definitions: `src/constants/presets.js`
 - Command palette (Cmd+K): `src/components/ui/CommandPalette.jsx`
-- Settings modal (themes + shortcuts): `src/components/ui/SettingsModal.jsx`
+- Settings modal (themes + shortcuts + sound alerts): `src/components/ui/SettingsModal.jsx`
 - Error boundary: `src/components/ui/ErrorBoundary.jsx`
 - Logo: `src/components/ui/Logo.jsx`
 - Toast notifications: `src/components/ui/ToastContainer.jsx`
-- Status bar (WS/polling): `src/components/ui/StatusBar.jsx`
+- Status bar (WS/polling + session stats): `src/components/ui/StatusBar.jsx`
 - ATR gauge: `src/components/ui/ATRGauge.jsx`
 - Day type banner: `src/components/ui/DayTypeBanner.jsx`
+- Onboarding tour: `src/components/ui/OnboardingTour.jsx`
 
 ### Utilities
 - Shared timezone utils: `src/utils/timezone.js`
 - Bar normalizer: `src/utils/normalizeBar.js`
+- localStorage schema validation: `src/utils/validate.js`
+- Chart snapshot capture + export: `src/utils/snapshot.js`
+
+### PWA
+- Manifest: `public/manifest.json`
+- Service worker: `public/sw.js`
+- Icons: `public/icons/icon-192.png`, `public/icons/icon-512.png`
 
 ### Docs
 - Project spec + architecture: `project.md`

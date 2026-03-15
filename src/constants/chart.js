@@ -49,6 +49,31 @@ export const BOLLINGER_MULTIPLIER   = 2
 export const BOLLINGER_MIDDLE_COLOR = '#a78bfa'  // purple — SMA(20) middle band
 export const BOLLINGER_BAND_COLOR   = '#7c3aed80' // purple semi-transparent — upper/lower bands
 
+// ─── Confluence weights ─────────────────────────────────────────────────────
+export const CONFLUENCE_WEIGHTS = {
+  dayType:  3,
+  emaStack: 3,
+  vwap:     2,
+  atr:      2,
+  rsi:      1,
+  macd:     1,
+}
+
+// ─── Confluence / MTF signal colors ─────────────────────────────────────────
+export const SIGNAL_COLORS = {
+  bull:     '#22c55e',
+  bear:     '#ef4444',
+  neutral:  '#6b7280',
+  strong:   '#22c55e',
+  moderate: '#eab308',
+  weak:     '#ef4444',
+  none:     '#6b7280',
+}
+
+// ─── Alert sound ────────────────────────────────────────────────────────────
+export const ALERT_SOUND_FREQ     = 880   // A5 note
+export const ALERT_SOUND_DURATION = 0.3   // seconds
+
 // ─── Timeframe config ─────────────────────────────────────────────────────────
 // lookbackMs: how far back to fetch data for this timeframe
 // alpacaTimeframe: the string Alpaca's API expects

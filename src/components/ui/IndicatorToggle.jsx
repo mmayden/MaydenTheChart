@@ -36,12 +36,12 @@ export function IndicatorToggle() {
             onClick={() => { if (!disabled) { toggleIndicator(key); markModified() } }}
             disabled={disabled}
             className={[
-              'px-2 py-1 text-xs font-mono font-semibold rounded border transition-colors text-left',
+              'px-2 py-1 text-xs font-mono font-semibold rounded border transition-colors text-left touch-target',
               disabled
-                ? 'border-gray-800 bg-transparent cursor-not-allowed opacity-40'
+                ? 'border-theme bg-transparent cursor-not-allowed opacity-40'
                 : on
-                  ? 'border-blue-500 bg-blue-950'
-                  : 'border-gray-700 bg-transparent hover:border-gray-600 hover:bg-gray-800/50',
+                  ? 'border-accent bg-accent-dim'
+                  : 'border-theme-mid bg-transparent hover:border-theme-mid hover:bg-theme-hover',
             ].join(' ')}
             style={{ color: disabled ? 'var(--text-muted, #9ca3af)' : on ? 'var(--text-primary, #e8e0d0)' : 'var(--text-muted, #9ca3af)' }}
             title={disabled ? 'VWAP is only available on intraday timeframes' : undefined}

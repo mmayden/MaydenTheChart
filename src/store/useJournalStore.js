@@ -6,13 +6,16 @@
  */
 
 import { create } from 'zustand'
+import { validateJournalEntry } from '../utils/validate'
 
 const STORAGE_KEY = 'cheechart-journal'
 
 function loadEntries() {
   try {
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY))
-    if (Array.isArray(stored)) return stored
+    if (Array.isArray(stored)) {
+      return stored.map(validateJournalEntry).filter(Boolean)
+    }
   } catch { /* corrupt or missing */ }
   return []
 }

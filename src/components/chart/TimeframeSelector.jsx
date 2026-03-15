@@ -30,10 +30,10 @@ export function TimeframeSelector() {
             key={tf}
             onClick={() => handleSelect(tf)}
             className={[
-              'px-2 py-1 text-xs font-mono font-semibold rounded border transition-colors text-left',
+              'px-2 py-1 text-xs font-mono font-semibold rounded border transition-colors text-left touch-target',
               active
-                ? 'border-blue-500 text-blue-300 bg-blue-950'
-                : 'border-gray-700 text-gray-300 bg-transparent hover:border-gray-600 hover:bg-gray-800/50',
+                ? 'border-accent text-accent bg-accent-dim'
+                : 'border-theme-mid text-theme bg-transparent hover:border-theme-mid hover:bg-theme-hover',
             ].join(' ')}
           >
             {active && <span className="mr-1.5">▸</span>}

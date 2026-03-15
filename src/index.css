@@ -80,43 +80,26 @@ body,
   color: var(--text-primary);
 }
 
-/* ── Lumpia theme: Tailwind class overrides ──────────────────────────────── */
+/* ── Theme-aware semantic utilities ─────────────────────────────────────── */
+/* Replaces per-theme !important overrides. Components use these instead of
+   raw Tailwind gray/blue classes so every theme works without overrides.    */
 
-[data-theme="lumpia"] .border-gray-800 { border-color: var(--border) !important; }
-[data-theme="lumpia"] .border-gray-700 { border-color: var(--border-mid) !important; }
-[data-theme="lumpia"] .text-gray-500   { color: var(--text-muted) !important; }
-[data-theme="lumpia"] .text-gray-400   { color: var(--text-muted) !important; }
-[data-theme="lumpia"] .text-gray-300   { color: var(--text-primary) !important; }
-[data-theme="lumpia"] .text-gray-100   { color: var(--text-primary) !important; }
-[data-theme="lumpia"] .text-white      { color: var(--text-primary) !important; }
-[data-theme="lumpia"] .text-blue-400   { color: var(--accent) !important; }
-[data-theme="lumpia"] .text-blue-300   { color: var(--accent) !important; }
-[data-theme="lumpia"] .bg-gray-800     { background-color: var(--border) !important; }
-[data-theme="lumpia"] .border-blue-500 { border-color: var(--accent) !important; }
-[data-theme="lumpia"] .bg-blue-950     { background-color: var(--accent-dim) !important; }
+.border-theme          { border-color: var(--border); }
+.border-theme-mid      { border-color: var(--border-mid); }
+.divide-theme > * + *  { border-color: var(--border); }
+.text-theme            { color: var(--text-primary); }
+.text-theme-muted      { color: var(--text-muted); }
+.bg-theme-border       { background-color: var(--border); }
+.bg-theme-surface      { background-color: var(--bg-surface); }
+.text-accent           { color: var(--accent); }
+.border-accent         { border-color: var(--accent); }
+.bg-accent-dim         { background-color: var(--accent-dim); }
+.placeholder-theme-muted::placeholder { color: var(--text-muted); }
 
-[data-theme="lumpia"] .hover\:text-gray-300:hover { color: var(--text-primary) !important; }
-[data-theme="lumpia"] .hover\:bg-gray-800:hover   { background-color: var(--hover-bg) !important; }
-[data-theme="lumpia"] .hover\:border-gray-600:hover { border-color: var(--border-mid) !important; }
-
-/* ── Terminal theme: Tailwind class overrides ────────────────────────────── */
-
-[data-theme="terminal"] .border-gray-800 { border-color: var(--border) !important; }
-[data-theme="terminal"] .border-gray-700 { border-color: var(--border-mid) !important; }
-[data-theme="terminal"] .text-gray-500   { color: var(--text-muted) !important; }
-[data-theme="terminal"] .text-gray-400   { color: var(--text-muted) !important; }
-[data-theme="terminal"] .text-gray-300   { color: var(--text-primary) !important; }
-[data-theme="terminal"] .text-gray-100   { color: var(--text-primary) !important; }
-[data-theme="terminal"] .text-white      { color: var(--text-primary) !important; }
-[data-theme="terminal"] .text-blue-400   { color: var(--accent) !important; }
-[data-theme="terminal"] .text-blue-300   { color: var(--accent) !important; }
-[data-theme="terminal"] .bg-gray-800     { background-color: var(--border) !important; }
-[data-theme="terminal"] .border-blue-500 { border-color: var(--accent) !important; }
-[data-theme="terminal"] .bg-blue-950     { background-color: var(--accent-dim) !important; }
-
-[data-theme="terminal"] .hover\:text-gray-300:hover { color: var(--text-primary) !important; }
-[data-theme="terminal"] .hover\:bg-gray-800:hover   { background-color: var(--hover-bg) !important; }
-[data-theme="terminal"] .hover\:border-gray-600:hover { border-color: var(--border-mid) !important; }
+/* Hover variants */
+.hover\:bg-theme-hover:hover     { background-color: var(--hover-bg); }
+.hover\:text-theme:hover         { color: var(--text-primary); }
+.hover\:border-theme-mid:hover   { border-color: var(--border-mid); }
 
 /* ── Crosshair legend fade ─────────────────────────────────────────────── */
 
@@ -146,6 +129,18 @@ body,
   display: none !important;
 }
 
+/* ── Touch target sizing (WCAG 44px minimum on touch devices) ────────────── */
+
+@media (pointer: coarse) {
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
 /* ── Mobile responsive ───────────────────────────────────────────────────── */
 
 @media (max-width: 767px) {
@@ -154,15 +149,6 @@ body,
     transform: translateX(0) !important;
   }
 
-  /* Dashboard cards full width */
-  .dashboard-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  /* Smaller text on mobile */
-  .mobile-text-xs {
-    font-size: 10px;
-  }
 }
 
 /* ── Line clamp utility ──────────────────────────────────────────────────── */
