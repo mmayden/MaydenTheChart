@@ -254,6 +254,57 @@ The nuclear options — each one could be a product on its own.
 
 ---
 
+## Data Provider Strategy
+
+**Current:** Alpaca Markets free tier (IEX feed, 200 calls/min, 7yr history, WebSocket for 30 symbols).
+
+**Architecture decision (2026-03-15):** Abstract the data layer behind a provider interface
+so the app is provider-agnostic. The chart, indicators, backtester, and confluence engine
+never touch provider-specific code — they receive normalized `Bar[]` arrays.
+
+| Provider | Free Tier | Best For | When to consider |
+|---|---|---|---|
+| **Alpaca** (current) | 200 calls/min, WS, 7yr history | Free with WebSocket | Current — works, no cost |
+| **FMP** ($19/mo) | 250/day free | Best bang-for-buck paid upgrade | When IEX data quality matters |
+| **Polygon/Massive** (~$29-199/mo) | 5 calls/min free | SIP data (gold standard quality) | When data must match TradingView |
+| **Twelve Data** | 800/day, real-time US | Deep history (back to 1980) | Daily bars supplement |
+
+**Provider interface (3 methods):**
+```js
+{
+  fetchBars(symbol, timeframe, start, end) → Bar[],
+  subscribe(symbol, onBar) → unsubscribe(),
+  fetchSnapshot(symbols) → Snapshot[]
+}
+```
+
+**Coupling audit (2026-03-15):**
+- `src/services/alpaca.js` (27 lines) — thin HTTP wrapper, easy to swap
+- `src/services/websocket.js` (170 lines) — Alpaca-specific protocol, needs adapter
+- `api/bars.js`, `api/snapshot.js`, `api/ws-auth.js` — HTTP proxies, easy to make provider-aware
+- Indicators, backtest, confluence, levels, S/R — **zero** provider dependency
+
+## Production Infrastructure
+
+**Cache strategy:**
+- Static assets (`/assets/*`): `immutable, max-age=31536000` — Vite content-hashes all filenames
+- HTML: `s-maxage=60, stale-while-revalidate=300` — fast deploy propagation
+- API: per-endpoint (bars 30s, snapshot 15s, ws-auth no-store)
+- Service worker: network-first for all, API bypassed, versioned via build hash
+
+**Security headers (vercel.json):**
+- HSTS (2yr, includeSubDomains, preload), X-Frame-Options DENY, nosniff
+- CSP: self + fonts + Alpaca WS only, frame-ancestors none
+- Permissions-Policy: camera/microphone/geolocation disabled
+
+**Performance targets:**
+- Main bundle: <250KB (currently 226KB + 164KB charts + 81KB vendor, 6 lazy chunks)
+- LCP: <2.5s (self-hosted fonts, no external blocking requests)
+- INP: <200ms (canvas-based chart interactions bypass DOM)
+- CLS: <0.1 (fixed layout, no late-loading content)
+
+---
+
 ## State Management Architecture
 
 ```
@@ -429,8 +480,13 @@ Component state (useState — local only):
 - [x] Health audits: security headers, input validation, shared utilities, dead code cleanup
 - [x] Comprehensive audit (2026-03-15): security hardening (rate limiting, SSRF guard, input validation), ESLint, timezone tests, backtest test determinism, contract fixes, dead code cleanup
 
-### Upcoming
-- [ ] Phase 12+: Screener, trade replay, gap tracking, cloud sync
+### Upcoming (Phase 12 — detailed plan finalized 2026-03-15)
+- [ ] Phase 12A: Production hardening — cache headers, self-host fonts, SW auto-versioning, OG meta, Sentry, reduced-motion
+- [ ] Phase 12B: UX sharpening — Motion library (panel/modal animations), skeleton loading states, accent color customization
+- [ ] Phase 12C: Dependency upgrades — React 19, Zustand 5, Vite 8, Tailwind 4
+- [ ] Phase 12D: Data provider abstraction — provider interface, Alpaca adapter, rename hooks to be provider-agnostic
+- [ ] Phase 12E: Infinite scroll — on-demand history loading, IndexedDB cache (Dexie.js), enableConflation
+- [ ] Phase 12F: Future differentiators — screener, trade replay, annotations, gap tracking, cloud sync
 
 ---
 
@@ -473,3 +529,4 @@ Component state (useState — local only):
 | 2026-03-15 | Nav hover micro-animations: unique CSS keyframe animation per TopNav button — bell ring (24° swing), watchlist bounce (translateY oscillation), backtest EKG pulse (double-tap scale), journal tilt (rotate from spine), search zoom, settings gear spin + glow. All icons pop 1.25-1.4x on hover. Sound alerts default changed to ON for new users. Settings gear gets unique per-theme color (dark cyan, terminal mint, lumpia warm gold). 257/257 tests, build clean. |
 | 2026-03-15 | Comprehensive audit: 4 parallel agents (security, testing, architecture, build health). **Security:** rate limiting on all 3 API endpoints (ws-auth 5/min, bars 60/min, snapshot 30/min), SSRF guard (ALPACA_DATA_URL allowlist), symbol regex validation on URL params + watchlist input, ISO date regex anchored, ErrorBoundary hides raw errors in prod, SW cache versioned. **Testing:** +17 timezone.js tests (DST boundaries), backtest tests deterministic (removed Math.random), removed empty assertion guards. **Code quality:** ESLint added (eslint 9 + react-hooks plugin, 0 errors), vwapWithBands now returns .series per contract, chart polling stops after found, ref-during-render fixed, missing useEffect deps fixed, dead code removed. Alpaca keys rotated. 274/274 tests, build clean. |
 | 2026-03-15 | Hotfix: ISO date regex in `api/bars.js` rejected `Date.toISOString()` output (includes milliseconds `.000Z`). Added optional `(\.\d{1,3})?` group. This was the root cause of "Data Error" in production after audit push. |
+| 2026-03-15 | **Phase 12 strategic planning session.** Deep research (web-verified) across 3 dimensions: (1) Market data providers — evaluated Alpaca, Polygon/Massive, Twelve Data, Finnhub, FMP, Alpha Vantage, Yahoo Finance, Databento, IEX Cloud, Tradier. Decision: stay with Alpaca, abstract data layer behind provider interface for future swaps. FMP ($19/mo) identified as best paid upgrade. (2) Infinite scroll — researched lightweight-charts v5 `subscribeVisibleLogicalRangeChange` + `barsInLogicalRange` pattern, performance limits (~50-100K bars), IndexedDB caching via Dexie.js, per-timeframe page sizes. (3) Stack assessment — confirmed lightweight-charts v5, React, Zustand, Vercel are all correct choices. Planned upgrades: React 19.2.4, Zustand 5.0.11, Vite 8, Tailwind 4.2.1. (4) Production infrastructure audit — identified missing cache headers (P0), Google Fonts dependency (P1), manual SW versioning (P1), missing OG meta tags (P2). (5) UX deep dive — Motion library for panel/modal animations, skeleton loading states, accent color customization, `prefers-reduced-motion` support, Sentry error tracking. Compiled 6-phase plan (12A–12F) into tasks.md, project.md, CLAUDE.md. |

@@ -22,13 +22,23 @@ Every indicator function in `src/utils/indicators.js` must return BOTH:
 ```
 The live chart and the backtester share identical math. Never duplicate indicator logic.
 
-## Stack (locked)
-- Vite 7 + React 18 + lightweight-charts **v5** (NOT v4)
-- TanStack Query v5, Zustand v4, Axios, Tailwind CSS 3, Vitest v3
+## Stack (locked — upgrades planned in Phase 12C)
+- Vite 7→8 + React 18→19 + lightweight-charts **v5** (NOT v4)
+- TanStack Query v5, Zustand v4→5, Axios, Tailwind CSS 3→4, Vitest v3
 - ESLint 9 + eslint-plugin-react-hooks (flat config, `eslint.config.js`)
-- JavaScript (not TypeScript)
+- JavaScript (not TypeScript — tests provide sufficient coverage at current scale)
 - `feed: 'iex'` required on all Alpaca data fetches (free tier)
 - **No react-router-dom** — single-page app, panel-based architecture
+- Motion (formerly Framer Motion) for panel/modal animations (Phase 12B)
+
+## Data provider strategy
+- **Current provider:** Alpaca Markets (free tier, IEX feed, 200 calls/min, 7yr history)
+- **Architecture:** Data layer will be abstracted behind a provider interface (Phase 12D)
+  so providers can be swapped without touching chart/indicator code
+- **Provider interface:** `fetchBars()`, `subscribe()`, `fetchSnapshot()` — 3 methods
+- **Future options evaluated:** FMP ($19/mo best value), Polygon/Massive (best SIP data),
+  Twelve Data (real-time free but WS costs $191+/mo), Finnhub (shallow intraday history)
+- Indicators, backtester, confluence — zero provider coupling (pure math)
 
 ## Security rules
 - All API endpoints must have rate limiting (in-memory per-instance, IP-based)
@@ -144,3 +154,13 @@ keyframes in `src/index.css` (`.nav-btn-{id}` classes).
 - Indicator math reference: `indicators.md`
 - Competitive research + vision: `brainstorming.md`
 - Health audit template: `audit.md`
+
+## Production infrastructure rules
+- Static assets (`/assets/*`): `Cache-Control: public, max-age=31536000, immutable` (Vite content-hashes filenames)
+- HTML (`/`): `Cache-Control: public, s-maxage=60, stale-while-revalidate=300`
+- API endpoints: per-endpoint cache (bars 30s, snapshot 15s, ws-auth no-store)
+- Fonts must be self-hosted (no external CDN dependency) — `public/fonts/`
+- Service worker `CACHE_NAME` must be auto-versioned via build hash (not manual bump)
+- `prefers-reduced-motion: reduce` must be respected for all animations
+- Open Graph meta tags required in `index.html` for social sharing previews
+- Error tracking via Sentry free tier (5K errors/month, session replay)

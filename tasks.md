@@ -475,7 +475,86 @@
 
 ---
 
-## 🔲 Phase 12+ — Future Differentiators
+## 🔲 Phase 12A — Production Hardening
+
+> **Goal:** Make the site ready for real public traffic. Cache optimization, font independence,
+> error visibility, social sharing, accessibility.
+
+- 🔲 Static asset cache headers: `Cache-Control: public, max-age=31536000, immutable` for `/assets/*` in `vercel.json`
+- 🔲 HTML cache header: `Cache-Control: public, s-maxage=60, stale-while-revalidate=300` for `/` in `vercel.json`
+- 🔲 Self-host fonts: download Boogaloo + Inter 800, move to `public/fonts/`, replace Google Fonts `<link>` with `@font-face`
+- 🔲 Auto-version service worker: inject Vite build hash into `CACHE_NAME` (eliminate manual bump)
+- 🔲 Open Graph meta tags in `index.html` (`og:title`, `og:description`, `og:image`)
+- 🔲 `prefers-reduced-motion: reduce` media query — disable nav hover animations for users who request it
+- 🔲 Sentry free tier integration — error tracking + session replay for production visibility
+
+---
+
+## 🔲 Phase 12B — UX Sharpening
+
+> **Goal:** Cutting-edge micro-interactions and loading states. Make the app feel alive.
+
+- 🔲 Add Motion library (formerly Framer Motion) — ~15KB with LazyMotion
+- 🔲 Panel slide-in/out with spring physics (replace CSS transition-all)
+- 🔲 Command palette scale+fade entrance animation (AnimatePresence for exit)
+- 🔲 Settings modal entrance/exit animation
+- 🔲 Skeleton loading states: replace spinners with content-shaped skeletons + shimmer pulse
+  - Chart area: pulsing rectangle skeleton
+  - Panel content: skeleton rows matching watchlist/journal/backtest layout
+- 🔲 Accent color customization in Settings (5-6 preset accent colors per theme, stored in localStorage, updates `--accent` CSS variable)
+
+---
+
+## 🔲 Phase 12C — Dependency Upgrades
+
+> **Goal:** Modernize the stack. All upgrades are incremental version bumps, not rewrites.
+> Rationale: security patches (React 19), ecosystem compatibility (Zustand 5 drops
+> use-sync-external-store), faster builds (Tailwind 4 Oxide engine), future-proofing.
+
+- 🔲 Zustand 4 → 5.0.11 — use `createWithEqualityFn` if using shallow, update persist middleware, devtools import path
+- 🔲 React 18 → 19.2.4 — `useEffectEvent` for WebSocket/chart stale closures, React Compiler opt-in, DoS mitigations
+- 🔲 Vite 7 → 8 — version bump, verify build
+- 🔲 Tailwind 3 → 4.2.1 — run `npx @tailwindcss/upgrade`, switch to `@tailwindcss/vite` plugin, configure dark mode as `darkMode: 'selector'` (we use `[data-theme]` attributes), verify class renames, remove `tailwind.config.js` (config moves to CSS `@theme`)
+- 🔲 Verify: 274+ tests passing, build clean, ESLint 0 errors after all upgrades
+
+---
+
+## 🔲 Phase 12D — Data Provider Abstraction
+
+> **Goal:** Decouple the app from Alpaca so data sources can be swapped via config.
+> Keep Alpaca as the only implementation for now.
+
+- 🔲 Create `src/services/dataProvider.js` — provider interface: `fetchBars()`, `subscribe()`, `fetchSnapshot()`
+- 🔲 Create `src/services/providers/alpaca.js` — extract existing Alpaca logic into adapter
+- 🔲 Rename hooks: `useAlpacaBars` → `useBars`, `useAlpacaSocket` → `useLiveFeed`
+- 🔲 Abstract WebSocket layer: extract Alpaca-specific protocol into adapter, generic reconnect + aggregation stays in shared layer
+- 🔲 Make serverless proxies provider-aware (env var selects provider, URL builder adapts)
+- 🔲 Update `TIMEFRAME_CONFIG` to use adapter pattern for provider-specific timeframe strings
+
+---
+
+## 🔲 Phase 12E — Infinite Scroll
+
+> **Goal:** TradingView/Webull-style endless chart history. Scroll left to load older data on demand.
+> Uses lightweight-charts v5 `subscribeVisibleLogicalRangeChange` + `barsInLogicalRange` API.
+
+- 🔲 Create `src/hooks/useInfiniteHistory.js` — core scroll-back logic
+  - Subscribe to `subscribeVisibleLogicalRangeChange` on chart timeScale
+  - When `barsBefore < 50`, calculate older date range and fetch via provider
+  - Deduplicate by timestamp, prepend to existing bars array
+  - Save/restore scroll position to prevent viewport jump after `setData()`
+  - Debounce scroll trigger (200ms), gate with `isFetching` flag
+- 🔲 Enable `enableConflation: true` on chart timeScale options (optimizes rendering for large datasets)
+- 🔲 Add per-timeframe page sizes to `TIMEFRAME_CONFIG`: 1m=390 bars/page, 5m=390, 15m=260, 1h=150, 4h=180, 1D=252
+- 🔲 IndexedDB cache via Dexie.js — cache fetched bar ranges per symbol+timeframe, instant on revisit
+- 🔲 Max bars cap per timeframe: 50K for 1m, 100K for 5m+, unlimited for 1D
+- 🔲 "Loading more..." indicator at left edge of chart while fetching
+- 🔲 Update `useViewportPersistence.js` — don't `fitContent()` after scroll-back loads
+- 🔲 Update all overlay components to handle growing bars array (no architecture change needed — `bars` prop is already single source of truth)
+
+---
+
+## 🔲 Phase 12F — Future Differentiators
 
 - 🔲 Screener — scan watchlist for active setups
 - 🔲 Trade replay — step through historical days bar-by-bar with simulated trades
