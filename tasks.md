@@ -208,6 +208,16 @@
 
 ---
 
+## ✅ Keyboard Shortcut Stability Fix (2026-03-15)
+
+- ✅ `src/hooks/useKeyboardShortcuts.js` — debounced rapid keypresses (150ms) to prevent chart blackout from spamming 1-6 keys
+- ✅ Added `cancelQueries()` before `invalidateQueries()` to abort stale in-flight fetches during rapid switching
+- ✅ Cleanup: `clearTimeout` on unmount to prevent memory leaks
+- ✅ `src/hooks/useAlpacaBars.js` — added `placeholderData: keepPreviousData` so chart shows previous timeframe's data while new data loads (prevents flash to black)
+- ✅ Build clean
+
+---
+
 ## 🔲 Phase 7b — Stretch Goals
 
 - 🔲 `src/utils/backtest.js` — replay historical days using same indicator math, output win rate / R:R / by day type

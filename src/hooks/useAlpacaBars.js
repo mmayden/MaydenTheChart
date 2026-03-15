@@ -10,7 +10,7 @@
  *   const { data: bars, isLoading, isError, error } = useAlpacaBars()
  */
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import { fetchBars } from '../services/alpaca'
 import { useChartStore } from '../store/useChartStore'
 import { TIMEFRAME_CONFIG } from '../constants/chart'
@@ -63,6 +63,9 @@ export function useAlpacaBars() {
         .map(normalizebar)
     },
     enabled:         !!symbol && !!timeframe,
+    // Keep stale data visible while the new timeframe loads — prevents
+    // the chart from flashing black during rapid timeframe switches.
+    placeholderData: keepPreviousData,
     // When WebSocket is streaming live bars, skip REST polling entirely.
     // Otherwise: intraday refetch every 60s, daily/swing every 5 min.
     refetchInterval: wsStatus === 'subscribed'
