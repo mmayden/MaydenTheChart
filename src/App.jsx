@@ -36,7 +36,6 @@ import { StatusBar } from './components/ui/StatusBar'
 import { IndicatorToggle } from './components/ui/IndicatorToggle'
 import { ATRGauge } from './components/ui/ATRGauge'
 import { DayTypeBanner } from './components/ui/DayTypeBanner'
-// MacroStatusBar removed — QQQ-specific feature, saved in qqq-specific-features.txt
 import { IndicatorTabView } from './components/ui/IndicatorTabView'
 import { NotificationBell } from './components/ui/NotificationBell'
 import Logo from './components/ui/Logo'
@@ -52,7 +51,10 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   const selectedTimeframe = useChartStore((s) => s.selectedTimeframe)
-  const indicators        = useChartStore((s) => s.indicators)
+  const showEma           = useChartStore((s) => s.indicators.ema)
+  const showVwap          = useChartStore((s) => s.indicators.vwap)
+  const showLevels        = useChartStore((s) => s.indicators.levels)
+  const showSr            = useChartStore((s) => s.indicators.sr)
   const theme             = useChartStore((s) => s.theme)
 
   const { data: bars, isLoading, isError, error, dataUpdatedAt, refetch } = useAlpacaBars()
@@ -177,7 +179,7 @@ export default function App() {
         {/* ── Header ──────────────────────────────────────────────────────── */}
         <header className="flex items-center gap-4 px-4 py-2 border-b border-gray-800 shrink-0">
           <Logo />
-          {bars && <PriceDisplay bars={bars} />}
+          {bars && <PriceDisplay bars={bars} byDay={byDay} />}
           <div className="flex items-center gap-3 ml-auto">
             <NotificationBell bars={bars} timeframe={selectedTimeframe} />
             <DayTypeBanner dayType={dayType} />
@@ -233,9 +235,9 @@ export default function App() {
 
           {chart && candleSeries && bars && (
             <>
-              <EMAOverlay chart={chart} bars={bars} visible={indicators.ema} />
+              <EMAOverlay chart={chart} bars={bars} visible={showEma} />
               {tfConfig.showVWAP && (
-                <VWAPOverlay chart={chart} bars={bars} visible={indicators.vwap} />
+                <VWAPOverlay chart={chart} bars={bars} visible={showVwap} />
               )}
               <LevelOverlay
                 chart={chart}
@@ -243,14 +245,14 @@ export default function App() {
                 bars={bars}
                 byDay={byDay}
                 showORB={tfConfig.showORB}
-                visible={indicators.levels}
+                visible={showLevels}
               />
               <SROverlay
                 candleSeries={candleSeries}
                 bars={bars}
-                visible={indicators.sr}
+                visible={showSr}
               />
-              <CrosshairLegend chart={chart} bars={bars} indicators={indicators} theme={theme} />
+              <CrosshairLegend chart={chart} bars={bars} theme={theme} />
             </>
           )}
         </div>

@@ -12,13 +12,8 @@
  * No side effects, no external dependencies, no DOM access.
  */
 
-// ─── Private helpers ─────────────────────────────────────────────────────────
-
-/** Convert unix seconds to a YYYY-MM-DD date string in US-Eastern time. */
-function toETDateString(unixSecs) {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' })
-    .format(new Date(unixSecs * 1000))
-}
+import { toETDateString } from './timezone'
+import { RSI_PERIOD, MACD_FAST, MACD_SLOW, MACD_SIGNAL, ATR_PERIOD, RVOL_PERIOD, RVOL_THRESHOLD } from '../constants/chart'
 
 // ─── EMA — Exponential Moving Average ────────────────────────────────────────
 
@@ -191,7 +186,7 @@ export function vwapWithBands(bars) {
  * @param {number} period - default 14
  * @returns {{ series: Array<{time, value}>, signal: {value, bias, strength} }}
  */
-export function atr(bars, period = 14) {
+export function atr(bars, period = ATR_PERIOD) {
   if (!bars || bars.length < period + 1) {
     return { series: [], signal: { value: null, bias: 'neutral', strength: 'weak' } }
   }
@@ -261,7 +256,7 @@ export function getDailyRangeStatus(todayBars, atr14Value) {
  * @param {number} threshold - RVOL level that triggers highlight (default 1.5)
  * @returns {{ series: Array<{time, value, rvol, highlight}>, signal: {value, bias, strength} }}
  */
-export function relativeVolume(bars, period = 20, threshold = 1.5) {
+export function relativeVolume(bars, period = RVOL_PERIOD, threshold = RVOL_THRESHOLD) {
   if (!bars || bars.length < period + 1) {
     return { series: [], signal: { value: null, bias: 'neutral', strength: 'weak' } }
   }
@@ -302,7 +297,7 @@ export function relativeVolume(bars, period = 20, threshold = 1.5) {
  * @param {number} period - default 14
  * @returns {{ series: Array<{time, value}>, signal: {value, bias, strength} }}
  */
-export function rsi(bars, period = 14) {
+export function rsi(bars, period = RSI_PERIOD) {
   if (!bars || bars.length < period + 1) {
     return { series: [], signal: { value: null, bias: 'neutral', strength: 'weak' } }
   }
@@ -322,7 +317,7 @@ export function rsi(bars, period = 14) {
   avgGain /= period
   avgLoss /= period
 
-  const firstRS  = avgLoss === 0 ? 100000 : avgGain / avgLoss
+  const firstRS  = avgLoss === 0 ? Infinity : avgGain / avgLoss
   const firstRsi = 100 - 100 / (1 + firstRS)
   series.push({ time: bars[period].time, value: parseFloat(firstRsi.toFixed(2)) })
 
@@ -335,7 +330,7 @@ export function rsi(bars, period = 14) {
     avgGain = (avgGain * (period - 1) + gain) / period
     avgLoss = (avgLoss * (period - 1) + loss) / period
 
-    const rs      = avgLoss === 0 ? 100000 : avgGain / avgLoss
+    const rs      = avgLoss === 0 ? Infinity : avgGain / avgLoss
     const rsiVal  = 100 - 100 / (1 + rs)
     series.push({ time: bars[i].time, value: parseFloat(rsiVal.toFixed(2)) })
   }
@@ -364,7 +359,7 @@ export function rsi(bars, period = 14) {
  *   signal:     {value, bias, strength}
  * }}
  */
-export function macd(bars, fastPeriod = 12, slowPeriod = 26, signalPeriod = 9) {
+export function macd(bars, fastPeriod = MACD_FAST, slowPeriod = MACD_SLOW, signalPeriod = MACD_SIGNAL) {
   const empty = {
     macd: [], signalLine: [], histogram: [],
     signal: { value: null, bias: 'neutral', strength: 'weak' },

@@ -177,7 +177,8 @@ Component state (useState — local only):
 | `src/hooks/useAlpacaBars.js` | TanStack Query hook for historical bars |
 | `src/hooks/useAlpacaSocket.js` | WebSocket manager for live bar updates |
 | `src/utils/indicators.js` | Pure math: EMA, VWAP, ATR, Bollinger, RSI, MACD — every function returns `{ series, signal }` |
-| `src/utils/backtest.js` | Backtest harness — replays historical days using the same indicator functions, outputs win rate / R:R / day type breakdown |
+| `src/utils/backtest.js` | *(planned, not yet built)* Backtest harness — replays historical days using the same indicator functions |
+| `src/utils/timezone.js` | Shared ET timezone utilities (toETDateString, toETTime) |
 | `src/utils/normalizeBar.js` | Shared Alpaca bar → lightweight-charts bar normalizer (used by REST, WS, daily hooks) |
 | `src/utils/levels.js` | Previous H/L detection, ORB zone, open of day |
 | `src/utils/supportResistance.js` | Pivot point S/R detection algorithm |

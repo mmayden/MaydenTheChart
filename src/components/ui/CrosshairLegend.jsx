@@ -10,7 +10,6 @@
  * Props:
  *   chart      — lightweight-charts IChartApi instance
  *   bars       — array of { time, open, high, low, close, volume } bar objects
- *   indicators — indicator toggle object from Zustand (reserved for future use)
  *   theme      — 'dark' | 'lumpia'
  */
 
@@ -47,7 +46,7 @@ function formatTimeET(unixSeconds) {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export function CrosshairLegend({ chart, bars, indicators, theme = 'dark' }) {
+export function CrosshairLegend({ chart, bars, theme = 'dark' }) {
   const legendRef = useRef(null)
   const barsRef   = useRef(bars)
 

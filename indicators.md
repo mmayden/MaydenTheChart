@@ -23,8 +23,8 @@ This is non-negotiable — it lets the live chart and the backtester share ident
 }
 ```
 
-The backtester (`src/utils/backtest.js`) calls the exact same functions with historical bar slices.
-No duplicate math, ever.
+The planned backtester (`src/utils/backtest.js` — not yet built) will call the exact same functions
+with historical bar slices. No duplicate math, ever.
 
 ---
 
@@ -55,9 +55,9 @@ On today's session:
 
 ### Code signature
 ```js
-// returns { prevHigh, prevLow, weeklyHigh, weeklyLow }
+// returns { prevHigh, prevLow, weeklyHigh, weeklyLow, prevDate }
 // bars must include at least 2 full trading days
-getPreviousLevels(bars)
+getPreviousLevels(bars, byDay = null)
 ```
 
 ---
@@ -90,8 +90,8 @@ Failed breakout (re-enters zone) → fade opportunity
 ### Code signature
 ```js
 // bars must be sorted oldest → newest, intraday only
-// returns { orbHigh, orbLow, orbTime }
-getORBZone(bars, sessionStart = '09:30', orbMinutes = 15)
+// returns { orbHigh, orbLow, orbTime, valid }
+getORBZone(bars, orbMinutes = 15, byDay = null)
 ```
 
 ---
@@ -113,7 +113,7 @@ pivot — price reclaiming the open is bullish; price losing the open is bearish
 // returns { price, startTime, endTime } or null
 // price = open of today's first bar
 // startTime/endTime = Unix timestamps bounding today's session bars
-getOpenOfDay(bars)
+getOpenOfDay(bars, byDay = null)
 ```
 
 ---
@@ -155,10 +155,10 @@ First EMA value = simple average (SMA) of first `period` closes.
 
 ### Code signature
 ```js
-// returns array of { time, value } for lightweight-charts
-ema(closes, period)
+// returns { series: [{ time, value }], signal: { value, bias, strength } }
+ema(bars, period)
 
-// Auto-detect 4hr EMA 9 × EMA 48 crosses
+// Auto-detect 4hr EMA 9 × EMA 48 crosses (helper — not subject to indicator contract)
 // returns array of { time, direction: 'bull' | 'bear' }
 detectEMACrosses(ema9Series, ema48Series)
 ```
@@ -286,6 +286,12 @@ Classification:
 - "⚡ Chop — Both Levels Broken" (orange background)
 - "↔️ Range Day — Neither Level Broken" (neutral/gray)
 
+### Code signature
+```js
+// returns { type, brokePDH, brokePDL, label, color }
+classifyDayType(bars, prevHigh, prevLow, byDay = null)
+```
+
 ---
 
 ## Relative Volume (RVOL)
@@ -311,7 +317,7 @@ RVOL < 1.0 → below average volume, treat breakouts with caution
 
 ### Code signature
 ```js
-// returns array of { time, volume, rvol, highlight: bool }
+// returns { series: [{ time, value, rvol, highlight }], signal: { value, bias, strength } }
 relativeVolume(bars, period = 20, threshold = 1.5)
 ```
 
@@ -387,7 +393,7 @@ Histogram   = MACD Line - Signal Line
 ### Code signature
 ```js
 // returns { macd, signalLine, histogram, signal } — series arrays + signal object
-macd(closes, fastPeriod = 12, slowPeriod = 26, signalPeriod = 9)
+macd(bars, fastPeriod = 12, slowPeriod = 26, signalPeriod = 9)
 ```
 
 ---

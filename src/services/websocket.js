@@ -14,6 +14,7 @@ const WS_URL = 'wss://stream.data.alpaca.markets/v2/iex'
 const MAX_RETRIES = 10
 const BASE_DELAY_MS = 1000
 const MAX_DELAY_MS = 30000
+const DEBUG = import.meta.env.DEV
 
 /**
  * Fetch WebSocket credentials from the serverless proxy.
@@ -53,7 +54,7 @@ export function createAlpacaSocket({ onBar, onStatus, getSymbol }) {
         if (intentionalClose) return // disconnected while fetching creds
 
         if (!key || !secret) {
-          console.error('[WS] Invalid credentials from /api/ws-auth')
+          DEBUG && console.error('[WS] Invalid credentials from /api/ws-auth')
           onStatus('error')
           return
         }
@@ -65,7 +66,7 @@ export function createAlpacaSocket({ onBar, onStatus, getSymbol }) {
           try {
             messages = JSON.parse(event.data)
           } catch (e) {
-            console.warn('[WS] Failed to parse message:', e.message)
+            DEBUG && console.warn('[WS] Failed to parse message:', e.message)
             return
           }
 
@@ -100,7 +101,7 @@ export function createAlpacaSocket({ onBar, onStatus, getSymbol }) {
 
             // Auth error
             if (msg.T === 'error') {
-              console.error('[WS] Alpaca error:', msg.msg, msg.code)
+              DEBUG && console.error('[WS] Alpaca error:', msg.msg, msg.code)
               onStatus('error')
             }
           }
@@ -115,12 +116,12 @@ export function createAlpacaSocket({ onBar, onStatus, getSymbol }) {
         }
 
         ws.onerror = (err) => {
-          console.error('[WS] WebSocket error:', err)
+          DEBUG && console.error('[WS] WebSocket error:', err)
           // onclose will fire after this, which handles reconnect
         }
       })
       .catch((err) => {
-        console.error('[WS] Failed to fetch credentials:', err)
+        DEBUG && console.error('[WS] Failed to fetch credentials:', err)
         onStatus('error')
         scheduleReconnect()
       })
@@ -129,7 +130,7 @@ export function createAlpacaSocket({ onBar, onStatus, getSymbol }) {
   function scheduleReconnect() {
     if (intentionalClose || retryCount >= MAX_RETRIES) {
       if (retryCount >= MAX_RETRIES) {
-        console.error('[WS] Max retries reached, giving up')
+        DEBUG && console.error('[WS] Max retries reached, giving up')
         onStatus('error')
       }
       return
@@ -141,7 +142,7 @@ export function createAlpacaSocket({ onBar, onStatus, getSymbol }) {
       BASE_DELAY_MS * Math.pow(2, retryCount - 1) + Math.random() * 1000,
       MAX_DELAY_MS,
     )
-    console.log(`[WS] Reconnecting in ${Math.round(delay)}ms (attempt ${retryCount}/${MAX_RETRIES})`)
+    DEBUG && console.log(`[WS] Reconnecting in ${Math.round(delay)}ms (attempt ${retryCount}/${MAX_RETRIES})`)
     retryTimer = setTimeout(connect, delay)
   }
 

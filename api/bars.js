@@ -24,6 +24,19 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing required params: symbol, timeframe, start, end' })
   }
 
+  // Input validation
+  const VALID_TIMEFRAMES = ['1Min', '5Min', '15Min', '30Min', '1Hour', '4Hour', '1Day', '1Week', '1Month']
+  if (!/^[A-Z]{1,10}$/.test(symbol)) {
+    return res.status(400).json({ error: 'Invalid symbol — must be 1-10 uppercase letters' })
+  }
+  if (!VALID_TIMEFRAMES.includes(timeframe)) {
+    return res.status(400).json({ error: `Invalid timeframe — must be one of: ${VALID_TIMEFRAMES.join(', ')}` })
+  }
+  const parsedLimit = parseInt(limit, 10)
+  if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 10000) {
+    return res.status(400).json({ error: 'Invalid limit — must be an integer between 1 and 10000' })
+  }
+
   const apiKey = process.env.ALPACA_API_KEY
   const secretKey = process.env.ALPACA_SECRET_KEY
   const dataUrl = process.env.ALPACA_DATA_URL || 'https://data.alpaca.markets/v2'
@@ -37,7 +50,7 @@ export default async function handler(req, res) {
       timeframe,
       start,
       end,
-      limit,
+      limit: String(parsedLimit),
       adjustment: 'raw',
       feed: 'iex',
     })

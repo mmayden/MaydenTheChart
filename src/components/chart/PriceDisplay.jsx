@@ -5,17 +5,15 @@
 
 import { useMemo } from 'react'
 import { useChartStore } from '../../store/useChartStore'
-import { groupBarsByDay } from '../../utils/levels'
 
-export function PriceDisplay({ bars }) {
+export function PriceDisplay({ bars, byDay }) {
   const symbol = useChartStore((s) => s.selectedSymbol)
 
   const { price, change, changePct } = useMemo(() => {
-    if (!bars || bars.length < 2) {
+    if (!bars || bars.length < 2 || !byDay) {
       return { price: null, change: null, changePct: null }
     }
 
-    const byDay   = groupBarsByDay(bars)
     const days    = Array.from(byDay.keys()).sort()
 
     const todayBars = byDay.get(days[days.length - 1]) ?? []
@@ -35,7 +33,7 @@ export function PriceDisplay({ bars }) {
     const changePct = (change / prevClose) * 100
 
     return { price: lastClose, change, changePct }
-  }, [bars])
+  }, [bars, byDay])
 
   if (price == null) return null
 

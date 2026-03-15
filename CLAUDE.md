@@ -37,12 +37,19 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - Main chart: `src/components/chart/CandlestickChart.jsx`
 - Symbol input + autocomplete: `src/components/chart/SymbolInput.jsx`
 - Crosshair OHLCV legend: `src/components/ui/CrosshairLegend.jsx`
-- Toast notifications: `src/hooks/useToast.js` + `src/components/ui/ToastContainer.jsx`
+- Toast notifications: `src/store/useToastStore.js` + `src/components/ui/ToastContainer.jsx`
 - Viewport persistence: `src/hooks/useViewportPersistence.js`
 - WebSocket live feed: `src/hooks/useAlpacaSocket.js` + `src/services/websocket.js`
-- RSI/MACD toggle + mini charts: `src/components/ui/IndicatorTabView.jsx`
+- RSI/MACD toggle + mini charts: `src/components/ui/IndicatorTabView.jsx` + `RSIMiniChart.jsx` + `MACDMiniChart.jsx`
 - Keyboard shortcuts (1-6 timeframes): `src/hooks/useKeyboardShortcuts.js`
 - Sidebar indicator toggles (overlays only): `src/components/ui/IndicatorToggle.jsx`
 - Alert system: `src/store/useAlertsStore.js` + `src/components/ui/NotificationBell.jsx`
+- Error boundary: `src/components/ui/ErrorBoundary.jsx`
+- Logo: `src/components/ui/Logo.jsx`
+- Settings modal: `src/components/ui/SettingsModal.jsx`
+- Status bar (WS/polling): `src/components/ui/StatusBar.jsx`
+- Daily bars hook: `src/hooks/useDailyBars.js`
+- Shared timezone utils: `src/utils/timezone.js`
+- Bar normalizer: `src/utils/normalizeBar.js`
 - App layout: `src/App.jsx`
 - Feature ideas (not committed tasks): `feature-ideas.md`

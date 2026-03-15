@@ -12,7 +12,7 @@
 
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { useChartStore } from '../../store/useChartStore'
-import { useToast } from '../../hooks/useToast'
+import { useToast } from '../../store/useToastStore'
 import { fetchBars } from '../../services/alpaca'
 import { SYMBOL_SUGGESTIONS } from '../../constants/chart'
 

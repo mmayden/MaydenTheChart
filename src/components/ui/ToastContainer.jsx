@@ -9,7 +9,7 @@
  * The container itself is pointer-events:none so clicks pass through gaps.
  */
 
-import { useToast } from '../../hooks/useToast'
+import { useToast } from '../../store/useToastStore'
 
 const BORDER_COLORS = {
   info:    '#3b82f6', // blue-500

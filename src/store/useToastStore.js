@@ -2,7 +2,7 @@
  * useToast — Zustand-based toast notification store.
  *
  * Usage:
- *   import { useToast } from '../hooks/useToast'
+ *   import { useToast } from '../store/useToastStore'
  *   const toast = useToast()
  *   toast.add({ message: 'Symbol changed to AAPL', type: 'info' })
  *
