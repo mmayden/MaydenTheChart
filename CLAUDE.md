@@ -43,7 +43,7 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - RSI/MACD toggle + mini charts: `src/components/ui/IndicatorTabView.jsx` + `RSIMiniChart.jsx` + `MACDMiniChart.jsx`
 - Keyboard shortcuts (1-6 timeframes): `src/hooks/useKeyboardShortcuts.js`
 - Sidebar indicator toggles (overlays only): `src/components/ui/IndicatorToggle.jsx`
-- Alert system: `src/store/useAlertsStore.js` + `src/components/ui/NotificationBell.jsx`
+- Alert system: `src/store/useAlertsStore.js` + `src/components/ui/NotificationBell.jsx` + `src/hooks/useAlertChecker.js`
 - Error boundary: `src/components/ui/ErrorBoundary.jsx`
 - Logo: `src/components/ui/Logo.jsx`
 - Settings modal: `src/components/ui/SettingsModal.jsx`

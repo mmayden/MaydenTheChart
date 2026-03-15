@@ -225,7 +225,9 @@ Component state (useState — local only):
 - [x] Multi-symbol support — dynamic symbol input, autocomplete, Alpaca validation, all systems symbol-agnostic
 - [x] Indicator deep assessment — 6 fixes (VWAP timezone, ATR thresholds, RVOL bias, MACD naming, byDay dedup, levels tests)
 - [x] QOL phase — crosshair OHLCV legend, toast notifications, viewport persistence, smooth loading transitions
-- [x] 77/77 tests passing, build clean
+- [x] Full project health audit (reusable audit.md template, 8-category assessment)
+- [x] P0–P3 audit fixes: ErrorBoundary, input validation, security headers, shared timezone.js, mini chart extraction, alert hook extraction, WS auto-recovery, dead code cleanup, doc sync
+- [x] 82/82 tests passing, build clean
 
 ---
 
@@ -252,3 +254,4 @@ Component state (useState — local only):
 | 2026-03-15 | QOL polish: unified sidebar button hover states (bg-gray-800/50), bumped RSI/MACD tab + VOL label contrast, crosshair legend fade transition, error retry button, status bar shows data source (WebSocket/Polling), color variable cleanup (CROSSHAIR_COLOR constant, CSS theme vars), symbol input hover via CSS class, keyboard shortcuts (1-6 for timeframes via useKeyboardShortcuts hook). 77/77 tests, build clean. |
 | 2026-03-15 | Keyboard shortcut stability: debounced rapid keypresses (150ms) in useKeyboardShortcuts to prevent chart blackout from rapid timeframe spam. Added cancelQueries() before invalidation to abort stale in-flight fetches. Added keepPreviousData to useAlpacaBars so chart shows stale data during transitions instead of flashing black. Build clean. |
 | 2026-03-15 | Code health audit: 3 bug fixes (ResizeObserver null guards in CandlestickChart + IndicatorTabView, toast ID collision → crypto.randomUUID()), 3 smell fixes (shared normalizeBar utility deduplicating 3 files, LevelOverlay accepts pre-computed byDay prop, SettingsModal Escape key close). 77/77 tests, build clean. |
+| 2026-03-15 | Full project health audit: created reusable audit.md template (10 categories), ran 8 parallel agents across build/architecture/code quality/security/performance/resilience/testing/docs. P0 fixes: React ErrorBoundary, /api/bars input validation, vercel.json security headers. P1 fixes: shared timezone.js, chart.js constants wired into indicators, console gating, dead file deletion, RSI Infinity fix, doc signature sync. P2 fixes: RSIMiniChart/MACDMiniChart extracted, useToast moved to store/, useAlertChecker hook extracted from NotificationBell, App.jsx Zustand subscriptions narrowed. P3: WS auto-recovery after max retries. P4: normalizeBar tests added. 82/82 tests, build clean. |

@@ -5,36 +5,15 @@
  *   Price Level   — fires when price crosses above/below a set value
  *   Candle Streak — fires when N candles in a row are the same color
  *
- * Fires a browser Notification on trigger. Badge shows active alert count.
+ * Alert checking logic lives in useAlertChecker hook.
+ * This component handles only UI: bell button, dropdown panel, forms, alert list.
  */
 
 import { useState, useEffect, useRef } from 'react'
 import { useAlertsStore } from '../../store/useAlertsStore'
-import { useChartStore } from '../../store/useChartStore'
+import { useAlertChecker } from '../../hooks/useAlertChecker'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
-
-function getStreak(bars) {
-  if (!bars?.length) return { count: 0, direction: null }
-  const last    = bars[bars.length - 1]
-  const lastDir = last.close >= last.open ? 'green' : 'red'
-  let count = 1
-  for (let i = bars.length - 2; i >= 0; i--) {
-    const dir = bars[i].close >= bars[i].open ? 'green' : 'red'
-    if (dir === lastDir) count++
-    else break
-  }
-  return { count, direction: lastDir }
-}
-
-function fireNotification(title, body) {
-  const send = () => new Notification(title, { body })
-  if (Notification.permission === 'granted') {
-    send()
-  } else if (Notification.permission !== 'denied') {
-    Notification.requestPermission().then((p) => { if (p === 'granted') send() })
-  }
-}
 
 function alertLabel(alert) {
   if (alert.type === 'price') {
@@ -66,12 +45,11 @@ export function NotificationBell({ bars, timeframe }) {
   const [streakDir,   setStreakDir]   = useState('either')
   const panelRef = useRef(null)
 
-  const { alerts, addAlert, removeAlert, markTriggered } = useAlertsStore()
-  const selectedSymbol = useChartStore((s) => s.selectedSymbol)
-  const activeCount  = alerts.filter((a) => !a.triggered).length
-  const currentPrice = bars?.[bars.length - 1]?.close ?? null
+  const { alerts, addAlert, removeAlert } = useAlertsStore()
+  const { currentPrice, getStreak } = useAlertChecker(bars, timeframe)
+  const activeCount = alerts.filter((a) => !a.triggered).length
 
-  // ── Close on outside click ─────────────────────────────────────────────────
+  // Close on outside click
   useEffect(() => {
     if (!open) return
     const handler = (e) => {
@@ -81,45 +59,7 @@ export function NotificationBell({ bars, timeframe }) {
     return () => document.removeEventListener('mousedown', handler)
   }, [open])
 
-  // ── Check price alerts ─────────────────────────────────────────────────────
-  useEffect(() => {
-    if (!currentPrice) return
-    alerts.forEach((alert) => {
-      if (alert.triggered || alert.type !== 'price') return
-      const hit =
-        (alert.condition === 'above' && currentPrice >= alert.price) ||
-        (alert.condition === 'below' && currentPrice <= alert.price)
-      if (!hit) return
-      markTriggered(alert.id)
-      fireNotification(
-        'Loompia — Price Alert',
-        `${selectedSymbol} ${alert.condition === 'above' ? 'crossed above' : 'crossed below'} $${alert.price.toFixed(2)} · now $${currentPrice.toFixed(2)}`
-      )
-    })
-  }, [currentPrice, alerts, markTriggered, selectedSymbol])
-
-  // ── Check candle-streak alerts ─────────────────────────────────────────────
-  // barsLengthAtCreation ensures we only fire on NEW bars, not existing data.
-  useEffect(() => {
-    if (!bars?.length) return
-    const streak = getStreak(bars)
-    alerts.forEach((alert) => {
-      if (alert.triggered || alert.type !== 'candle-streak') return
-      // Skip until at least one new bar has arrived since this alert was set
-      if (bars.length <= alert.barsLengthAtCreation) return
-      const dirMatch = alert.direction === 'either' || alert.direction === streak.direction
-      if (dirMatch && streak.count >= alert.count) {
-        markTriggered(alert.id)
-        const dot = streak.direction === 'green' ? '🟢' : '🔴'
-        fireNotification(
-          'Loompia — Candle Streak',
-          `${streak.count} consecutive ${streak.direction} candles on ${timeframe ?? ''} ${dot}`
-        )
-      }
-    })
-  }, [bars, alerts, markTriggered, timeframe])
-
-  // ── Form submit ───────────────────────────────────────────────────────────
+  // Form submit
   function handleAdd(e) {
     e.preventDefault()
     if (Notification.permission === 'default') Notification.requestPermission()
@@ -142,7 +82,7 @@ export function NotificationBell({ bars, timeframe }) {
   return (
     <div className="relative" ref={panelRef}>
 
-      {/* ── Bell button ──────────────────────────────────────────────────── */}
+      {/* Bell button */}
       <button
         onClick={() => setOpen((o) => !o)}
         className="relative flex items-center justify-center w-8 h-8 rounded hover:bg-gray-800 text-yellow-400 hover:text-yellow-300 transition-colors"
@@ -160,7 +100,7 @@ export function NotificationBell({ bars, timeframe }) {
         )}
       </button>
 
-      {/* ── Dropdown panel ───────────────────────────────────────────────── */}
+      {/* Dropdown panel */}
       {open && (
         <div
           className="absolute right-0 top-full mt-2 bg-[#0d1117] border border-gray-600 rounded-lg shadow-2xl z-50 overflow-hidden"
@@ -174,7 +114,7 @@ export function NotificationBell({ bars, timeframe }) {
             )}
           </div>
 
-          {/* Type tabs — list below is filtered to match active tab */}
+          {/* Type tabs */}
           <div className="flex border-b border-gray-700">
             {[['price', 'Price Level'], ['candle-streak', 'Candle Streak']].map(([val, label]) => {
               const tabCount = alerts.filter((a) => a.type === val && !a.triggered).length
@@ -201,7 +141,6 @@ export function NotificationBell({ bars, timeframe }) {
 
           {/* Form */}
           <form onSubmit={handleAdd} className="px-4 py-3 border-b border-gray-700 flex flex-col gap-2.5">
-
             {alertType === 'price' ? (
               <div className="flex gap-2">
                 <input
@@ -291,14 +230,14 @@ export function NotificationBell({ bars, timeframe }) {
                         {alertLabel(alert)}
                       </span>
                       {alert.triggered && (
-                        <span className="text-[10px] text-green-500 shrink-0">✓ hit</span>
+                        <span className="text-[10px] text-green-500 shrink-0">hit</span>
                       )}
                       <button
                         onClick={() => removeAlert(alert.id)}
                         className="text-gray-500 hover:text-red-400 text-xs transition-colors shrink-0 leading-none"
                         title="Remove"
                       >
-                        ✕
+                        x
                       </button>
                     </li>
                   ))}

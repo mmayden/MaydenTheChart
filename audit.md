@@ -173,7 +173,7 @@
 ### P1 — Code Health (dead code, duplication, contracts) — DONE
 - [x] Delete `MacroStatusBar.jsx` and `validateEnv.js` (+ remove call in `main.jsx`)
 - [x] Extract `toETDateString()` to `src/utils/timezone.js`, unify all ET conversions
-- [ ] Fix `vwapWithBands` to include a `series` key (or document the intentional deviation)
+- [x] Document `vwapWithBands` and `macd` intentional contract deviations in `indicators.md`
 - [x] Wire indicator constants from `chart.js` into function defaults
 - [x] Remove or gate `console.*` statements in `websocket.js`
 - [x] Pass `byDay` prop to `PriceDisplay` instead of recomputing
@@ -182,19 +182,19 @@
 - [x] Add undocumented files to CLAUDE.md/project.md file maps
 - [x] Fix magic number `100000` → `Infinity` in RSI
 
-### P2 — Architecture (modularity, SRP) — MOSTLY DONE
+### P2 — Architecture (modularity, SRP) — DONE
 - [x] Extract `RSIMiniChart`/`MACDMiniChart` to separate files + shared `miniChartConfig.js`
 - [x] Move `useToast.js` to `src/store/useToastStore.js`
-- [ ] Extract alert-checking logic from `NotificationBell` into `useAlertChecker` hook
+- [x] Extract alert-checking logic from `NotificationBell` into `useAlertChecker` hook
 - [x] Narrow `App.jsx` Zustand subscription to overlay-relevant indicator fields only
 
 ### P3 — Performance (optimize when needed)
 - [ ] Use `update()` for last-bar candle/volume series updates instead of `setData()`
 - [ ] Consider incremental indicator updates (append new EMA point vs full recalc)
-- [ ] Add WebSocket auto-recovery after max retries (e.g., retry again after 5 minutes)
+- [x] Add WebSocket auto-recovery after max retries (resets after 5 minutes)
 
 ### P4 — Test Coverage (expand over time)
-- [ ] Add `normalizeBar.js` tests (pure function, easy win)
+- [x] Add `normalizeBar.js` tests (5 tests — pure function coverage)
 - [ ] Add `null` and single-element edge case tests for all indicator functions
 - [ ] Deepen signal contract assertions in existing tests (verify `value`, `bias`, `strength` for all)
 - [ ] Add Zustand store tests (`useChartStore`, `useAlertsStore`)

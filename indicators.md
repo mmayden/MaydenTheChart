@@ -26,6 +26,11 @@ This is non-negotiable — it lets the live chart and the backtester share ident
 The planned backtester (`src/utils/backtest.js` — not yet built) will call the exact same functions
 with historical bar slices. No duplicate math, ever.
 
+**Documented deviations:**
+- `vwapWithBands()` returns `{ vwap, band1Upper, band1Lower, band2Upper, band2Lower, signal }` — multiple band series instead of a single `series` key. This is intentional because the chart needs 5 separate line series.
+- `macd()` returns `{ macd, signalLine, histogram, signal }` — three chart series instead of one.
+- `detectEMACrosses()` and `getDailyRangeStatus()` are helper functions that do not follow the contract (they are not standalone indicators).
+
 ---
 
 ## Previous Day High / Low (Nick's Rule 1)

@@ -128,11 +128,15 @@ export function createAlpacaSocket({ onBar, onStatus, getSymbol }) {
   }
 
   function scheduleReconnect() {
-    if (intentionalClose || retryCount >= MAX_RETRIES) {
-      if (retryCount >= MAX_RETRIES) {
-        DEBUG && console.error('[WS] Max retries reached, giving up')
-        onStatus('error')
-      }
+    if (intentionalClose) return
+    if (retryCount >= MAX_RETRIES) {
+      DEBUG && console.error('[WS] Max retries reached, scheduling recovery in 5 minutes')
+      onStatus('error')
+      // Auto-recovery: reset retry counter and try again after 5 minutes
+      retryTimer = setTimeout(() => {
+        retryCount = 0
+        connect()
+      }, 5 * 60 * 1000)
       return
     }
 
