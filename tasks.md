@@ -475,18 +475,17 @@
 
 ---
 
-## 🔲 Phase 12A — Production Hardening
+## ✅ Phase 12A — Production Hardening — COMPLETE
 
-> **Goal:** Make the site ready for real public traffic. Cache optimization, font independence,
-> error visibility, social sharing, accessibility.
+**274/274 tests passing, build clean, ESLint 0 errors**
 
-- 🔲 Static asset cache headers: `Cache-Control: public, max-age=31536000, immutable` for `/assets/*` in `vercel.json`
-- 🔲 HTML cache header: `Cache-Control: public, s-maxage=60, stale-while-revalidate=300` for `/` in `vercel.json`
-- 🔲 Self-host fonts: download Boogaloo + Inter 800, move to `public/fonts/`, replace Google Fonts `<link>` with `@font-face`
-- 🔲 Auto-version service worker: inject Vite build hash into `CACHE_NAME` (eliminate manual bump)
-- 🔲 Open Graph meta tags in `index.html` (`og:title`, `og:description`, `og:image`)
-- 🔲 `prefers-reduced-motion: reduce` media query — disable nav hover animations for users who request it
-- 🔲 Sentry free tier integration — error tracking + session replay for production visibility
+- ✅ Static asset cache headers: `Cache-Control: public, max-age=31536000, immutable` for `/assets/*` and `/fonts/*` in `vercel.json`
+- ✅ HTML cache header: `Cache-Control: public, s-maxage=60, stale-while-revalidate=300` for `/` in `vercel.json`
+- ✅ Self-host fonts: Boogaloo (10KB) + Inter 800 (24KB) woff2 in `public/fonts/`, `@font-face` in `src/index.css`, removed Google Fonts `<link>` tags + CSP origins
+- ✅ Auto-version service worker: Vite plugin (`serviceWorkerVersion()` in `vite.config.js`) reads `src/sw.js`, injects `cheechart-{hash}` into `CACHE_NAME`, writes to `dist/sw.js`
+- ✅ Open Graph + Twitter Card meta tags in `index.html` (`og:title`, `og:description`, `og:image`, `og:url`, `twitter:card`)
+- ✅ `prefers-reduced-motion: reduce` media query — disables all nav hover animations, gear spin, panel slides, crosshair fade, button transitions
+- ✅ Sentry free tier integration: `@sentry/react` with conditional init via `VITE_SENTRY_DSN` env var (no-op without it), session replay on error only
 
 ---
 
