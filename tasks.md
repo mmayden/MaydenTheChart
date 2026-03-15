@@ -431,7 +431,7 @@
 - ✅ SSRF guard: `ALPACA_DATA_URL` validated against `ALLOWED_DATA_HOSTS` allowlist in `bars.js` + `snapshot.js`
 - ✅ Symbol regex validation: `useURLState.js` URL param `?s=` now validated against `/^[A-Z]{1,10}(\.[A-Z]{1,2})?$/`
 - ✅ Symbol regex validation: `WatchlistPanel.jsx` `addSymbol()` rejects invalid input
-- ✅ ISO date regex anchored with `$` in `bars.js` — no trailing garbage
+- ✅ ISO date regex anchored with `$` in `bars.js` — no trailing garbage; fixed to allow optional milliseconds (`.000`) since `Date.toISOString()` always includes them
 - ✅ ErrorBoundary shows generic message in production, raw error only in dev
 - ✅ Service worker cache versioned (`cheechart-v2`) — invalidates stale caches on deploy
 - ✅ `ws-auth.js` documents credential exposure risk (bearer token ships in client bundle)
