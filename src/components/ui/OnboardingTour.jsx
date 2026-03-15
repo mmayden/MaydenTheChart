@@ -109,15 +109,19 @@ export function OnboardingTour() {
   const current = STEPS[step]
   const isLast = step === STEPS.length - 1
 
-  // Calculate tooltip position based on placement
+  // Calculate tooltip position based on placement, clamped to viewport
   const tooltipStyle = {}
   const OFFSET = 12
+  const TOOLTIP_W = 288 // w-72 = 18rem = 288px
+  const PADDING = 12
+
   switch (current.placement) {
-    case 'bottom':
+    case 'bottom': {
       tooltipStyle.top = rect.bottom + OFFSET
-      tooltipStyle.left = rect.left + rect.width / 2
-      tooltipStyle.transform = 'translateX(-50%)'
+      const centerX = rect.left + rect.width / 2 - TOOLTIP_W / 2
+      tooltipStyle.left = Math.max(PADDING, Math.min(centerX, window.innerWidth - TOOLTIP_W - PADDING))
       break
+    }
     case 'right':
       tooltipStyle.top = rect.top + rect.height / 2
       tooltipStyle.left = rect.right + OFFSET
@@ -128,10 +132,12 @@ export function OnboardingTour() {
       tooltipStyle.right = window.innerWidth - rect.left + OFFSET
       tooltipStyle.transform = 'translateY(-50%)'
       break
-    default: // top
+    default: { // top
       tooltipStyle.bottom = window.innerHeight - rect.top + OFFSET
-      tooltipStyle.left = rect.left + rect.width / 2
-      tooltipStyle.transform = 'translateX(-50%)'
+      const centerX2 = rect.left + rect.width / 2 - TOOLTIP_W / 2
+      tooltipStyle.left = Math.max(PADDING, Math.min(centerX2, window.innerWidth - TOOLTIP_W - PADDING))
+      break
+    }
   }
 
   return (
