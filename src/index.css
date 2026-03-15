@@ -113,10 +113,10 @@ body,
   --nav-active-bg: rgba(200,88,24,0.10);
   --alert-color:  #c8a040;
   --alert-active-bg: rgba(200,160,64,0.10);
-  --watchlist-color: #d0a060;
-  --watchlist-active-bg: rgba(208,160,96,0.10);
-  --backtest-color: #c07868;
-  --backtest-active-bg: rgba(192,120,104,0.10);
+  --watchlist-color: #70b8a0;
+  --watchlist-active-bg: rgba(112,184,160,0.10);
+  --backtest-color: #e07050;
+  --backtest-active-bg: rgba(224,112,80,0.10);
   --journal-color: #88b870;
   --journal-active-bg: rgba(136,184,112,0.10);
   --cmd-palette-color: #a88098;
