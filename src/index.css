@@ -145,3 +145,41 @@ body,
 .tv-lightweight-charts a[href*="tradingview"] {
   display: none !important;
 }
+
+/* ── Mobile responsive ───────────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  /* Fix sidebar as mobile drawer */
+  .sidebar-mobile-open {
+    transform: translateX(0) !important;
+  }
+
+  /* Dashboard cards full width */
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Smaller text on mobile */
+  .mobile-text-xs {
+    font-size: 10px;
+  }
+}
+
+/* ── Line clamp utility ──────────────────────────────────────────────────── */
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Alerts panel slide transition ───────────────────────────────────────── */
+
+.alerts-panel-enter {
+  transform: translateX(100%);
+}
+.alerts-panel-enter-active {
+  transform: translateX(0);
+  transition: transform 300ms ease-out;
+}

@@ -1,17 +1,14 @@
 /**
- * NotificationBell — Price alert bell in the header.
+ * AlertsPanel — Right slide-out panel for managing alerts.
  *
- * Supports two alert types:
- *   Price Level   — fires when price crosses above/below a set value
- *   Candle Streak — fires when N candles in a row are the same color
- *
- * Alert checking logic lives in useAlertChecker hook.
- * This component handles only UI: bell button, dropdown panel, forms, alert list.
+ * Slides in from the right side of the screen.
+ * Reads live market context (currentPrice, currentStreak) from the alerts store
+ * so it works regardless of which view is active.
  */
 
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
+import { useChartStore } from '../../store/useChartStore'
 import { useAlertsStore } from '../../store/useAlertsStore'
-import { useAlertChecker } from '../../hooks/useAlertChecker'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -36,30 +33,19 @@ function alertDotColor(alert) {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function NotificationBell({ bars, timeframe }) {
-  const [open,       setOpen]       = useState(false)
-  const [alertType,  setAlertType]  = useState('price')
-  const [priceInput, setPriceInput] = useState('')
-  const [condition,  setCondition]  = useState('above')
+export function AlertsPanel() {
+  const open            = useChartStore((s) => s.alertsPanelOpen)
+  const setOpen         = useChartStore((s) => s.setAlertsPanelOpen)
+  const { alerts, addAlert, removeAlert, currentPrice, currentStreak, barsLength } = useAlertsStore()
+
+  const [alertType,   setAlertType]   = useState('price')
+  const [priceInput,  setPriceInput]  = useState('')
+  const [condition,   setCondition]   = useState('above')
   const [streakCount, setStreakCount] = useState('6')
   const [streakDir,   setStreakDir]   = useState('either')
-  const panelRef = useRef(null)
 
-  const { alerts, addAlert, removeAlert } = useAlertsStore()
-  const { currentPrice, getStreak } = useAlertChecker(bars, timeframe)
   const activeCount = alerts.filter((a) => !a.triggered).length
 
-  // Close on outside click
-  useEffect(() => {
-    if (!open) return
-    const handler = (e) => {
-      if (panelRef.current && !panelRef.current.contains(e.target)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [open])
-
-  // Form submit
   function handleAdd(e) {
     e.preventDefault()
     if (Notification.permission === 'default') Notification.requestPermission()
@@ -71,7 +57,7 @@ export function NotificationBell({ bars, timeframe }) {
     } else {
       const n = parseInt(streakCount, 10)
       if (!n || n < 2) return
-      addAlert({ type: 'candle-streak', count: n, direction: streakDir, barsLengthAtCreation: bars?.length ?? 0 })
+      addAlert({ type: 'candle-streak', count: n, direction: streakDir, barsLengthAtCreation: barsLength })
     }
   }
 
@@ -80,49 +66,56 @@ export function NotificationBell({ bars, timeframe }) {
     : parseInt(streakCount, 10) >= 2
 
   return (
-    <div className="relative" ref={panelRef}>
-
-      {/* Bell button */}
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="relative flex items-center justify-center w-8 h-8 rounded hover:bg-gray-800 text-yellow-400 hover:text-yellow-300 transition-colors"
-        title="Alerts"
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="w-4 h-4">
-          <path strokeLinecap="round" strokeLinejoin="round"
-            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-          />
-        </svg>
-        {activeCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-3.5 h-3.5 rounded-full bg-red-500 text-[8px] font-bold text-white leading-none">
-            {activeCount > 9 ? '9+' : activeCount}
-          </span>
-        )}
-      </button>
-
-      {/* Dropdown panel */}
+    <>
+      {/* Backdrop */}
       {open && (
         <div
-          className="absolute right-0 top-full mt-2 bg-[#0d1117] border border-gray-600 rounded-lg shadow-2xl z-50 overflow-hidden"
-          style={{ width: 280 }}
-        >
+          className="fixed inset-0 bg-black/30 z-[45]"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
+      {/* Panel */}
+      <div
+        className={`fixed top-0 right-0 h-full z-50 transition-transform duration-300 ease-out ${
+          open ? 'translate-x-0' : 'translate-x-full'
+        }`}
+        style={{ width: 340, backgroundColor: 'var(--bg-surface)' }}
+      >
+        <div className="flex flex-col h-full border-l border-gray-800">
+
           {/* Header */}
-          <div className="px-4 py-2.5 border-b border-gray-700 flex items-center justify-between">
-            <span className="text-xs font-bold tracking-widest text-gray-200 uppercase">Alerts</span>
-            {currentPrice && (
-              <span className="text-xs text-gray-400 font-mono">${currentPrice.toFixed(2)}</span>
-            )}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold tracking-wide">Alerts</span>
+              {activeCount > 0 && (
+                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-red-500/20 text-red-400 text-[10px] font-bold">
+                  {activeCount}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-3">
+              {currentPrice && (
+                <span className="text-xs text-gray-400 font-mono">${currentPrice.toFixed(2)}</span>
+              )}
+              <button
+                onClick={() => setOpen(false)}
+                className="text-gray-500 hover:text-gray-300 transition-colors text-lg leading-none"
+              >
+                ×
+              </button>
+            </div>
           </div>
 
           {/* Type tabs */}
-          <div className="flex border-b border-gray-700">
+          <div className="flex border-b border-gray-800">
             {[['price', 'Price Level'], ['candle-streak', 'Candle Streak']].map(([val, label]) => {
               const tabCount = alerts.filter((a) => a.type === val && !a.triggered).length
               return (
                 <button
                   key={val}
                   onClick={() => setAlertType(val)}
-                  className={`flex-1 py-2 text-xs font-medium transition-colors flex items-center justify-center gap-1.5 ${
+                  className={`flex-1 py-2.5 text-xs font-medium transition-colors flex items-center justify-center gap-1.5 ${
                     alertType === val
                       ? 'text-blue-400 border-b-2 border-blue-500 -mb-px bg-blue-500/5'
                       : 'text-gray-400 hover:text-gray-200'
@@ -140,7 +133,7 @@ export function NotificationBell({ bars, timeframe }) {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleAdd} className="px-4 py-3 border-b border-gray-700 flex flex-col gap-2.5">
+          <form onSubmit={handleAdd} className="px-4 py-3 border-b border-gray-800 flex flex-col gap-2.5">
             {alertType === 'price' ? (
               <div className="flex gap-2">
                 <input
@@ -189,39 +182,41 @@ export function NotificationBell({ bars, timeframe }) {
                   </select>
                 </div>
                 {/* Live streak readout */}
-                {bars?.length > 0 && (() => {
-                  const s = getStreak(bars)
-                  const dot = s.direction === 'green' ? '#22c55e' : '#ef4444'
-                  return (
-                    <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: dot }} />
-                      Current streak:&nbsp;<span className="text-gray-100 font-mono">{s.count} {s.direction}</span>
-                    </div>
-                  )
-                })()}
+                {currentStreak.direction && (
+                  <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                    <span
+                      className="w-1.5 h-1.5 rounded-full shrink-0"
+                      style={{ backgroundColor: currentStreak.direction === 'green' ? '#22c55e' : '#ef4444' }}
+                    />
+                    Current streak:&nbsp;
+                    <span className="text-gray-100 font-mono">{currentStreak.count} {currentStreak.direction}</span>
+                  </div>
+                )}
               </>
             )}
 
             <button
               type="submit"
               disabled={!canSubmit}
-              className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold py-1.5 rounded transition-colors"
+              className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold py-2 rounded transition-colors"
             >
               Set Alert
             </button>
           </form>
 
           {/* Alert list */}
-          <div className="max-h-48 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto">
             {(() => {
               const tabAlerts = alerts.filter((a) => a.type === alertType)
               if (tabAlerts.length === 0) return (
-                <p className="text-center text-gray-500 text-xs py-5">No {alertType === 'price' ? 'price' : 'streak'} alerts set</p>
+                <p className="text-center text-gray-500 text-xs py-8">
+                  No {alertType === 'price' ? 'price' : 'streak'} alerts set
+                </p>
               )
               return (
                 <ul className="divide-y divide-gray-800">
                   {tabAlerts.map((alert) => (
-                    <li key={alert.id} className="flex items-center gap-2 px-4 py-2.5">
+                    <li key={alert.id} className="flex items-center gap-2 px-4 py-3">
                       <span
                         className="w-1.5 h-1.5 rounded-full shrink-0"
                         style={{ backgroundColor: alertDotColor(alert) }}
@@ -237,7 +232,7 @@ export function NotificationBell({ bars, timeframe }) {
                         className="text-gray-500 hover:text-red-400 text-xs transition-colors shrink-0 leading-none"
                         title="Remove"
                       >
-                        x
+                        ×
                       </button>
                     </li>
                   ))}
@@ -246,8 +241,21 @@ export function NotificationBell({ bars, timeframe }) {
             })()}
           </div>
 
+          {/* Footer: clear all triggered */}
+          {alerts.some((a) => a.triggered) && (
+            <div className="px-4 py-3 border-t border-gray-800">
+              <button
+                onClick={() => {
+                  alerts.filter((a) => a.triggered).forEach((a) => removeAlert(a.id))
+                }}
+                className="w-full text-xs text-gray-500 hover:text-gray-300 transition-colors py-1"
+              >
+                Clear triggered alerts
+              </button>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </>
   )
 }

@@ -8,11 +8,12 @@ import { usePresetsStore } from '../../store/usePresetsStore'
 import { TIMEFRAME_CONFIG } from '../../constants/chart'
 
 const TOGGLES = [
-  { key: 'ema',    label: 'EMA'    },
-  { key: 'vwap',   label: 'VWAP'   },
-  { key: 'rvol',   label: 'RVOL'   },
-  { key: 'levels', label: 'Levels' },
-  { key: 'sr',     label: 'S/R'    },
+  { key: 'ema',       label: 'EMA'        },
+  { key: 'vwap',      label: 'VWAP'       },
+  { key: 'bollinger', label: 'Bollinger'  },
+  { key: 'rvol',      label: 'RVOL'       },
+  { key: 'levels',    label: 'Levels'     },
+  { key: 'sr',        label: 'S/R'        },
 ]
 
 export function IndicatorToggle() {

@@ -18,6 +18,8 @@ import {
   relativeVolume,
   rsi,
   macd,
+  bollingerBands,
+  detectRSIDivergences,
 } from './indicators'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -725,6 +727,94 @@ describe('signal contract', () => {
       const result = relativeVolume(bars, 20, 1.5)
       expect(result.signal.bias).toBe('neutral')
       expect(result.signal.strength).toBe('weak')
+    })
+  })
+
+  // ─── Bollinger Bands ──────────────────────────────────────────────────────
+
+  describe('bollingerBands', () => {
+    it('returns empty on insufficient data', () => {
+      const result = bollingerBands(makeBars([100, 101, 102]), 20)
+      expect(result.middle).toHaveLength(0)
+      expect(result.upper).toHaveLength(0)
+      expect(result.lower).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+    })
+
+    it('returns middle, upper, lower series with correct lengths', () => {
+      const closes = Array.from({ length: 30 }, (_, i) => 400 + i * 0.5)
+      const bars = makeBars(closes)
+      const result = bollingerBands(bars, 20, 2)
+      expect(result.middle).toHaveLength(11) // 30 - 20 + 1
+      expect(result.upper).toHaveLength(11)
+      expect(result.lower).toHaveLength(11)
+    })
+
+    it('upper > middle > lower for all points', () => {
+      const closes = Array.from({ length: 30 }, (_, i) => 400 + Math.sin(i) * 2)
+      const bars = makeBars(closes)
+      const result = bollingerBands(bars, 20, 2)
+      for (let i = 0; i < result.middle.length; i++) {
+        expect(result.upper[i].value).toBeGreaterThan(result.middle[i].value)
+        expect(result.lower[i].value).toBeLessThan(result.middle[i].value)
+      }
+    })
+
+    it('signal has correct shape', () => {
+      const closes = Array.from({ length: 30 }, (_, i) => 400 + i * 0.5)
+      const bars = makeBars(closes)
+      const result = bollingerBands(bars, 20, 2)
+      expect(result.signal).toHaveProperty('value')
+      expect(result.signal).toHaveProperty('bias')
+      expect(result.signal).toHaveProperty('strength')
+      expect(['bull', 'bear', 'neutral']).toContain(result.signal.bias)
+    })
+
+    it('middle band equals SMA(20) of closes', () => {
+      const closes = Array.from({ length: 25 }, (_, i) => 400 + i)
+      const bars = makeBars(closes)
+      const result = bollingerBands(bars, 20, 2)
+      // First middle value = SMA of first 20 closes
+      const expectedSMA = closes.slice(0, 20).reduce((s, c) => s + c, 0) / 20
+      expect(result.middle[0].value).toBeCloseTo(expectedSMA, 4)
+    })
+  })
+
+  // ─── RSI Divergence Detection ─────────────────────────────────────────────
+
+  describe('detectRSIDivergences', () => {
+    it('returns empty on insufficient data', () => {
+      const result = detectRSIDivergences([], [], 5)
+      expect(result).toHaveLength(0)
+    })
+
+    it('returns empty when no divergences exist', () => {
+      // Flat price and RSI — no divergence possible
+      const closes = Array.from({ length: 50 }, () => 400)
+      const bars = makeBars(closes)
+      const rsiSeries = bars.map((b) => ({ time: b.time, value: 50 }))
+      const result = detectRSIDivergences(bars, rsiSeries, 3)
+      expect(result).toHaveLength(0)
+    })
+
+    it('returns array of objects with time and type', () => {
+      // Create a bearish divergence: price makes higher high, RSI makes lower high
+      const closes = Array.from({ length: 60 }, (_, i) => {
+        if (i < 20) return 400 + i
+        if (i < 30) return 420 - (i - 20)
+        if (i < 50) return 410 + (i - 30) * 1.5
+        return 440 - (i - 50)
+      })
+      const bars = makeBars(closes)
+      const rsiResult = rsi(bars, 14)
+      const result = detectRSIDivergences(bars, rsiResult.series, 5)
+      // Should return array (may or may not find divergences depending on exact values)
+      expect(Array.isArray(result)).toBe(true)
+      result.forEach((d) => {
+        expect(d).toHaveProperty('time')
+        expect(d).toHaveProperty('type')
+        expect(['bullish', 'bearish']).toContain(d.type)
+      })
     })
   })
 })

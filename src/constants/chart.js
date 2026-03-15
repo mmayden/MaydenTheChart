@@ -43,6 +43,12 @@ export const ATR_PERIOD        = 14
 export const RVOL_PERIOD       = 20
 export const RVOL_THRESHOLD    = 1.5
 
+// ─── Bollinger Bands ─────────────────────────────────────────────────────────
+export const BOLLINGER_PERIOD       = 20
+export const BOLLINGER_MULTIPLIER   = 2
+export const BOLLINGER_MIDDLE_COLOR = '#a78bfa'  // purple — SMA(20) middle band
+export const BOLLINGER_BAND_COLOR   = '#7c3aed80' // purple semi-transparent — upper/lower bands
+
 // ─── Timeframe config ─────────────────────────────────────────────────────────
 // lookbackMs: how far back to fetch data for this timeframe
 // alpacaTimeframe: the string Alpaca's API expects

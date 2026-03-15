@@ -2,8 +2,9 @@
  * useKeyboardShortcuts — Global keyboard shortcuts for the chart terminal.
  *
  * Binds:
- *   1-6  → switch timeframe (1=1m, 2=5m, 3=15m, 4=1h, 5=4h, 6=1D)
- *   [/]  → cycle presets (prev/next)
+ *   1-6    → switch timeframe (1=1m, 2=5m, 3=15m, 4=1h, 5=4h, 6=1D)
+ *   [/]    → cycle presets (prev/next)
+ *   Cmd+K  → open command palette (works even in inputs)
  *
  * Shortcuts are disabled when an input/textarea is focused so they
  * don't interfere with typing (e.g. symbol input, alert forms).
@@ -28,6 +29,14 @@ export function useKeyboardShortcuts() {
 
   useEffect(() => {
     function handler(e) {
+      // ── Command palette (Cmd+K / Ctrl+K) — works even in inputs ──
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        const { commandPaletteOpen, setCommandPaletteOpen } = useChartStore.getState()
+        setCommandPaletteOpen(!commandPaletteOpen)
+        return
+      }
+
       // Don't capture when typing in inputs
       const tag = e.target.tagName
       if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return

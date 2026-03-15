@@ -98,9 +98,76 @@ per Concretum Group/SSRN research, 2016–2023).
 
 ---
 
+## Competitive Landscape (March 2026)
+
+Research from Trustpilot, Reddit (r/daytrading, r/TradingView, r/Webull, r/thinkorswim),
+app store reviews, and trading forums. These gaps define our opportunity.
+
+| Platform | Strengths We Respect | Gaps We Exploit |
+|---|---|---|
+| **TradingView** (1.9/5 Trustpilot) | Best charting UX, Pine Script ecosystem, 100+ indicators | Free tier nearly unusable (2 indicators, 1 chart, 3 alerts). Subscriptions $15-60/mo. Hidden alert throttle (15/3min all plans). Pine Script lock-in — scripts break on major versions. Chart lag during volatile markets. Settings don't persist reliably. |
+| **Webull** | Outstanding mobile charting, magnifying glass for drawing, bar replay, trade-from-chart | Only 56 indicators, no real scripting. Replay is visual-only (no simulated trades/stats). Desktop is "glitchy, confusing, frustrating" on Mac. Chart lag and freezes. No real backtesting engine. |
+| **thinkorswim** (1.3/5 Trustpilot) | 400+ free indicators, ThinkScript, best paper trading, Active Trader ladder | Schwab migration destroyed stability — crashes, blank screens, broken fills. "Archaic 1990s-era UI." ThinkScript functions deprecated without replacement. Friday lockouts. |
+| **TrendSpider** ($33/mo) | AI auto-pattern detection, multi-timeframe overlay, "Sidekick" natural language AI | Expensive. Narrow focus — analysis only, no execution integration. |
+| **NinjaTrader** | Algorithmic backtesting, no script lock-in | Desktop-only, steep learning curve, expensive for full features. |
+
+**The tool traders describe but nobody has built:** fast web-based charts, free, scriptable,
+reliable real-time data, clean modern UI, broker-agnostic, no paywall on core features.
+Cheechart is 70% of the way there.
+
+**Our structural advantages already shipped:**
+- Zero indicator cap (unlimited, free)
+- Standard JS indicator functions (no vendor lock-in, no breaking updates)
+- lightweight-charts v5 (16% smaller bundle than TV's engine — performance by default)
+- Settings persistence that actually works (Zustand + localStorage, preset system)
+- Real-time data without per-exchange surcharges (Alpaca IEX feed, free)
+- Keyboard-first UX (Cmd+K command palette — no retail charting platform has this)
+
+---
+
+## Architecture — Single-Page Panel System
+
+**Design principle:** The chart is the gravitational center. You never leave it.
+
+The industry has converged on single-page apps with modular, panel-based layouts
+(Bloomberg, thinkorswim, VS Code, Linear). Multi-page routing creates context-switching
+friction — you can't see backtest results alongside the chart that produced them.
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  TopNav: Logo | ⌘K | 🔔 | ⚙                                    │
+├────────┬──────────────────────────────────────────┬──────────────┤
+│        │  Confluence Bar: 🟢 4/6 Bull — Trend +   │              │
+│  Side  │  EMA aligned + VWAP above  ⚠ ATR 72%     │  Right Panel │
+│  bar   ├──────────────────────────────────────────┤  (one at a   │
+│        │  MTF Strip: 5m Bull | 4h Bear | 1D Neut  │   time)      │
+│ Symbol ├──────────────────────────────────────────┤              │
+│ TF     │                                          │ [Backtest]   │
+│ Preset │          CHART (always visible)           │ [Journal]    │
+│ Indic. │                                          │ [Watchlist]  │
+│ ATR    │                                          │ [Alerts]     │
+│        ├──────────────────────────────────────────┤              │
+│        │  RSI / MACD tabs                         │              │
+│        ├──────────────────────────────────────────┤              │
+│        │  Status bar                              │              │
+└────────┴──────────────────────────────────────────┴──────────────┘
+```
+
+**Right panel system:** A single slot — only one panel open at a time (Alerts, Backtest,
+Journal, or Watchlist), toggled via TopNav icons or Cmd+K. Same pattern as VS Code's
+sidebar, Linear's detail panels, and Bloomberg's modular layout.
+
+**Mobile:** Right panels become full-screen overlays (same pattern as the existing sidebar
+drawer). The chart fills the viewport; everything else is an overlay.
+
+**Routing:** No react-router-dom. Single-page app. URL state sync handles `?s=QQQ&tf=5m&p=full`
+for shareability without page routes.
+
+---
+
 ## Feature Design — What We Build and Why
 
-### Tier 1 — Core Essentials (Phases 1–2)
+### Tier 1 — Core Essentials (Phases 1–2) ✅ COMPLETE
 These make the tool functional. Without them, nothing else matters.
 
 | Feature | Why it's here |
@@ -117,42 +184,70 @@ These make the tool functional. Without them, nothing else matters.
 | EMA 9 (blue), EMA 48 (green), EMA 200 (white) | The exact EMA stack with the exact colors |
 | Live price display + % change | Basic UX |
 
-### Tier 2 — Intelligence Layer (Phases 3–4)
+### Tier 2 — Intelligence Layer (Phases 3–4) ✅ COMPLETE
 These are what make this tool better than a generic charting platform.
 
 | Feature | Why it's here |
 |---|---|
 | RSI (14) subchart | Momentum confirmation and divergence detection |
 | MACD (12, 26, 9) subchart | Trend confirmation and crossover signals |
-| **ATR daily range meter** | Shows "range used today vs. 14-day ATR budget" as a gauge — prevents chasing exhausted moves; research shows QQQ trades 80–95% of ATR in first few hours on most days |
-| **Macro health status bar** | QQQ vs. 50MA and 200MA, both trending up/down — Minervini-style market filter; contextualizes every signal |
+| **ATR daily range meter** | Shows "range used today vs. 14-day ATR budget" as a gauge — prevents chasing exhausted moves |
 | **Day type banner** | Real-time classification: Trend Day / Range Day / Chop — updates as price breaks or holds prev H/L |
-| **4hr EMA cross annotations** | Auto arrow marker on chart when 4hr EMA 9 crosses EMA 48 — the strongest swing signal, visualized automatically |
 | Auto support & resistance levels | Pivot point method, clustered by proximity, labeled with price |
 | Swing high / swing low markers | Dots at confirmed swing points |
-
-### Tier 3 — Chart Presets + Workspaces (Phase 8)
-Lightweight saved layout system — the #1 UX gap across all major charting platforms.
-
-| Feature | Why it's here |
-|---|---|
-| **Saved chart presets** | Serialize indicator toggles + timeframe + theme under a named preset. Switch strategies in one click — solves the #1 trader complaint (settings not persisting). Symbol floats freely (not tied to preset), matching TradingView's consensus model. |
-| **Default presets shipped** | "Full" (everything on), "Clean" (candles + volume only), "Scalp" (VWAP + EMAs, 5m default), "Swing" (EMAs + S/R + levels, 4h default) — instant onboarding value |
-| **Save / rename / delete custom presets** | User creates their own presets from current toggle state via "Save Current as..." |
-| **Sidebar preset dropdown** | Prominent dropdown above indicator toggles — zero-click discovery vs TradingView's buried menus |
-| **localStorage persistence** | Auto-persist on every change — no manual save button, no multi-tab bugs, no "settings vanished overnight" |
-
-### Tier 4 — Advanced / Stretch (Phase 9+)
-| Feature | Why it's here |
-|---|---|
-| Backtester (`src/utils/backtest.js`) | Replay historical days using same indicator math — win rate, R:R, by day type. Validates the system with the same math the live chart uses. |
-| Weekly gap tracking panel | A panel showing unfilled QQQ weekly gaps would be uniquely useful |
-| Volume profile (horizontal) | Price levels with most traded volume = strongest S/R |
 | Bollinger Bands overlay | Mean reversion bands, complements VWAP σ bands |
-| RSI divergence detection | Auto-annotate when price makes new high but RSI doesn't (and vice versa) |
-| Alert sets per preset | Tie alert configurations to presets — huge pain point on every platform |
-| Instrument linking (multi-chart) | Change symbol in one panel, all linked panels follow — thinkorswim's beloved feature |
-| Cloud sync / preset export | Multi-device persistence, preset sharing between traders |
+
+### Tier 3 — Presets + Live Infrastructure (Phases 5–9) ✅ COMPLETE
+Settings persistence, live data, and keyboard-first UX.
+
+| Feature | Why it's here |
+|---|---|
+| **Saved chart presets** | One-click strategy switching — solves the #1 trader complaint (settings not persisting) |
+| **4 default presets** | Clean, Full, Scalp, Swing — instant onboarding value |
+| **Custom preset save/rename/delete** | User creates presets from current toggle state |
+| **Live WebSocket feed** | Real-time price updates during market hours |
+| **Command palette (Cmd+K)** | Power-user navigation — no retail charting platform has this |
+| **Keyboard shortcuts** | 1-6 timeframes, [/] cycle presets, Cmd+K palette |
+| **Alert system** | Price-level and candle-streak alerts with browser notifications |
+| **Multi-symbol support** | Dynamic symbol input with autocomplete (~80 tickers) |
+
+### Tier 4 — Synthesis Layer (Phase 10) 🔄 CURRENT
+This is what makes friends say "damn." The chart has all the data — now make it *think*.
+
+| Feature | Why it's here | Competitive edge |
+|---|---|---|
+| **Confluence Score** | Weighted synthesis of all indicator signals into a single "setup quality" readout. Traffic light on surface (🟢🟡🔴), full breakdown on expand. | No retail platform does this. TrendSpider charges $33/mo for something similar but less integrated. |
+| **Multi-Timeframe Status Strip** | Thin bar showing EMA alignment across 5m/15m/4h/1D simultaneously | TrendSpider's MTF overlay costs $33/mo. We give it away. |
+| **Right Panel System** | Slide-out panels for Backtest, Journal, Watchlist, Alerts — always alongside the chart | Replaces route-based dashboard. Matches Bloomberg/ToS/VS Code panel pattern. |
+| **Backtester Upgrade** | Configurable params, "Run" button, equity curve, day type breakdown, VWAP Bounce strategy | Webull has no backtester. TradingView's requires Pine Script. Ours uses the same math as the live chart. |
+| **Watchlist with Live Prices** | Symbol list with price + daily % change from Alpaca snapshot | Current watchlist is text-only — needs live data to compete with Webull |
+| **Journal Analytics** | Performance breakdown by setup type, win/loss streaks, rating correlation, heat calendar | Transforms a notes app into a trading coach |
+| **Session Stats** | "Today: 2 trades, +0.8%" in status bar from journal entries | Connects journal to live session — always visible |
+| **Sound Alerts** | Optional Bloomberg-style audio ping on alert triggers | Makes the app feel alive during market hours |
+
+### Tier 5 — Polish + Mobile (Phase 11)
+Make it sticky and portable.
+
+| Feature | Why it's here |
+|---|---|
+| **First-visit onboarding** | 4-step tooltip tour highlighting Day Type, ATR gauge, presets, Cmd+K. No platform explains itself well. |
+| **Mobile polish pass** | Touch targets 44px+, swipe gestures (right=sidebar, left=panel), chart fills viewport |
+| **PWA manifest** | Installable to home screen, feels like a native app |
+| **CSS theme refactor** | Replace Tailwind !important overrides with CSS variable-first approach |
+| **Chart annotations** | Click to add notes/arrows directly on chart, saved per symbol |
+
+### Tier 6 — Future Differentiators (Phase 12+)
+The nuclear options — each one could be a product on its own.
+
+| Feature | Why it's here |
+|---|---|
+| **Screener** | Scan watchlist for active setups ("QQQ: ORB breakout + RVOL 2.1x"). No free tool does this. |
+| **Trade replay mode** | Step through historical days bar-by-bar with indicators updating live. Webull's replay is visual-only — ours would have simulated trades + stats. |
+| **Weekly gap tracking** | Panel showing unfilled QQQ weekly gaps with distance from current price |
+| **Volume profile (horizontal)** | Price levels with most traded volume = strongest S/R |
+| **Alert sets per preset** | Tie alert configurations to presets — huge pain point on every platform |
+| **Cloud sync / preset export** | Multi-device persistence, preset sharing between traders |
+| **Snapshot sharing** | One-click chart screenshot with all indicators, copyable/shareable |
 
 ---
 
@@ -160,89 +255,171 @@ Lightweight saved layout system — the #1 UX gap across all major charting plat
 
 ```
 Server state (TanStack Query):
-  - Historical bars from Alpaca
+  - Historical bars from Alpaca (per symbol + timeframe)
   - Latest quote / live price
+  - Watchlist snapshots (latest quote per watched symbol)
   - Caching, background refetch, loading/error states
 
-Client state (Zustand store):
+Client state (Zustand — useChartStore):
   - selectedTimeframe: '5Min'
   - selectedSymbol: 'QQQ'
-  - indicators: { ema: true, vwap: true, rvol: true, rsi: true, macd: true, levels: true, sr: true }
-  - activePreset: 'full'        // currently applied preset name
-  - presets: { ... }                     // saved presets (persisted to localStorage)
+  - indicators: { ema, vwap, rvol, rsi, macd, levels, sr, bollinger }
+  - theme: 'dark' | 'lumpia' | 'terminal'
+  - activePanel: null | 'alerts' | 'backtest' | 'journal' | 'watchlist'
+  - sidebarOpen: boolean
+  - wsStatus, isMarketOpen
+
+Client state (Zustand — usePresetsStore):
+  - activePresetId, presets (persisted to localStorage)
+
+Client state (Zustand — useJournalStore):
+  - Trade journal entries + CRUD (persisted to localStorage)
+
+Client state (Zustand — useAlertsStore):
+  - Alert definitions + triggered state
 
 Component state (useState — local only):
   - Hover states, animation, tooltip position
+  - Backtest config params (local to BacktestPanel)
 ```
 
 ---
 
 ## File Ownership Map
 
+### Core Data Layer
 | File | Purpose |
 |---|---|
-| `src/store/useChartStore.js` | Zustand — timeframe, symbol, indicator toggles |
 | `src/services/alpaca.js` | Axios client, auth headers, base URLs |
 | `src/services/queryClient.js` | TanStack Query client config + default options |
+| `src/services/websocket.js` | Alpaca WebSocket connection manager — auth, subscribe, reconnect with exponential backoff |
+| `api/bars.js` | Vercel serverless proxy — Alpaca API (keys server-only, pagination) |
+| `api/ws-auth.js` | Vercel serverless function — returns Alpaca WS credentials, protected by bearer token |
+
+### Stores (Zustand)
+| File | Purpose |
+|---|---|
+| `src/store/useChartStore.js` | Primary UI state — timeframe, symbol, indicator toggles, active panel, theme, WS status |
+| `src/store/usePresetsStore.js` | Preset CRUD — save/load/rename/delete named presets, localStorage persistence |
+| `src/store/useAlertsStore.js` | Alert definitions, triggered state |
+| `src/store/useJournalStore.js` | Trade journal CRUD + stats (localStorage persisted) |
+| `src/store/useToastStore.js` | Toast notification queue (add/remove/auto-dismiss) |
+
+### Hooks
+| File | Purpose |
+|---|---|
 | `src/hooks/useAlpacaBars.js` | TanStack Query hook for historical bars |
-| `src/hooks/useAlpacaSocket.js` | WebSocket manager for live bar updates |
+| `src/hooks/useAlpacaSocket.js` | React hook — WS market-hours gating, 1-min bar aggregation, TanStack cache injection |
+| `src/hooks/useDailyBars.js` | TanStack Query hook for daily bars (ATR gauge) |
+| `src/hooks/useKeyboardShortcuts.js` | Global keyboard shortcuts (1-6 timeframes, [/] presets, Cmd+K, panel toggles) |
+| `src/hooks/useViewportPersistence.js` | Preserves chart zoom/scroll across live data updates |
+| `src/hooks/useAlertChecker.js` | Checks alert conditions against incoming bar data |
+| `src/hooks/useURLState.js` | Bidirectional URL state sync (?s=QQQ&tf=5m&p=full) |
+
+### Indicator Math (pure functions)
+| File | Purpose |
+|---|---|
 | `src/utils/indicators.js` | Pure math: EMA, VWAP, ATR, Bollinger, RSI, MACD — every function returns `{ series, signal }` |
-| `src/utils/backtest.js` | *(planned, not yet built)* Backtest harness — replays historical days using the same indicator functions |
-| `src/utils/timezone.js` | Shared ET timezone utilities (toETDateString, toETTime) |
-| `src/utils/normalizeBar.js` | Shared Alpaca bar → lightweight-charts bar normalizer (used by REST, WS, daily hooks) |
-| `src/utils/levels.js` | Previous H/L detection, ORB zone, open of day |
+| `src/utils/levels.js` | Previous H/L detection, ORB zone, open of day, day type classification |
 | `src/utils/supportResistance.js` | Pivot point S/R detection algorithm |
+| `src/utils/confluence.js` | *(Phase 10)* Weighted confluence score — synthesizes all indicator signals |
+| `src/utils/backtest.js` | Backtest harness — ORB, EMA-cross, VWAP Bounce strategies |
+| `src/utils/timezone.js` | Shared ET timezone utilities (toETDateString, toETTime) |
+| `src/utils/normalizeBar.js` | Shared Alpaca bar → lightweight-charts bar normalizer |
 | `src/utils/validateEnv.js` | Validate required VITE_* env vars on startup |
+
+### App Shell
+| File | Purpose |
+|---|---|
+| `src/main.jsx` | App entry: QueryClientProvider, validateEnv() call |
+| `src/App.jsx` | Single-page shell: TopNav + Sidebar + Chart + Right Panel + overlays |
+| `src/constants/chart.js` | All colors, periods, timeframe configs, symbol suggestions |
+| `src/constants/presets.js` | Default preset definitions (Clean, Full, Scalp, Swing) |
+
+### Layout Components
+| File | Purpose |
+|---|---|
+| `src/components/layout/TopNav.jsx` | Top navigation (Logo, panel toggles, ⌘K, bell, settings) |
+| `src/components/layout/Sidebar.jsx` | Left sidebar — symbol, timeframe, presets, indicators, ATR gauge |
+| `src/components/layout/RightPanel.jsx` | *(Phase 10)* Generic right panel shell — renders active panel content |
+
+### Chart Components
+| File | Purpose |
+|---|---|
 | `src/components/chart/CandlestickChart.jsx` | lightweight-charts v5 main chart + pane management |
 | `src/components/chart/TimeframeSelector.jsx` | Timeframe button group |
 | `src/components/chart/PriceDisplay.jsx` | Live price + % change header |
+| `src/components/chart/SymbolInput.jsx` | Symbol input + autocomplete dropdown |
+
+### Indicator Overlays
+| File | Purpose |
+|---|---|
 | `src/components/indicators/EMAOverlay.jsx` | EMA 9/48/200 line series |
-| `src/components/indicators/VWAPOverlay.jsx` | VWAP + band series |
-| `src/components/indicators/LevelOverlay.jsx` | Prev H/L price lines, ORB zone, ODC as session-scoped LineSeries |
+| `src/components/indicators/VWAPOverlay.jsx` | VWAP + σ band series |
+| `src/components/indicators/LevelOverlay.jsx` | Prev H/L, ORB zone, ODC as session-scoped LineSeries |
 | `src/components/indicators/SROverlay.jsx` | Support/resistance lines + swing high/low markers |
+| `src/components/indicators/BollingerOverlay.jsx` | Bollinger Bands (middle + upper/lower series) |
+
+### Right Panels (slide-out, one at a time)
+| File | Purpose |
+|---|---|
+| `src/components/panels/AlertsPanel.jsx` | Alert management (price-level + candle-streak) |
+| `src/components/panels/BacktestPanel.jsx` | *(Phase 10)* Configurable backtester with equity curve + day type breakdown |
+| `src/components/panels/JournalPanel.jsx` | *(Phase 10)* Trade journal + performance analytics |
+| `src/components/panels/WatchlistPanel.jsx` | *(Phase 10)* Watchlist with live prices + daily % change |
+
+### UI Components
+| File | Purpose |
+|---|---|
+| `src/components/ui/ConfluenceBar.jsx` | *(Phase 10)* Weighted setup quality readout — traffic light + expandable breakdown |
+| `src/components/ui/MTFStrip.jsx` | *(Phase 10)* Multi-timeframe EMA alignment strip |
 | `src/components/ui/IndicatorTabView.jsx` | RSI + MACD toggle buttons and mini charts below main chart |
 | `src/components/ui/ATRGauge.jsx` | Daily range used vs ATR budget gauge |
 | `src/components/ui/DayTypeBanner.jsx` | Trend / Range / Chop live classification |
-| `src/components/ui/MacroStatusBar.jsx` | 50MA / 200MA alignment, macro bias label |
-| `src/components/ui/IndicatorToggle.jsx` | Sidebar show/hide toggles for chart overlays (EMA, VWAP, Levels, S/R, RVOL) |
-| `src/services/websocket.js` | Alpaca WebSocket connection manager — auth, subscribe, reconnect with exponential backoff |
-| `src/hooks/useAlpacaSocket.js` | React hook — connects WS during market hours, aggregates 1-min bars into selected timeframe, injects into TanStack Query cache |
-| `api/ws-auth.js` | Vercel serverless function — returns Alpaca WS credentials, protected by bearer token |
+| `src/components/ui/IndicatorToggle.jsx` | Sidebar show/hide toggles for chart overlays |
+| `src/components/ui/PresetSelector.jsx` | Sidebar preset grid — switch, save, rename, delete |
+| `src/components/ui/CommandPalette.jsx` | Cmd+K search overlay (symbols, timeframes, indicators, panels) |
+| `src/components/ui/SettingsModal.jsx` | Themes + keyboard shortcuts reference |
 | `src/components/ui/CrosshairLegend.jsx` | OHLCV data overlay on crosshair hover (ref-based, no re-renders) |
 | `src/components/ui/ToastContainer.jsx` | Fixed bottom-right toast notification renderer |
-| `src/hooks/useToast.js` | Zustand toast notification store (add/remove/auto-dismiss) |
-| `src/hooks/useViewportPersistence.js` | Preserves chart zoom/scroll across live data updates |
-| `src/hooks/useKeyboardShortcuts.js` | Global keyboard shortcuts (1-6 for timeframes) |
-| `src/store/usePresetsStore.js` | *(Phase 8)* Zustand preset store — save/load/rename/delete named presets, localStorage persistence |
-| `src/components/ui/PresetSelector.jsx` | *(Phase 8)* Sidebar dropdown — switch presets, "Save Current as...", rename/delete |
-| `src/constants/presets.js` | *(Phase 8)* Default preset definitions (Clean, Full, Scalp, Swing) |
-| `src/constants/chart.js` | All colors, periods, timeframe configs |
-| `src/main.jsx` | App entry: QueryClientProvider, validateEnv() call |
-| `src/App.jsx` | Root layout and routing |
+| `src/components/ui/StatusBar.jsx` | WebSocket/Polling status + last updated time |
+| `src/components/ui/ErrorBoundary.jsx` | React error boundary with fallback UI |
+| `src/components/ui/Logo.jsx` | Boogaloo font logo with BETA badge |
+
+### Docs
+| File | Purpose |
+|---|---|
+| `project.md` | Full project spec, architecture, competitive landscape |
+| `tasks.md` | Living task board, current sprint status |
+| `indicators.md` | Indicator math reference and code contracts |
+| `brainstorming.md` | Competitive intelligence research + vision document |
+| `audit.md` | Health audit reusable template |
 
 ---
 
 ## Current Status
 
-- [x] Project initialized (Vite 7 + React 18, scaffolded directly in Lumpia/)
-- [x] Dependencies installed (lightweight-charts v5, axios, zustand, @tanstack/react-query v5, tailwind, vitest)
-- [x] Git initialized, first commit on `main` — 36 files, 33/33 tests passing, clean build
-- [x] `.env` configured with Alpaca paper keys
-- [x] Phase 1 — core chart + levels + VWAP + EMAs (all code written, tested, committed)
-- [x] Phase 2 — ORB zone + RVOL + VWAP bands (built during Phase 1)
-- [x] Phase 3 — RSI/MACD panes, ATR gauge, day type banner — committed
-- [x] Phase 4 — S/R detection + macro status bar — 45/45 tests, build clean
-- [x] Phase 5 — live WebSocket (ws-auth proxy, websocket.js manager, useAlpacaSocket hook, StatusBar live indicator)
-- [x] Phase 6 — Vercel deployment (api/bars.js serverless proxy, cheechart.space custom domain, SSL pending)
-- [x] Alert system (Tier 3 stretch) — price-level and candle-streak alerts with browser notifications
-- [x] Multi-symbol support — dynamic symbol input, autocomplete, Alpaca validation, all systems symbol-agnostic
-- [x] Indicator deep assessment — 6 fixes (VWAP timezone, ATR thresholds, RVOL bias, MACD naming, byDay dedup, levels tests)
-- [x] QOL phase — crosshair OHLCV legend, toast notifications, viewport persistence, smooth loading transitions
-- [x] Full project health audit (reusable audit.md template, 8-category assessment)
-- [x] P0–P3 audit fixes: ErrorBoundary, input validation, security headers, shared timezone.js, mini chart extraction, alert hook extraction, WS auto-recovery, dead code cleanup, doc sync
-- [x] Phase 8 — Saved chart presets (4 defaults, custom save/rename/delete, localStorage, 21 preset tests)
-- [x] QOL fixes: RVOL toggle wired, preset sync (markModified on RSI/MACD/TF), API pagination, symbol regex
-- [x] 169/169 tests passing, build clean
+**192/192 tests passing, build clean.**
+
+### Completed
+- [x] Phases 1–4: Core chart, indicators, levels, S/R detection, ATR gauge, day type
+- [x] Phase 5: Live WebSocket feed (market-hours gating, 1-min aggregation, auto-reconnect)
+- [x] Phase 6: Vercel deployment (serverless proxy, cheechart.space, SSL)
+- [x] Phase 7: Multi-symbol support (autocomplete, Alpaca validation, symbol-agnostic)
+- [x] Phase 8: Saved chart presets (4 defaults, custom CRUD, localStorage, 21 tests)
+- [x] Phase 9: Multi-view architecture, command palette, alerts panel, Bollinger Bands, backtester engine, dashboard, mobile responsive
+- [x] Alert system: price-level + candle-streak alerts with browser notifications
+- [x] QOL: crosshair legend, toasts, viewport persistence, keyboard shortcuts, error boundary
+- [x] Health audits: security headers, input validation, shared utilities, dead code cleanup
+
+### In Progress
+- [ ] Phase 10A: Architecture consolidation (single-page, panel system, kill router)
+- [ ] Phase 10B: Synthesis layer (confluence score, MTF strip, backtester upgrade)
+- [ ] Phase 10C: Right panel content (watchlist with live prices, journal analytics)
+
+### Upcoming
+- [ ] Phase 11: Polish + Mobile (onboarding, touch targets, PWA, theme refactor)
+- [ ] Phase 12+: Screener, trade replay, gap tracking, cloud sync
 
 ---
 
@@ -273,3 +450,5 @@ Component state (useState — local only):
 | 2026-03-15 | Phase 8 design: researched TradingView/thinkorswim/NinjaTrader/Webull/Sierra Chart layout systems. Consensus: layout = indicator config + style + timeframe, symbol floats freely. #1 trader complaint = settings not persisting. Designed lightweight preset system (Zustand + localStorage, sidebar dropdown, 4 default presets). Updated project.md, tasks.md, CLAUDE.md with Phase 8 plan. |
 | 2026-03-15 | Chart QA + fixes: evaluated all 6 timeframes via screenshots. Fixed: RVOL toggle wired to highlight volume bars (amber ≥1.5x, red ≥2x). RSI/MACD/timeframe toggles now call markModified() for correct preset sync. VWAP toggle disabled on non-intraday TFs. API proxy follows Alpaca next_page_token pagination (fixes 4h data truncation). Symbol regex accepts dotted tickers (BRK.B). 169/169 tests, build clean. |
 | 2026-03-15 | UX improvements: saved preset delete confirmation (two-click safety, red-tinted pill capsule), rename/delete buttons in theme-aware pill with larger hit targets. Terminal theme added (sage green #a8d8a8 on deep black #060806, vivid green accent #50d050) — CSS vars, Tailwind overrides, SettingsModal 3-column grid. Hover feedback (brightness-125) on all preset buttons. Build clean. |
+| 2026-03-15 | Phase 9: Multi-view architecture (react-router-dom, ChartView + DashboardView), TopNav shared navigation, Sidebar extracted, Command palette (Cmd+K), AlertsPanel slide-out (replaces dropdown), Bollinger Bands indicator + overlay, RSI divergence detection helper, backtester engine (ORB + EMA-cross), Dashboard with BacktestCard + TradeJournal + WatchlistCard, useJournalStore, URL state sync, keyboard shortcuts expanded ([/] presets, Cmd+K), Settings shortcuts tab, mobile responsive layout. Quality audit: fixed z-index collision, TradeJournal reactivity, added useJournalStore tests. 192/192 tests, build clean. |
+| 2026-03-15 | Strategic assessment + competitive research: 4 parallel research agents analyzed TradingView (1.9/5 Trustpilot, paywall rage, Pine Script lock-in, chart lag), Webull (great mobile, 56 indicators only, no real backtesting, desktop glitchy), thinkorswim (1.3/5 Trustpilot, Schwab migration disaster, deprecated ThinkScript), and 2026 UX trends (single-page panel architectures, AI copilots, command palettes). Decision: collapse `/dashboard` route into right-panel system (single-page, chart-centric). New Phase 10 plan: confluence score, MTF strip, panel architecture, backtester upgrade, watchlist with live prices, journal analytics. Updated project.md, tasks.md, CLAUDE.md, brainstorming.md. |

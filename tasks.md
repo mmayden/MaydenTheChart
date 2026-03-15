@@ -257,16 +257,166 @@
 
 ---
 
-## 🔲 Phase 9 — Stretch Goals
+## ✅ Phase 9 — Multi-View + Stretch Goals — COMPLETE
 
-- 🔲 `src/utils/backtest.js` — replay historical days using same indicator math, output win rate / R:R / by day type
-- 🔲 Weekly gap tracking panel (unfilled QQQ weekly gaps with distance from current price)
-- 🔲 Volume profile (horizontal bars at each price level)
-- 🔲 Bollinger Bands overlay
-- 🔲 RSI divergence detection (auto-annotation)
-- 🔲 Alert sets per preset (tie alert configs to presets)
-- 🔲 Instrument linking (multi-chart: change symbol in one panel, all linked panels follow)
-- 🔲 Cloud sync / preset export (multi-device persistence, preset sharing)
+**192/192 tests passing, build clean**
+
+### Architecture
+- ✅ Multi-view routing (react-router-dom): ChartView (`/`) + DashboardView (`/dashboard`)
+- ✅ `src/App.jsx` rewritten from 288-line monolith to 55-line router shell
+- ✅ `src/components/layout/TopNav.jsx` — shared navigation (Logo, Chart/Dashboard links, Cmd+K, Bell, Settings)
+- ✅ `src/components/layout/Sidebar.jsx` — extracted chart controls, mobile drawer overlay
+- ✅ `src/hooks/useURLState.js` — bidirectional URL sync (?s=QQQ&tf=5m&p=full)
+
+### Command Palette + Alerts
+- ✅ `src/components/ui/CommandPalette.jsx` — Cmd+K search (symbols, timeframes, indicators, presets, navigation)
+- ✅ `src/components/panels/AlertsPanel.jsx` — right slide-out panel (replaces old dropdown)
+- ✅ Keyboard shortcuts expanded: [/] cycle presets, Cmd+K palette
+- ✅ Settings modal: added Shortcuts tab (keyboard reference)
+
+### New Indicators
+- ✅ Bollinger Bands (`bollingerBands()` in indicators.js + `BollingerOverlay.jsx`)
+- ✅ RSI divergence detection (`detectRSIDivergences()` — helper, not wired to UI yet)
+- ✅ `bollinger: false` added to all default presets
+
+### Dashboard
+- ✅ `src/utils/backtest.js` — ORB breakout + EMA-cross strategies, same indicator math
+- ✅ `src/components/dashboard/BacktestCard.jsx` — strategy selector, stats grid, trade table
+- ✅ `src/components/dashboard/TradeJournal.jsx` — trade logging with setup/result/notes/rating
+- ✅ `src/components/dashboard/WatchlistCard.jsx` — symbol watchlist (localStorage)
+- ✅ `src/store/useJournalStore.js` — CRUD + stats, localStorage persistence
+
+### Mobile Responsive
+- ✅ Sidebar: fixed drawer overlay on <768px, collapsible on desktop
+- ✅ TopNav: hamburger menu on mobile (chart view only)
+- ✅ Responsive grid layouts on dashboard cards
+
+### Quality Audit Fixes
+- ✅ Fixed z-index collision (AlertsPanel backdrop z-[45] vs Sidebar z-40)
+- ✅ Fixed TradeJournal stats reactivity (was using getState(), now computed from entries)
+- ✅ Added useJournalStore.test.js (8 tests)
+- ✅ Updated CLAUDE.md, project.md, tasks.md, indicators.md
+
+---
+
+## 🔲 Phase 10A — Architecture Consolidation (Single-Page Panel System)
+
+**Goal:** Collapse `/dashboard` route into right-panel system. Chart always visible.
+**Why:** Industry converging on single-page panel architectures (Bloomberg, ToS, VS Code).
+Context-switching between routes breaks the charting workflow.
+
+### Step 1 — Right Panel Shell
+- 🔲 `src/components/layout/RightPanel.jsx` — generic slide-out panel container (reuse AlertsPanel animation)
+- 🔲 Add `activePanel` state to `useChartStore.js` — `null | 'alerts' | 'backtest' | 'journal' | 'watchlist'`
+- 🔲 `setActivePanel(panel)` — toggle: same panel = close, different = switch
+- 🔲 Wire RightPanel into `App.jsx` — renders alongside chart
+
+### Step 2 — Migrate Dashboard Components to Panels
+- 🔲 `src/components/panels/BacktestPanel.jsx` — BacktestCard content in panel format
+- 🔲 `src/components/panels/JournalPanel.jsx` — TradeJournal content in panel format
+- 🔲 `src/components/panels/WatchlistPanel.jsx` — WatchlistCard content in panel format
+- 🔲 Migrate AlertsPanel to use generic RightPanel shell
+
+### Step 3 — Kill Router
+- 🔲 Remove react-router-dom from App.jsx and main.jsx
+- 🔲 Remove `src/views/ChartView.jsx` and `src/views/DashboardView.jsx` — inline into App.jsx
+- 🔲 Update TopNav — replace nav links with panel toggle icons
+- 🔲 Update useURLState.js — remove pathname handling, keep query params
+- 🔲 Update CommandPalette — "Open Panel" commands replace "Navigate"
+- 🔲 Update useKeyboardShortcuts.js — panel toggle shortcuts
+- 🔲 `npm uninstall react-router-dom`
+- 🔲 Verify all tests pass, build clean
+
+---
+
+## 🔲 Phase 10B — Synthesis Layer ("Damn Factor")
+
+**Goal:** Make the chart think. No retail platform synthesizes indicator signals for you.
+
+### Confluence Score
+- 🔲 `src/utils/confluence.js` — weighted score:
+  - Day Type (heavy) + EMA Alignment (heavy) + VWAP Position (medium)
+  - ATR Budget (medium) + RSI zone (light) + MACD direction (light)
+- 🔲 Returns: `{ score, bias, level, reasons[], warnings[] }`
+- 🔲 Unit tests (all bull, all bear, mixed, chop day edge cases)
+- 🔲 `src/components/ui/ConfluenceBar.jsx` — 🟢🟡🔴 traffic light + expandable breakdown
+- 🔲 Position: between price display and chart (always visible, prominent)
+
+### Multi-Timeframe Status Strip
+- 🔲 `src/components/ui/MTFStrip.jsx` — `5m: Bull | 15m: Bull | 4h: Bear | 1D: Neutral`
+- 🔲 Color-coded per EMA alignment
+- 🔲 Data strategy: fetch EMA data for 4 timeframes in parallel via TanStack Query
+
+### Backtester Upgrade
+- 🔲 Blank state → configure params → "Run Backtest" → results
+- 🔲 Configurable params: ORB window/RVOL/direction, EMA periods, stop loss, RSI filter, day type filter
+- 🔲 VWAP Bounce strategy (entry on VWAP touch + reversal, exit on 2σ or EOD)
+- 🔲 Wire `classifyDayType()` and `rsi()` (already imported but unused)
+- 🔲 Day type breakdown table in results
+- 🔲 Equity curve: mini lightweight-charts line chart of cumulative P&L%
+- 🔲 Clean up dead imports, add tests
+
+---
+
+## 🔲 Phase 10C — Panel Content Upgrades
+
+**Goal:** Make each panel worth opening.
+
+### Watchlist with Live Prices
+- 🔲 `api/snapshot.js` — Vercel proxy for Alpaca `/v2/snapshot`
+- 🔲 `src/hooks/useWatchlistQuotes.js` — TanStack Query, latest quotes per watched symbol
+- 🔲 WatchlistPanel: symbol + price + daily % change (green/red), click → chart updates
+- 🔲 Auto-refresh (30s interval)
+
+### Journal Analytics
+- 🔲 Stats: win rate by setup type, best/worst setup, current/longest streak
+- 🔲 Rating correlation (higher-rated trades → higher win rate?)
+- 🔲 Filter tabs: by setup type + by result (Win/Loss/All)
+- 🔲 Heat calendar: GitHub-style contribution graph of daily P&L (green=profit, red=loss)
+
+### QOL Enhancements
+- 🔲 Sound alerts: optional subtle audio ping on alert triggers (Bloomberg-style, off by default)
+- 🔲 Session stats in status bar: "Today: 2 trades, +0.8%" from journal entries for current day
+
+---
+
+## 🔲 Phase 11 — Polish + Mobile
+
+### Onboarding
+- 🔲 First-visit tooltip tour: Day Type → ATR gauge → Presets → Cmd+K
+- 🔲 Dismissible, localStorage flag, never shows again
+
+### Mobile
+- 🔲 Touch targets 44px+ minimum
+- 🔲 Panels → full-screen overlays on <768px
+- 🔲 Swipe gestures: right for sidebar, left for panel
+- 🔲 Chart fills viewport
+
+### Chart Snapshot
+- 🔲 Cmd+Shift+S captures chart as PNG with all indicators
+- 🔲 Copy to clipboard or download
+
+### PWA
+- 🔲 manifest.json + service worker
+- 🔲 Installable to home screen
+
+### Theme Refactor
+- 🔲 CSS variable-first approach, eliminate ~40 lines of !important overrides
+
+---
+
+## 🔲 Phase 12+ — Future Differentiators
+
+- 🔲 Screener — scan watchlist for active setups
+- 🔲 Trade replay — step through historical days bar-by-bar with simulated trades
+- 🔲 Chart annotations — notes/arrows on chart, saved per symbol
+- 🔲 Snapshot sharing — one-click chart screenshot
+- 🔲 Weekly gap tracking panel
+- 🔲 Volume profile (horizontal bars)
+- 🔲 RSI divergence chart markers (math exists)
+- 🔲 Alert sets per preset
+- 🔲 Cloud sync / preset export
+- 🔲 4hr EMA cross annotations
 
 ---
 

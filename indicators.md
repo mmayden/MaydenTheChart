@@ -23,7 +23,7 @@ This is non-negotiable — it lets the live chart and the backtester share ident
 }
 ```
 
-The planned backtester (`src/utils/backtest.js` — not yet built) will call the exact same functions
+The backtester (`src/utils/backtest.js`) calls the exact same functions
 with historical bar slices. No duplicate math, ever.
 
 **Documented deviations:**
@@ -432,6 +432,67 @@ Zone strength = number of pivots merged (more touches = stronger level)
 ```js
 // returns { support: [{ price, strength }], resistance: [{ price, strength }] }
 findSupportResistance(bars, lookback = 10, clusterThreshold = 0.001)
+```
+
+---
+
+## Bollinger Bands
+
+### What it tells you
+Bollinger Bands measure volatility around a moving average. When bands tighten ("squeeze"),
+a breakout is coming. When price touches the outer bands, it signals potential mean reversion.
+Complements VWAP σ bands by operating on a different math basis (SMA vs volume-weighted).
+
+### Formula
+```
+Middle Band = SMA(close, 20)
+Upper Band  = Middle + 2 × stdDev(close, 20)
+Lower Band  = Middle - 2 × stdDev(close, 20)
+```
+
+### Key signals
+| Condition | Meaning |
+|---|---|
+| Price > Upper Band | Overbought / trend continuation |
+| Price < Lower Band | Oversold / trend continuation |
+| Bands tightening | Volatility squeeze — breakout imminent |
+| Bands widening | Volatility expansion — trend accelerating |
+
+### Rendering
+- Middle band: solid purple (#a78bfa)
+- Upper/Lower bands: dashed semi-transparent purple (#7c3aed80)
+- Toggle in sidebar IndicatorToggle, default OFF
+
+### Code signature
+```js
+// returns { middle, upper, lower, signal }
+// each band = { series: [{ time, value }] }
+// signal = { value, bias, strength }
+bollingerBands(bars, period = 20, multiplier = 2)
+```
+
+---
+
+## RSI Divergence Detection
+
+### What it tells you
+RSI divergence occurs when price and RSI momentum disagree. Bullish divergence
+(price makes lower low, RSI makes higher low) often precedes reversals up.
+Bearish divergence (price makes higher high, RSI makes lower high) often precedes
+reversals down. This is a high-conviction pattern used by institutional traders.
+
+### Detection algorithm
+```
+Look back N bars from each point:
+  Bullish: price low < prev price low, but RSI low > prev RSI low
+  Bearish: price high > prev price high, but RSI high < prev RSI high
+```
+
+### Code signature
+```js
+// returns array of { time, type: 'bullish' | 'bearish' }
+// Not wired to UI markers yet — helper function for future annotation
+detectRSIDivergences(bars, rsiSeries, lookback = 5)
 ```
 
 ---

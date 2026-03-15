@@ -1,11 +1,15 @@
 /**
  * SettingsModal — Full settings panel opened by the gear icon.
- * Centered overlay with sections for app configuration.
- * Currently: Color Scheme selection.
+ *
+ * Tabs:
+ *   Appearance  — Color scheme selection (Dark / Lumpia / Terminal)
+ *   Shortcuts   — Keyboard shortcut reference
  */
 
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useChartStore } from '../../store/useChartStore'
+
+// ── Theme schemes ───────────────────────────────────────────────────────────
 
 const SCHEMES = [
   {
@@ -49,6 +53,29 @@ const SCHEMES = [
   },
 ]
 
+// ── Keyboard shortcuts ──────────────────────────────────────────────────────
+
+const SHORTCUTS = [
+  { category: 'Navigation', items: [
+    { keys: ['⌘', 'K'],     label: 'Open command palette' },
+    { keys: ['Esc'],         label: 'Close panel / modal' },
+  ]},
+  { category: 'Timeframes', items: [
+    { keys: ['1'],  label: '1-minute chart' },
+    { keys: ['2'],  label: '5-minute chart' },
+    { keys: ['3'],  label: '15-minute chart' },
+    { keys: ['4'],  label: '1-hour chart' },
+    { keys: ['5'],  label: '4-hour chart' },
+    { keys: ['6'],  label: 'Daily chart' },
+  ]},
+  { category: 'Presets', items: [
+    { keys: ['['],  label: 'Previous preset' },
+    { keys: [']'],  label: 'Next preset' },
+  ]},
+]
+
+// ── Sub-components ──────────────────────────────────────────────────────────
+
 function SchemeCard({ scheme, active, onSelect }) {
   const p = scheme.preview
   return (
@@ -69,16 +96,12 @@ function SchemeCard({ scheme, active, onSelect }) {
     >
       {/* Mini UI preview */}
       <div style={{ display: 'flex', gap: 6, marginBottom: 12, height: 52 }}>
-        {/* Sidebar strip */}
         <div style={{ width: 28, borderRadius: 4, background: p.surface, border: `1px solid ${p.border}`, flexShrink: 0 }} />
-        {/* Main area */}
         <div style={{ flex: 1, borderRadius: 4, border: `1px solid ${p.border}`, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          {/* Header bar */}
           <div style={{ height: 12, background: p.surface, borderBottom: `1px solid ${p.border}`, display: 'flex', alignItems: 'center', paddingLeft: 6, gap: 3 }}>
             <div style={{ width: 16, height: 4, borderRadius: 2, background: p.accent }} />
             <div style={{ width: 10, height: 4, borderRadius: 2, background: p.muted }} />
           </div>
-          {/* Chart area — always dark */}
           <div style={{ flex: 1, background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 20 }}>
               {[14, 18, 12, 22, 16, 20, 10, 24, 18].map((h, i) => (
@@ -99,7 +122,6 @@ function SchemeCard({ scheme, active, onSelect }) {
             {scheme.description}
           </div>
         </div>
-        {/* Active indicator */}
         <div style={{
           width: 18, height: 18, borderRadius: '50%', flexShrink: 0, marginTop: 2,
           background: active ? p.accent : 'transparent',
@@ -117,9 +139,17 @@ function SchemeCard({ scheme, active, onSelect }) {
   )
 }
 
+const TABS = [
+  { id: 'appearance', label: 'Appearance' },
+  { id: 'shortcuts',  label: 'Shortcuts' },
+]
+
+// ── Main component ──────────────────────────────────────────────────────────
+
 export function SettingsModal({ onClose }) {
   const theme    = useChartStore((s) => s.theme)
   const setTheme = useChartStore((s) => s.setTheme)
+  const [activeTab, setActiveTab] = useState('appearance')
 
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose() }
@@ -158,13 +188,9 @@ export function SettingsModal({ onClose }) {
         {/* Header */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '20px 24px 16px',
-          borderBottom: '1px solid var(--border)',
+          padding: '20px 24px 0',
         }}>
-          <div>
-            <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: '0.04em' }}>Settings</div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Appearance</div>
-          </div>
+          <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: '0.04em' }}>Settings</div>
           <button
             onClick={onClose}
             style={{
@@ -180,25 +206,94 @@ export function SettingsModal({ onClose }) {
           </button>
         </div>
 
+        {/* Tabs */}
+        <div style={{ display: 'flex', gap: 0, padding: '12px 24px 0', borderBottom: '1px solid var(--border)' }}>
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                padding: '8px 16px',
+                fontSize: 12,
+                fontWeight: 600,
+                letterSpacing: '0.04em',
+                background: 'none',
+                border: 'none',
+                borderBottom: activeTab === tab.id ? '2px solid var(--accent)' : '2px solid transparent',
+                color: activeTab === tab.id ? 'var(--accent)' : 'var(--text-muted)',
+                cursor: 'pointer',
+                transition: 'color 0.15s, border-color 0.15s',
+                fontFamily: 'monospace',
+                marginBottom: -1,
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
         {/* Body */}
         <div style={{ padding: '24px' }}>
 
-          {/* Color Scheme section */}
-          <div style={{ marginBottom: 8 }}>
-            <div style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 14 }}>
-              Color Scheme
+          {/* Appearance tab */}
+          {activeTab === 'appearance' && (
+            <div>
+              <div style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 14 }}>
+                Color Scheme
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+                {SCHEMES.map((s) => (
+                  <SchemeCard
+                    key={s.id}
+                    scheme={s}
+                    active={theme === s.id}
+                    onSelect={setTheme}
+                  />
+                ))}
+              </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-              {SCHEMES.map((s) => (
-                <SchemeCard
-                  key={s.id}
-                  scheme={s}
-                  active={theme === s.id}
-                  onSelect={setTheme}
-                />
+          )}
+
+          {/* Shortcuts tab */}
+          {activeTab === 'shortcuts' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              {SHORTCUTS.map((group) => (
+                <div key={group.category}>
+                  <div style={{
+                    fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase',
+                    color: 'var(--text-muted)', marginBottom: 10,
+                  }}>
+                    {group.category}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {group.items.map((item, i) => (
+                      <div key={i} style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        padding: '8px 12px', borderRadius: 8,
+                        background: 'var(--bg-surface)',
+                        border: '1px solid var(--border)',
+                      }}>
+                        <span style={{ fontSize: 12, color: 'var(--text-primary)' }}>{item.label}</span>
+                        <div style={{ display: 'flex', gap: 4 }}>
+                          {item.keys.map((key, j) => (
+                            <kbd key={j} style={{
+                              fontSize: 11, fontFamily: 'monospace',
+                              padding: '2px 8px', borderRadius: 4,
+                              background: 'var(--border)', color: 'var(--text-primary)',
+                              border: '1px solid var(--border-mid, var(--border))',
+                              minWidth: 24, textAlign: 'center',
+                            }}>
+                              {key}
+                            </kbd>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
-          </div>
+          )}
 
         </div>
       </div>

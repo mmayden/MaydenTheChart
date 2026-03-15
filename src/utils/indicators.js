@@ -413,3 +413,121 @@ export function macd(bars, fastPeriod = MACD_FAST, slowPeriod = MACD_SLOW, signa
     signal:     { value: lastHist, bias, strength: finalStrength },
   }
 }
+
+// ─── Bollinger Bands ─────────────────────────────────────────────────────────
+
+/**
+ * Compute Bollinger Bands (SMA ± multiplier × stddev).
+ *
+ * @param {Array<{time, close}>} bars - sorted oldest → newest
+ * @param {number} period     - SMA period (default 20)
+ * @param {number} multiplier - standard deviation multiplier (default 2)
+ * @returns {{ middle: Array<{time, value}>, upper: Array<{time, value}>, lower: Array<{time, value}>, signal: {value, bias, strength} }}
+ */
+export function bollingerBands(bars, period = 20, multiplier = 2) {
+  if (!bars || bars.length < period) {
+    return { middle: [], upper: [], lower: [], signal: { value: null, bias: 'neutral', strength: 'weak' } }
+  }
+
+  const middle = []
+  const upper  = []
+  const lower  = []
+
+  for (let i = period - 1; i < bars.length; i++) {
+    const window = bars.slice(i - period + 1, i + 1)
+    const sma    = window.reduce((s, b) => s + b.close, 0) / period
+    const variance = window.reduce((s, b) => s + (b.close - sma) ** 2, 0) / period
+    const stdDev   = Math.sqrt(variance)
+
+    middle.push({ time: bars[i].time, value: sma })
+    upper.push({ time: bars[i].time, value: sma + multiplier * stdDev })
+    lower.push({ time: bars[i].time, value: sma - multiplier * stdDev })
+  }
+
+  const lastBar   = bars[bars.length - 1]
+  const lastUpper = upper[upper.length - 1]?.value
+  const lastLower = lower[lower.length - 1]?.value
+  const lastMid   = middle[middle.length - 1]?.value
+
+  let bias = 'neutral'
+  if (lastBar && lastUpper && lastLower) {
+    if (lastBar.close > lastUpper) bias = 'bull'
+    else if (lastBar.close < lastLower) bias = 'bear'
+  }
+
+  const bandwidth = lastMid ? (lastUpper - lastLower) / lastMid : 0
+  const strength  = bandwidth > 0.04 ? 'strong' : bandwidth > 0.02 ? 'moderate' : 'weak'
+
+  return { middle, upper, lower, signal: { value: lastMid, bias, strength } }
+}
+
+// ─── RSI Divergence Detection ────────────────────────────────────────────────
+
+/**
+ * Detect RSI divergences against price.
+ *
+ * Bullish divergence:  price makes lower low, RSI makes higher low
+ * Bearish divergence:  price makes higher high, RSI makes lower high
+ *
+ * @param {Array<{time, close, high, low}>} bars
+ * @param {Array<{time, value}>} rsiSeries
+ * @param {number} lookback - how many bars to compare swing points (default 5)
+ * @returns {Array<{time, type: 'bullish'|'bearish'}>}
+ */
+export function detectRSIDivergences(bars, rsiSeries, lookback = 5) {
+  const divergences = []
+  if (!bars?.length || !rsiSeries?.length || rsiSeries.length < lookback * 3) return divergences
+
+  const rsiMap = new Map(rsiSeries.map((p) => [p.time, p.value]))
+
+  // Find swing lows and highs in both price and RSI
+  for (let i = lookback * 2; i < bars.length - 1; i++) {
+    const rsiVal = rsiMap.get(bars[i].time)
+    if (rsiVal == null) continue
+
+    // Check for swing low in price (potential bullish divergence)
+    const isSwingLow = bars[i].low <= Math.min(...bars.slice(i - lookback, i).map((b) => b.low))
+      && bars[i].low < Math.min(...bars.slice(i + 1, Math.min(i + 3, bars.length)).map((b) => b.low))
+
+    if (isSwingLow) {
+      // Look back for a previous swing low
+      for (let j = i - lookback; j >= Math.max(0, i - lookback * 4); j--) {
+        const prevRsi = rsiMap.get(bars[j].time)
+        if (prevRsi == null) continue
+
+        const isPrevSwingLow = bars[j].low <= Math.min(
+          ...bars.slice(Math.max(0, j - lookback), j).map((b) => b.low),
+          ...bars.slice(j + 1, Math.min(j + 3, bars.length)).map((b) => b.low)
+        )
+
+        if (isPrevSwingLow && bars[i].low < bars[j].low && rsiVal > prevRsi) {
+          divergences.push({ time: bars[i].time, type: 'bullish' })
+          break
+        }
+      }
+    }
+
+    // Check for swing high (potential bearish divergence)
+    const isSwingHigh = bars[i].high >= Math.max(...bars.slice(i - lookback, i).map((b) => b.high))
+      && bars[i].high > Math.max(...bars.slice(i + 1, Math.min(i + 3, bars.length)).map((b) => b.high))
+
+    if (isSwingHigh) {
+      for (let j = i - lookback; j >= Math.max(0, i - lookback * 4); j--) {
+        const prevRsi = rsiMap.get(bars[j].time)
+        if (prevRsi == null) continue
+
+        const isPrevSwingHigh = bars[j].high >= Math.max(
+          ...bars.slice(Math.max(0, j - lookback), j).map((b) => b.high),
+          ...bars.slice(j + 1, Math.min(j + 3, bars.length)).map((b) => b.high)
+        )
+
+        if (isPrevSwingHigh && bars[i].high > bars[j].high && rsiVal < prevRsi) {
+          divergences.push({ time: bars[i].time, type: 'bearish' })
+          break
+        }
+      }
+    }
+  }
+
+  return divergences
+}

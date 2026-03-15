@@ -3,13 +3,15 @@
  *
  * Extracted from NotificationBell to separate business logic from UI.
  * Fires browser notifications when alerts trigger.
+ * Updates alertsStore with currentPrice and currentStreak so the
+ * AlertsPanel can display live data without needing bars directly.
  */
 
 import { useEffect } from 'react'
 import { useAlertsStore } from '../store/useAlertsStore'
 import { useChartStore } from '../store/useChartStore'
 
-function getStreak(bars) {
+export function getStreak(bars) {
   if (!bars?.length) return { count: 0, direction: null }
   const last    = bars[bars.length - 1]
   const lastDir = last.close >= last.open ? 'green' : 'red'
@@ -33,15 +35,27 @@ function fireNotification(title, body) {
 
 /**
  * Checks all active alerts against current bars. Call once in the component
- * that owns the bars data (NotificationBell).
+ * that owns the bars data (ChartView).
  *
  * @param {Array} bars — current bar data
  * @param {string} timeframe — current timeframe label (for notification text)
  */
 export function useAlertChecker(bars, timeframe) {
-  const { alerts, markTriggered } = useAlertsStore()
+  const { alerts, markTriggered, setCurrentPrice, setCurrentStreak, setBarsLength } = useAlertsStore()
   const selectedSymbol = useChartStore((s) => s.selectedSymbol)
   const currentPrice   = bars?.[bars.length - 1]?.close ?? null
+
+  // Push live context into the store for AlertsPanel
+  useEffect(() => {
+    setCurrentPrice(currentPrice)
+  }, [currentPrice, setCurrentPrice])
+
+  useEffect(() => {
+    if (bars?.length) {
+      setCurrentStreak(getStreak(bars))
+      setBarsLength(bars.length)
+    }
+  }, [bars, setCurrentStreak, setBarsLength])
 
   // Check price alerts
   useEffect(() => {
