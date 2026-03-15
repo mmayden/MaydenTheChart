@@ -8,15 +8,17 @@
 
 import { create } from 'zustand'
 
-let _nextId = 1
-
 export const useAlertsStore = create((set) => ({
   alerts: [],
 
   // alertData = everything except id + triggered
   addAlert: (alertData) =>
     set((state) => ({
-      alerts: [...state.alerts, { id: _nextId++, triggered: false, ...alertData }],
+      alerts: [...state.alerts, {
+        id: crypto.randomUUID(),
+        triggered: false,
+        ...alertData,
+      }],
     })),
 
   removeAlert: (id) =>

@@ -53,8 +53,8 @@ export default async function handler(req, res) {
     )
 
     if (!response.ok) {
-      const text = await response.text()
-      return res.status(response.status).json({ error: `Alpaca API error: ${response.status}`, detail: text })
+      console.error('[bars] Alpaca API error:', response.status, await response.text())
+      return res.status(response.status).json({ error: `Upstream API error (${response.status})` })
     }
 
     const data = await response.json()
@@ -63,6 +63,7 @@ export default async function handler(req, res) {
     res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60')
     return res.status(200).json(data)
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch from Alpaca', detail: err.message })
+    console.error('[bars] Fetch failed:', err.message)
+    return res.status(500).json({ error: 'Failed to fetch market data' })
   }
 }

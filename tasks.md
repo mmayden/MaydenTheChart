@@ -107,7 +107,7 @@
 
 ---
 
-## 🔄 Phase 6 — Deploy to Vercel
+## ✅ Phase 6 — Deploy to Vercel — COMPLETE
 
 - ✅ Create `vercel.json` — rewrites for API routes + SPA fallback
 - ✅ `api/bars.js` — Vercel serverless function proxies Alpaca API (keys server-only)
@@ -117,7 +117,7 @@
 - ✅ Add env vars to Vercel dashboard (ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_DATA_URL)
 - ✅ Deployed to Vercel — build succeeds, 4 successful deployments
 - ✅ Custom domain `cheechart.space` added via CNAME → `cname.vercel-dns.com`
-- 🔄 Verify live URL works (SSL cert was propagating — check again)
+- ✅ SSL verified working (2026-03-14)
 
 ---
 

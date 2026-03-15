@@ -68,13 +68,20 @@ export function createAlpacaSocket({ onBar, onStatus }) {
       .then(({ key, secret }) => {
         if (intentionalClose) return // disconnected while fetching creds
 
+        if (!key || !secret) {
+          console.error('[WS] Invalid credentials from /api/ws-auth')
+          onStatus('error')
+          return
+        }
+
         ws = new WebSocket(WS_URL)
 
         ws.onmessage = (event) => {
           let messages
           try {
             messages = JSON.parse(event.data)
-          } catch {
+          } catch (e) {
+            console.warn('[WS] Failed to parse message:', e.message)
             return
           }
 

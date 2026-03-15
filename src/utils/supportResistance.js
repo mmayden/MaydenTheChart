@@ -69,7 +69,7 @@ export function clusterPivots(pivots, clusterThreshold = 0.001) {
 
   for (let i = 1; i < sorted.length; i++) {
     const avgPrice = current.prices.reduce((s, p) => s + p, 0) / current.prices.length
-    const diff = Math.abs(sorted[i].price - avgPrice) / avgPrice
+    const diff = avgPrice !== 0 ? Math.abs(sorted[i].price - avgPrice) / avgPrice : 0
 
     if (diff <= clusterThreshold) {
       current.prices.push(sorted[i].price)
@@ -114,7 +114,7 @@ export function findSupportResistance(bars, lookback = 10, clusterThreshold = 0.
   const supportClusters = clusterPivots(swingLows, clusterThreshold)
 
   // Filter: resistance should be above current price, support below
-  // But keep nearby zones too (within 2% of price) for context
+  // Keep nearby zones within 0.2% of price for context
   const resistance = resistanceClusters
     .filter((z) => z.price >= lastPrice * 0.998)
     .map((z) => ({ price: parseFloat(z.price.toFixed(2)), strength: z.strength }))

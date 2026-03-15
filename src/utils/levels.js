@@ -32,9 +32,11 @@ function toETTime(unixSecs) {
     timeZone: ET_LOCALE,
     hour: 'numeric', minute: 'numeric', hour12: false,
   }).formatToParts(new Date(unixSecs * 1000))
+  const hourPart   = parts.find((p) => p.type === 'hour')
+  const minutePart = parts.find((p) => p.type === 'minute')
   return {
-    hour:   Number(parts.find((p) => p.type === 'hour').value),
-    minute: Number(parts.find((p) => p.type === 'minute').value),
+    hour:   hourPart   ? Number(hourPart.value)   : 0,
+    minute: minutePart ? Number(minutePart.value) : 0,
   }
 }
 
@@ -111,8 +113,8 @@ export function getOpenOfDay(bars) {
 
   if (!todayBars || todayBars.length === 0) return null
 
-  // First bar of the day
-  const sorted = todayBars.sort((a, b) => a.time - b.time)
+  // First bar of the day (copy to avoid mutating input)
+  const sorted = [...todayBars].sort((a, b) => a.time - b.time)
   return sorted[0].open
 }
 
@@ -140,7 +142,7 @@ export function getORBZone(bars, orbMinutes = 15) {
   const byDay     = groupBarsByDay(bars)
   const days      = Array.from(byDay.keys()).sort()
   const todayKey  = days[days.length - 1]
-  const todayBars = (byDay.get(todayKey) ?? []).sort((a, b) => a.time - b.time)
+  const todayBars = [...(byDay.get(todayKey) ?? [])].sort((a, b) => a.time - b.time)
 
   // Filter to bars within the ORB window
   const orbBars = todayBars.filter((bar) => {

@@ -41,7 +41,7 @@ export function ema(bars, period) {
   const lastBar   = bars[bars.length - 1]
   const lastEma   = series[series.length - 1].value
   const bias      = lastBar.close > lastEma ? 'bull' : lastBar.close < lastEma ? 'bear' : 'neutral'
-  const pctDiff   = Math.abs((lastBar.close - lastEma) / lastEma)
+  const pctDiff   = lastEma !== 0 ? Math.abs((lastBar.close - lastEma) / lastEma) : 0
   const strength  = pctDiff > 0.005 ? 'strong' : pctDiff > 0.002 ? 'moderate' : 'weak'
 
   return { series, signal: { value: lastEma, bias, strength } }
@@ -138,7 +138,15 @@ export function vwapWithBands(bars) {
     sumVol  += bar.volume
     sumTPV2 += tp * tp * bar.volume
 
-    if (sumVol === 0) continue
+    if (sumVol === 0) {
+      // Zero-volume bar: use typical price to avoid series misalignment
+      vwap.push       ({ time: bar.time, value: tp })
+      band1Upper.push ({ time: bar.time, value: tp })
+      band1Lower.push ({ time: bar.time, value: tp })
+      band2Upper.push ({ time: bar.time, value: tp })
+      band2Lower.push ({ time: bar.time, value: tp })
+      continue
+    }
 
     const vwapVal  = sumTPV / sumVol
     const variance = sumTPV2 / sumVol - vwapVal * vwapVal
@@ -219,7 +227,7 @@ export function atr(bars, period = 14) {
  * @returns {{ atrValue: number, rangeUsed: number, percentConsumed: number }}
  */
 export function getDailyRangeStatus(todayBars, atr14Value) {
-  if (!todayBars || todayBars.length === 0 || !atr14Value) {
+  if (!todayBars || todayBars.length === 0 || atr14Value == null || atr14Value <= 0) {
     return { atrValue: atr14Value ?? 0, rangeUsed: 0, percentConsumed: 0 }
   }
 
@@ -300,7 +308,7 @@ export function rsi(bars, period = 14) {
   avgGain /= period
   avgLoss /= period
 
-  const firstRS  = avgLoss === 0 ? Infinity : avgGain / avgLoss
+  const firstRS  = avgLoss === 0 ? 100000 : avgGain / avgLoss
   const firstRsi = 100 - 100 / (1 + firstRS)
   series.push({ time: bars[period].time, value: parseFloat(firstRsi.toFixed(2)) })
 
@@ -313,7 +321,7 @@ export function rsi(bars, period = 14) {
     avgGain = (avgGain * (period - 1) + gain) / period
     avgLoss = (avgLoss * (period - 1) + loss) / period
 
-    const rs      = avgLoss === 0 ? Infinity : avgGain / avgLoss
+    const rs      = avgLoss === 0 ? 100000 : avgGain / avgLoss
     const rsiVal  = 100 - 100 / (1 + rs)
     series.push({ time: bars[i].time, value: parseFloat(rsiVal.toFixed(2)) })
   }

@@ -10,9 +10,9 @@ import { DEFAULT_SYMBOL, DEFAULT_TIMEFRAME } from '../constants/chart'
 
 export const useChartStore = create((set) => ({
   // ─── Theme ─────────────────────────────────────────────────────────────────
-  theme: localStorage.getItem('lumpia-theme') ?? 'dark',
+  theme: (() => { try { return localStorage.getItem('lumpia-theme') ?? 'dark' } catch { return 'dark' } })(),
   setTheme: (theme) => {
-    localStorage.setItem('lumpia-theme', theme)
+    try { localStorage.setItem('lumpia-theme', theme) } catch { /* storage unavailable */ }
     set({ theme })
   },
 

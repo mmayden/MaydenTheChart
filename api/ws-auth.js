@@ -9,18 +9,32 @@
  * so the risk is minimal — for real money, use a persistent WS relay.
  */
 
+import { timingSafeEqual as _tse } from 'crypto'
+
+/** Timing-safe string comparison (constant-time to prevent timing attacks). */
+function timingSafeEqual(a, b) {
+  const bufA = Buffer.from(a)
+  const bufB = Buffer.from(b)
+  return bufA.length === bufB.length && _tse(bufA, bufB)
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  // Simple bearer token check
+  // Bearer token is mandatory — reject if WS_AUTH_TOKEN is not configured
   const expected = process.env.WS_AUTH_TOKEN
-  if (expected) {
-    const auth = req.headers.authorization
-    if (!auth || auth !== `Bearer ${expected}`) {
-      return res.status(401).json({ error: 'Unauthorized' })
-    }
+  if (!expected) {
+    return res.status(500).json({ error: 'Server misconfigured — WS_AUTH_TOKEN not set' })
+  }
+
+  const auth = req.headers.authorization
+  const token = auth?.startsWith('Bearer ') ? auth.slice(7) : ''
+
+  // Timing-safe comparison to prevent timing attacks
+  if (!timingSafeEqual(token, expected)) {
+    return res.status(401).json({ error: 'Unauthorized' })
   }
 
   const key = process.env.ALPACA_API_KEY
