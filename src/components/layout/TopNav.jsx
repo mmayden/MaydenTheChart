@@ -84,7 +84,7 @@ export function TopNav() {
         {/* Alerts bell (with badge) — first position */}
         <button
           onClick={() => setActivePanel('alerts')}
-          className="relative flex items-center justify-center w-8 h-8 rounded transition-colors touch-target hover:bg-theme-hover"
+          className="nav-btn-alerts relative flex items-center justify-center w-8 h-8 rounded transition-colors touch-target hover:bg-theme-hover"
           style={{
             color: 'var(--alert-color)',
             backgroundColor: activePanel === 'alerts' ? 'var(--alert-active-bg)' : undefined,
@@ -107,7 +107,7 @@ export function TopNav() {
           <button
             key={id}
             onClick={() => setActivePanel(id)}
-            className="flex items-center justify-center w-8 h-8 rounded transition-colors touch-target hover:bg-theme-hover"
+            className={`nav-btn-${id} flex items-center justify-center w-8 h-8 rounded transition-colors touch-target hover:bg-theme-hover`}
             style={{
               color: `var(--${id}-color)`,
               backgroundColor: activePanel === id ? `var(--${id}-active-bg)` : undefined,
@@ -126,7 +126,7 @@ export function TopNav() {
       <button
         data-tour="cmd-k"
         onClick={() => setCommandPaletteOpen(true)}
-        className="flex items-center justify-center w-7 h-7 rounded hover:bg-theme-hover transition-colors touch-target"
+        className="nav-btn-search flex items-center justify-center w-7 h-7 rounded hover:bg-theme-hover transition-colors touch-target"
         style={{ color: 'var(--cmd-palette-color)' }}
         title="Command Palette (⌘K)"
       >

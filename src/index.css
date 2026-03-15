@@ -124,8 +124,8 @@ body,
   --journal-color: #88b870;
   --journal-active-bg: rgba(136,184,112,0.10);
   --cmd-palette-color: #a88098;
-  --settings-color: #d0a878;
-  --settings-glow:  rgba(208,168,120,0.25);
+  --settings-color: #e8c088;
+  --settings-glow:  rgba(232,192,136,0.30);
   --btn-primary:  #a04010;
   --btn-primary-hover: #c85818;
   --input-bg:     #080808;
@@ -235,8 +235,48 @@ body,
   overflow: hidden;
 }
 
-/* ── Settings gear ────────────────────────────────────────────────────────── */
+/* ── Nav button hover micro-animations ─────────────────────────────────── */
 
+/* Alerts bell — shake/ring */
+.nav-btn-alerts svg { transition: transform 0.3s ease; }
+.nav-btn-alerts:hover svg {
+  animation: bell-ring 0.5s ease;
+}
+@keyframes bell-ring {
+  0%   { transform: rotate(0); }
+  20%  { transform: rotate(14deg); }
+  40%  { transform: rotate(-12deg); }
+  60%  { transform: rotate(8deg); }
+  80%  { transform: rotate(-4deg); }
+  100% { transform: rotate(0); }
+}
+
+/* Watchlist — slide down */
+.nav-btn-watchlist svg { transition: transform 0.25s ease; }
+.nav-btn-watchlist:hover svg { transform: translateY(1.5px); }
+
+/* Backtest pulse — heartbeat */
+.nav-btn-backtest svg { transition: transform 0.25s ease; }
+.nav-btn-backtest:hover svg {
+  animation: pulse-beat 0.6s ease;
+}
+@keyframes pulse-beat {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.2); }
+  50%  { transform: scale(0.95); }
+  70%  { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Journal — tilt like opening a page */
+.nav-btn-journal svg { transition: transform 0.3s ease; }
+.nav-btn-journal:hover svg { transform: rotate(-8deg) scale(1.05); }
+
+/* Command palette search — zoom */
+.nav-btn-search svg { transition: transform 0.25s ease; }
+.nav-btn-search:hover svg { transform: scale(1.15); }
+
+/* Settings gear — spin + glow */
 .settings-gear {
   color: var(--settings-color);
   transition: color 0.15s, filter 0.25s, transform 0.4s cubic-bezier(0.4,0,0.2,1);
