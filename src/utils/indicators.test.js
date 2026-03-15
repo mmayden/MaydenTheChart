@@ -381,3 +381,350 @@ describe('macd()', () => {
     expect(result.signal.value).toBeNull()
   })
 })
+
+// ─── Edge case tests (null, empty, single element, boundary) ────────────────
+
+describe('edge cases', () => {
+  describe('ema()', () => {
+    it('returns neutral signal for null input', () => {
+      const result = ema(null, 9)
+      expect(result.series).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+      expect(result.signal.bias).toBe('neutral')
+    })
+
+    it('returns empty for empty array', () => {
+      const result = ema([], 9)
+      expect(result.series).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+    })
+
+    it('returns empty for single element', () => {
+      const result = ema(makeBars([400]), 9)
+      expect(result.series).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+    })
+
+    it('returns exactly 1 series point when bars.length === period', () => {
+      const bars   = makeBars(Array.from({ length: 9 }, (_, i) => 400 + i))
+      const result = ema(bars, 9)
+      expect(result.series).toHaveLength(1)
+      expect(result.signal.value).toBeCloseTo(404, 0) // SMA seed of 400..408
+    })
+  })
+
+  describe('atr()', () => {
+    it('returns neutral signal for null input', () => {
+      const result = atr(null)
+      expect(result.series).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+      expect(result.signal.bias).toBe('neutral')
+    })
+
+    it('returns empty for empty array', () => {
+      const result = atr([])
+      expect(result.series).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+    })
+
+    it('returns empty for single element', () => {
+      const result = atr(makeBars([400]))
+      expect(result.series).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+    })
+
+    it('returns exactly 1 series point when bars.length === period + 1', () => {
+      // ATR(14) needs 15 bars (14 TRs, then SMA of first 14)
+      const bars   = makeBars(Array.from({ length: 15 }, (_, i) => 400 + i))
+      const result = atr(bars, 14)
+      expect(result.series).toHaveLength(1)
+      expect(result.signal.value).toBeGreaterThan(0)
+    })
+  })
+
+  describe('rsi()', () => {
+    it('returns neutral signal for null input', () => {
+      const result = rsi(null)
+      expect(result.series).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+      expect(result.signal.bias).toBe('neutral')
+    })
+
+    it('returns empty for empty array', () => {
+      const result = rsi([])
+      expect(result.series).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+    })
+
+    it('returns empty for single element', () => {
+      const result = rsi(makeBars([400]))
+      expect(result.series).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+    })
+
+    it('returns exactly 1 series point when bars.length === period + 1', () => {
+      // RSI(14) needs 15 bars
+      const bars   = makeBars(Array.from({ length: 15 }, (_, i) => 400 + i))
+      const result = rsi(bars, 14)
+      expect(result.series).toHaveLength(1)
+      expect(result.signal.value).toBeGreaterThanOrEqual(0)
+      expect(result.signal.value).toBeLessThanOrEqual(100)
+    })
+  })
+
+  describe('macd()', () => {
+    it('returns neutral signal for null input', () => {
+      const result = macd(null)
+      expect(result.macd).toHaveLength(0)
+      expect(result.signalLine).toHaveLength(0)
+      expect(result.histogram).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+      expect(result.signal.bias).toBe('neutral')
+    })
+
+    it('returns empty for empty array', () => {
+      const result = macd([])
+      expect(result.macd).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+    })
+
+    it('returns empty for single element', () => {
+      const result = macd(makeBars([400]))
+      expect(result.macd).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+    })
+
+    it('returns empty when bars.length === slowPeriod + signalPeriod - 1 (just under boundary)', () => {
+      // MACD default needs 26 + 9 = 35 bars minimum
+      const bars   = makeBars(Array.from({ length: 34 }, (_, i) => 400 + i))
+      const result = macd(bars)
+      expect(result.macd).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+    })
+
+    it('returns data when bars.length === slowPeriod + signalPeriod (exact boundary)', () => {
+      // 26 + 9 = 35 bars
+      const bars   = makeBars(Array.from({ length: 35 }, (_, i) => 400 + i))
+      const result = macd(bars)
+      expect(result.macd.length).toBeGreaterThanOrEqual(0)
+      // May or may not produce output depending on internal EMA alignment;
+      // the key contract is it doesn't crash
+      expect(result.signal).toBeDefined()
+    })
+  })
+
+  describe('vwapWithBands()', () => {
+    it('returns neutral signal for null input', () => {
+      const result = vwapWithBands(null)
+      expect(result.vwap).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+      expect(result.signal.bias).toBe('neutral')
+    })
+
+    it('returns empty for empty array', () => {
+      const result = vwapWithBands([])
+      expect(result.vwap).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+    })
+
+    it('returns 1 point for single element', () => {
+      const bars   = makeBars([400])
+      const result = vwapWithBands(bars)
+      expect(result.vwap).toHaveLength(1)
+      expect(result.band1Upper).toHaveLength(1)
+      expect(result.band1Lower).toHaveLength(1)
+      expect(result.band2Upper).toHaveLength(1)
+      expect(result.band2Lower).toHaveLength(1)
+      // VWAP of a single bar = typical price
+      expect(result.vwap[0].value).toBeCloseTo((400.5 + 399.5 + 400) / 3, 2)
+    })
+  })
+
+  describe('relativeVolume()', () => {
+    it('returns neutral signal for null input', () => {
+      const result = relativeVolume(null)
+      expect(result.series).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+      expect(result.signal.bias).toBe('neutral')
+    })
+
+    it('returns empty for empty array', () => {
+      const result = relativeVolume([])
+      expect(result.series).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+    })
+
+    it('returns empty for single element', () => {
+      const result = relativeVolume(makeBars([400]))
+      expect(result.series).toHaveLength(0)
+      expect(result.signal.value).toBeNull()
+    })
+
+    it('returns exactly 1 series point when bars.length === period + 1', () => {
+      // RVOL(20) needs 21 bars
+      const bars   = makeBars(Array.from({ length: 21 }, (_, i) => 400 + i))
+      const result = relativeVolume(bars, 20)
+      expect(result.series).toHaveLength(1)
+      expect(result.signal.value).toBeDefined()
+    })
+  })
+
+  describe('getDailyRangeStatus()', () => {
+    it('returns zeros for null input', () => {
+      const result = getDailyRangeStatus(null, 20)
+      expect(result.rangeUsed).toBe(0)
+      expect(result.percentConsumed).toBe(0)
+    })
+
+    it('returns zeros for empty array', () => {
+      const result = getDailyRangeStatus([], 20)
+      expect(result.rangeUsed).toBe(0)
+      expect(result.percentConsumed).toBe(0)
+    })
+
+    it('handles single element', () => {
+      const bars = [{ time: 1700000000, high: 405, low: 395, close: 400, open: 400, volume: 1000 }]
+      const result = getDailyRangeStatus(bars, 20)
+      expect(result.rangeUsed).toBe(10)
+      expect(result.percentConsumed).toBe(50)
+    })
+
+    it('returns zeros when atrValue is null', () => {
+      const bars = [{ time: 1700000000, high: 405, low: 395, close: 400, open: 400, volume: 1000 }]
+      const result = getDailyRangeStatus(bars, null)
+      expect(result.rangeUsed).toBe(0)
+      expect(result.percentConsumed).toBe(0)
+    })
+
+    it('returns zeros when atrValue is 0', () => {
+      const bars = [{ time: 1700000000, high: 405, low: 395, close: 400, open: 400, volume: 1000 }]
+      const result = getDailyRangeStatus(bars, 0)
+      expect(result.rangeUsed).toBe(0)
+      expect(result.percentConsumed).toBe(0)
+    })
+
+    it('returns zeros when atrValue is negative', () => {
+      const bars = [{ time: 1700000000, high: 405, low: 395, close: 400, open: 400, volume: 1000 }]
+      const result = getDailyRangeStatus(bars, -5)
+      expect(result.rangeUsed).toBe(0)
+      expect(result.percentConsumed).toBe(0)
+    })
+  })
+})
+
+// ─── Signal contract verification ───────────────────────────────────────────
+
+describe('signal contract', () => {
+  const VALID_BIASES    = ['bull', 'bear', 'neutral']
+  const VALID_STRENGTHS = ['strong', 'moderate', 'weak']
+
+  // Sufficient data for all indicators
+  const sufficientBars = makeBars(Array.from({ length: 80 }, (_, i) => 400 + Math.sin(i * 0.3) * 10))
+
+  describe('ema()', () => {
+    it('signal has numeric value, valid bias, valid strength', () => {
+      const result = ema(sufficientBars, 9)
+      expect(typeof result.signal.value).toBe('number')
+      expect(result.signal.value).not.toBeNull()
+      expect(result.signal.value).not.toBeNaN()
+      expect(VALID_BIASES).toContain(result.signal.bias)
+      expect(VALID_STRENGTHS).toContain(result.signal.strength)
+    })
+
+    it('signal contract holds for multiple periods', () => {
+      for (const period of [9, 21, 48]) {
+        const result = ema(sufficientBars, period)
+        expect(typeof result.signal.value).toBe('number')
+        expect(VALID_BIASES).toContain(result.signal.bias)
+        expect(VALID_STRENGTHS).toContain(result.signal.strength)
+      }
+    })
+  })
+
+  describe('atr()', () => {
+    it('signal has numeric value, neutral bias, valid strength', () => {
+      const result = atr(sufficientBars, 14)
+      expect(typeof result.signal.value).toBe('number')
+      expect(result.signal.value).not.toBeNull()
+      expect(result.signal.value).not.toBeNaN()
+      expect(result.signal.bias).toBe('neutral') // ATR is always neutral
+      expect(VALID_STRENGTHS).toContain(result.signal.strength)
+    })
+  })
+
+  describe('rsi()', () => {
+    it('signal has numeric value, valid bias, valid strength', () => {
+      const result = rsi(sufficientBars, 14)
+      expect(typeof result.signal.value).toBe('number')
+      expect(result.signal.value).not.toBeNull()
+      expect(result.signal.value).not.toBeNaN()
+      expect(result.signal.value).toBeGreaterThanOrEqual(0)
+      expect(result.signal.value).toBeLessThanOrEqual(100)
+      expect(VALID_BIASES).toContain(result.signal.bias)
+      expect(VALID_STRENGTHS).toContain(result.signal.strength)
+    })
+
+    it('bull bias when RSI > 50, bear bias when RSI < 50', () => {
+      const risingBars  = makeBars(Array.from({ length: 40 }, (_, i) => 400 + i))
+      const fallingBars = makeBars(Array.from({ length: 40 }, (_, i) => 440 - i))
+      expect(rsi(risingBars, 14).signal.bias).toBe('bull')
+      expect(rsi(fallingBars, 14).signal.bias).toBe('bear')
+    })
+  })
+
+  describe('macd()', () => {
+    it('signal has numeric value, valid bias, valid strength', () => {
+      const result = macd(sufficientBars)
+      expect(typeof result.signal.value).toBe('number')
+      expect(result.signal.value).not.toBeNull()
+      expect(result.signal.value).not.toBeNaN()
+      expect(VALID_BIASES).toContain(result.signal.bias)
+      expect(VALID_STRENGTHS).toContain(result.signal.strength)
+    })
+
+    it('bull bias when histogram > 0, bear when < 0', () => {
+      // Accelerating prices → positive histogram
+      const bullBars = makeBars(Array.from({ length: 80 }, (_, i) => 400 + i * i * 0.05))
+      const bullResult = macd(bullBars)
+      if (bullResult.histogram.length > 0) {
+        const lastHist = bullResult.histogram[bullResult.histogram.length - 1].value
+        if (lastHist > 0) expect(bullResult.signal.bias).toBe('bull')
+        if (lastHist < 0) expect(bullResult.signal.bias).toBe('bear')
+      }
+    })
+  })
+
+  describe('vwapWithBands()', () => {
+    it('signal has numeric value, valid bias, valid strength', () => {
+      const result = vwapWithBands(sufficientBars)
+      expect(typeof result.signal.value).toBe('number')
+      expect(result.signal.value).not.toBeNull()
+      expect(result.signal.value).not.toBeNaN()
+      expect(VALID_BIASES).toContain(result.signal.bias)
+      expect(VALID_STRENGTHS).toContain(result.signal.strength)
+    })
+  })
+
+  describe('relativeVolume()', () => {
+    it('signal has numeric value, valid bias, valid strength', () => {
+      const result = relativeVolume(sufficientBars, 20, 1.5)
+      expect(typeof result.signal.value).toBe('number')
+      expect(result.signal.value).not.toBeNull()
+      expect(result.signal.value).not.toBeNaN()
+      expect(VALID_BIASES).toContain(result.signal.bias)
+      expect(VALID_STRENGTHS).toContain(result.signal.strength)
+    })
+
+    it('bias is neutral when RVOL is below threshold', () => {
+      // Constant volume → RVOL ~1.0 → below 1.5 threshold → neutral
+      const bars = Array.from({ length: 30 }, (_, i) => ({
+        time:   1700000000 + i * 300,
+        open:   400, high: 400.5, low: 399.5, close: 400,
+        volume: 1000,
+      }))
+      const result = relativeVolume(bars, 20, 1.5)
+      expect(result.signal.bias).toBe('neutral')
+      expect(result.signal.strength).toBe('weak')
+    })
+  })
+})

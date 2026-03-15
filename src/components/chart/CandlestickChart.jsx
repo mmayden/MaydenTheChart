@@ -44,6 +44,8 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
   const themeRef     = useRef(theme)
   themeRef.current   = theme  // always current, readable inside effects
 
+  const prevBarsRef = useRef(null)
+
   const symbol    = useChartStore((s) => s.selectedSymbol)
   const timeframe = useChartStore((s) => s.selectedTimeframe)
   const shouldFit = useViewportPersistence(symbol, timeframe, dataUpdatedAt)
@@ -155,19 +157,59 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
     })
   }, [theme])
 
-  // Update data when bars change
+  // Update data when bars change — use update() for single-bar changes (live streaming)
   useEffect(() => {
-    if (!bars || !candleRef.current || !volumeRef.current) return
+    if (!bars || !bars.length || !candleRef.current || !volumeRef.current) return
 
-    candleRef.current.setData(bars)
+    const prev = prevBarsRef.current
+    const last = bars[bars.length - 1]
 
-    const volumeData = bars.map((bar) => ({
+    const makeVolBar = (bar) => ({
       time:  bar.time,
       value: bar.volume,
       color: bar.close >= bar.open ? VOLUME_UP_COLOR : VOLUME_DOWN_COLOR,
-    }))
+    })
 
-    volumeRef.current.setData(volumeData)
+    // Determine if we can use the lightweight update() path
+    let didUpdate = false
+
+    if (prev && prev.length > 0) {
+      const prevLast = prev[prev.length - 1]
+
+      // Case 1: same length, last bar changed (live tick updating current candle)
+      // Case 2: one new bar appended (new candle formed)
+      const sameLength   = bars.length === prev.length
+      const oneAppended  = bars.length === prev.length + 1
+
+      if (sameLength && prevLast.time === last.time) {
+        // Only the last bar differs — single update
+        if (
+          prevLast.open  !== last.open  ||
+          prevLast.high  !== last.high  ||
+          prevLast.low   !== last.low   ||
+          prevLast.close !== last.close ||
+          prevLast.volume !== last.volume
+        ) {
+          candleRef.current.update(last)
+          volumeRef.current.update(makeVolBar(last))
+        }
+        didUpdate = true
+      } else if (oneAppended && prevLast.time === bars[prev.length - 1].time) {
+        // A new bar was appended — update() handles append when time is new
+        candleRef.current.update(last)
+        volumeRef.current.update(makeVolBar(last))
+        didUpdate = true
+      }
+    }
+
+    // Fall back to full setData() for initial load, symbol change, timeframe change, etc.
+    if (!didUpdate) {
+      candleRef.current.setData(bars)
+      const volumeData = bars.map(makeVolBar)
+      volumeRef.current.setData(volumeData)
+    }
+
+    prevBarsRef.current = bars
     if (shouldFit) chartRef.current.timeScale().fitContent()
   }, [bars, shouldFit])
 

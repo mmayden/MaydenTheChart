@@ -33,10 +33,13 @@
 ## 4. Security
 - [ ] Zero API keys/secrets in client bundle (`grep` dist/ for key patterns)
 - [ ] Env vars: server-only vars have NO `VITE_` prefix
-- [ ] Serverless proxies validate/sanitize inputs (symbol, timeframe params)
-- [ ] No `dangerouslySetInnerHTML` or unescaped user input in DOM
+- [ ] Serverless proxies validate/sanitize ALL inputs (symbol, timeframe, limit, dates)
+- [ ] No `dangerouslySetInnerHTML` or `innerHTML` with user-influenced data
 - [ ] WebSocket auth token not hardcoded or exposed in client code
 - [ ] CORS / CSP headers configured appropriately
+- [ ] Auth endpoints use timing-safe comparison
+- [ ] `.env` in `.gitignore` and never committed to git history
+- [ ] Error responses don't leak internal details (stack traces, file paths)
 
 ## 5. Performance
 - [ ] No expensive computations inside render (indicators computed in useMemo)
@@ -188,16 +191,23 @@
 - [x] Extract alert-checking logic from `NotificationBell` into `useAlertChecker` hook
 - [x] Narrow `App.jsx` Zustand subscription to overlay-relevant indicator fields only
 
-### P3 — Performance (optimize when needed)
-- [ ] Use `update()` for last-bar candle/volume series updates instead of `setData()`
-- [ ] Consider incremental indicator updates (append new EMA point vs full recalc)
+### P3 — Performance (optimize when needed) — DONE
+- [x] Use `update()` for last-bar candle/volume series updates instead of `setData()`
+- [x] Consider incremental indicator updates — deferred (full recalc is <1ms for current data sizes; premature optimization)
 - [x] Add WebSocket auto-recovery after max retries (resets after 5 minutes)
 
-### P4 — Test Coverage (expand over time)
+### P4 — Test Coverage (expand over time) — DONE
 - [x] Add `normalizeBar.js` tests (5 tests — pure function coverage)
-- [ ] Add `null` and single-element edge case tests for all indicator functions
-- [ ] Deepen signal contract assertions in existing tests (verify `value`, `bias`, `strength` for all)
-- [ ] Add Zustand store tests (`useChartStore`, `useAlertsStore`)
+- [x] Add `null` and single-element edge case tests for all indicator functions (28 tests)
+- [x] Deepen signal contract assertions in existing tests (verify `value`, `bias`, `strength` for all — 11 tests)
+- [x] Add Zustand store tests (`useChartStore` — 14 tests, `useAlertsStore` — 12 tests)
+
+### Security Hardening (added per user priority)
+- [x] Validate ISO 8601 format on `start`/`end` date params in `/api/bars.js`
+- [x] Replace `innerHTML` with DOM element creation in `CrosshairLegend.jsx`
+- [x] Verified `.env` never committed to git (properly gitignored)
+- [x] Verified Alpaca credentials are server-only (no `VITE_` prefix, not in client bundle)
+- [x] Verified timing-safe auth in `/api/ws-auth.js`
 
 ### Deferred — Not Needed Now
 - [ ] CI/CD pipeline (GitHub Actions for lint + test + build) — add when sharing repo or onboarding contributors

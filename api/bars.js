@@ -36,6 +36,13 @@ export default async function handler(req, res) {
   if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 10000) {
     return res.status(400).json({ error: 'Invalid limit — must be an integer between 1 and 10000' })
   }
+  const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2})?/
+  if (start && !ISO_DATE_RE.test(start)) {
+    return res.status(400).json({ error: 'Invalid start — must be ISO 8601 format (YYYY-MM-DD or YYYY-MM-DDThh:mm:ss)' })
+  }
+  if (end && !ISO_DATE_RE.test(end)) {
+    return res.status(400).json({ error: 'Invalid end — must be ISO 8601 format (YYYY-MM-DD or YYYY-MM-DDThh:mm:ss)' })
+  }
 
   const apiKey = process.env.ALPACA_API_KEY
   const secretKey = process.env.ALPACA_SECRET_KEY

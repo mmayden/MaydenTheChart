@@ -77,14 +77,40 @@ export function CrosshairLegend({ chart, bars, theme = 'dark' }) {
       const dimColor  = '#9ca3af'
 
       el.style.opacity = '1'
-      el.innerHTML = [
-        `<span style="color:${dimColor}">${formatTimeET(param.time)}</span>`,
-        `<span style="color:${dimColor}">O</span> ${formatPrice(bar.open)}`,
-        `<span style="color:${dimColor}">H</span> ${formatPrice(bar.high)}`,
-        `<span style="color:${dimColor}">L</span> ${formatPrice(bar.low)}`,
-        `<span style="color:${closeClr}">C ${formatPrice(bar.close)}</span>`,
-        `<span style="color:${dimColor}">V</span> ${formatVolume(bar.volume ?? 0)}`,
-      ].join('&nbsp;&nbsp;')
+      el.textContent = ''
+
+      const spacer = () => {
+        const s = document.createElement('span')
+        s.textContent = '\u00A0\u00A0'
+        return s
+      }
+
+      const dim = (text) => {
+        const s = document.createElement('span')
+        s.style.color = dimColor
+        s.textContent = text
+        return s
+      }
+
+      const parts = [
+        dim(formatTimeET(param.time)),
+        spacer(),
+        dim('O'),
+        document.createTextNode(' ' + formatPrice(bar.open)),
+        spacer(),
+        dim('H'),
+        document.createTextNode(' ' + formatPrice(bar.high)),
+        spacer(),
+        dim('L'),
+        document.createTextNode(' ' + formatPrice(bar.low)),
+        spacer(),
+        (() => { const s = document.createElement('span'); s.style.color = closeClr; s.textContent = 'C ' + formatPrice(bar.close); return s })(),
+        spacer(),
+        dim('V'),
+        document.createTextNode(' ' + formatVolume(bar.volume ?? 0)),
+      ]
+
+      parts.forEach(node => el.appendChild(node))
     }
 
     chart.subscribeCrosshairMove(handler)

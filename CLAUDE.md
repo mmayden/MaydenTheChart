@@ -52,4 +52,5 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - Shared timezone utils: `src/utils/timezone.js`
 - Bar normalizer: `src/utils/normalizeBar.js`
 - App layout: `src/App.jsx`
+- Health audit (reusable template): `audit.md`
 - Feature ideas (not committed tasks): `feature-ideas.md`
