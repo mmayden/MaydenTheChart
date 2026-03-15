@@ -385,7 +385,7 @@ Histogram   = MACD Line - Signal Line
 
 ### Code signature
 ```js
-// returns { macd, signal, histogram } arrays of { time, value }
+// returns { macd, signalLine, histogram, signal } — series arrays + signal object
 macd(closes, fastPeriod = 12, slowPeriod = 26, signalPeriod = 9)
 ```
 

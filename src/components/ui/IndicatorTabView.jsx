@@ -116,7 +116,7 @@ function MACDMiniChart({ bars }) {
     if (!result.macd.length) return
     hist.setData(result.histogram.map((p) => ({ time: p.time, value: p.value, color: p.value >= 0 ? '#22c55e' : '#ef4444' })))
     macdLine.setData(result.macd)
-    signalLine.setData(result.signal)
+    signalLine.setData(result.signalLine)
     chartRef.current?.timeScale().fitContent()
   }, [bars])
 

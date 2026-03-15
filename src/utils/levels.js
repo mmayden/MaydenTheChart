@@ -69,13 +69,13 @@ export function groupBarsByDay(bars) {
  *   prevDate:    string | null
  * }}
  */
-export function getPreviousLevels(bars) {
+export function getPreviousLevels(bars, byDay = null) {
   if (!bars || bars.length === 0) {
     return { prevHigh: null, prevLow: null, weeklyHigh: null, weeklyLow: null, prevDate: null }
   }
 
-  const byDay     = groupBarsByDay(bars)
-  const days      = Array.from(byDay.keys()).sort()
+  const grouped   = byDay ?? groupBarsByDay(bars)
+  const days      = Array.from(grouped.keys()).sort()
   const todayKey  = days[days.length - 1]
   const prevKey   = days[days.length - 2]
 
@@ -83,13 +83,13 @@ export function getPreviousLevels(bars) {
     return { prevHigh: null, prevLow: null, weeklyHigh: null, weeklyLow: null, prevDate: null }
   }
 
-  const prevBars = byDay.get(prevKey)
+  const prevBars = grouped.get(prevKey)
   const prevHigh = Math.max(...prevBars.map((b) => b.high))
   const prevLow  = Math.min(...prevBars.map((b) => b.low))
 
   // Weekly: last 5 trading days excluding today
   const recentDays  = days.slice(-6, -1)   // up to 5 days before today
-  const weeklyBars  = recentDays.flatMap((d) => byDay.get(d) ?? [])
+  const weeklyBars  = recentDays.flatMap((d) => grouped.get(d) ?? [])
   const weeklyHigh  = weeklyBars.length ? Math.max(...weeklyBars.map((b) => b.high)) : null
   const weeklyLow   = weeklyBars.length ? Math.min(...weeklyBars.map((b) => b.low))  : null
 
@@ -103,13 +103,13 @@ export function getPreviousLevels(bars) {
  * @param {Array<{time, open, ...}>} bars - sorted oldest → newest
  * @returns {{ price: number, startTime: number, endTime: number } | null}
  */
-export function getOpenOfDay(bars) {
+export function getOpenOfDay(bars, byDay = null) {
   if (!bars || bars.length === 0) return null
 
-  const byDay    = groupBarsByDay(bars)
-  const days     = Array.from(byDay.keys()).sort()
-  const todayKey = days[days.length - 1]
-  const todayBars = byDay.get(todayKey)
+  const grouped   = byDay ?? groupBarsByDay(bars)
+  const days      = Array.from(grouped.keys()).sort()
+  const todayKey  = days[days.length - 1]
+  const todayBars = grouped.get(todayKey)
 
   if (!todayBars || todayBars.length === 0) return null
 
@@ -138,15 +138,15 @@ export function getOpenOfDay(bars) {
  *   valid:   boolean
  * }}
  */
-export function getORBZone(bars, orbMinutes = 15) {
+export function getORBZone(bars, orbMinutes = 15, byDay = null) {
   if (!bars || bars.length === 0) {
     return { orbHigh: null, orbLow: null, orbTime: null, valid: false }
   }
 
-  const byDay     = groupBarsByDay(bars)
-  const days      = Array.from(byDay.keys()).sort()
+  const grouped   = byDay ?? groupBarsByDay(bars)
+  const days      = Array.from(grouped.keys()).sort()
   const todayKey  = days[days.length - 1]
-  const todayBars = [...(byDay.get(todayKey) ?? [])].sort((a, b) => a.time - b.time)
+  const todayBars = [...(grouped.get(todayKey) ?? [])].sort((a, b) => a.time - b.time)
 
   // Filter to bars within the ORB window
   const orbBars = todayBars.filter((bar) => {
@@ -180,15 +180,15 @@ export function getORBZone(bars, orbMinutes = 15) {
  *   color:     string
  * }}
  */
-export function classifyDayType(bars, prevHigh, prevLow) {
+export function classifyDayType(bars, prevHigh, prevLow, byDay = null) {
   if (!bars || bars.length === 0 || prevHigh == null || prevLow == null) {
     return { type: 'range', brokePDH: false, brokePDL: false, label: '↔ Range Day', color: '#6b7280' }
   }
 
-  const byDay     = groupBarsByDay(bars)
-  const days      = Array.from(byDay.keys()).sort()
+  const grouped   = byDay ?? groupBarsByDay(bars)
+  const days      = Array.from(grouped.keys()).sort()
   const todayKey  = days[days.length - 1]
-  const todayBars = byDay.get(todayKey) ?? []
+  const todayBars = grouped.get(todayKey) ?? []
 
   const brokePDH = todayBars.some((b) => b.high > prevHigh)
   const brokePDL = todayBars.some((b) => b.low  < prevLow)

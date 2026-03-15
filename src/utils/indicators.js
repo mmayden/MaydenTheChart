@@ -12,6 +12,14 @@
  * No side effects, no external dependencies, no DOM access.
  */
 
+// ─── Private helpers ─────────────────────────────────────────────────────────
+
+/** Convert unix seconds to a YYYY-MM-DD date string in US-Eastern time. */
+function toETDateString(unixSecs) {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' })
+    .format(new Date(unixSecs * 1000))
+}
+
 // ─── EMA — Exponential Moving Average ────────────────────────────────────────
 
 /**
@@ -124,7 +132,7 @@ export function vwapWithBands(bars) {
 
   for (const bar of bars) {
     // Reset at session boundary (new calendar date)
-    const barDate = new Date(bar.time * 1000).toDateString()
+    const barDate = toETDateString(bar.time)
     if (barDate !== lastDate) {
       sumTPV  = 0
       sumVol  = 0
@@ -212,8 +220,11 @@ export function atr(bars, period = 14) {
   }
 
   const lastAtr  = series[series.length - 1].value
+  // Normalize ATR as % of price so thresholds work across any price level
+  const lastClose = bars[bars.length - 1].close
+  const atrPct    = lastClose > 0 ? lastAtr / lastClose : 0
   // ATR doesn't have a bull/bear bias — it measures volatility only
-  const strength = lastAtr > 3 ? 'strong' : lastAtr > 1 ? 'moderate' : 'weak'
+  const strength = atrPct > 0.02 ? 'strong' : atrPct > 0.008 ? 'moderate' : 'weak'
 
   return { series, signal: { value: lastAtr, bias: 'neutral', strength } }
 }
@@ -273,7 +284,10 @@ export function relativeVolume(bars, period = 20, threshold = 1.5) {
 
   const last      = series[series.length - 1]
   const rvolVal   = last?.rvol ?? 0
-  const bias      = rvolVal >= threshold ? 'bull' : 'neutral'   // high volume = conviction
+  const lastBar   = bars[bars.length - 1]
+  const bias      = rvolVal >= threshold
+    ? (lastBar.close >= lastBar.open ? 'bull' : 'bear')
+    : 'neutral'
   const strength  = rvolVal >= 2.0 ? 'strong' : rvolVal >= threshold ? 'moderate' : 'weak'
 
   return { series, signal: { value: rvolVal, bias, strength } }
@@ -344,16 +358,16 @@ export function rsi(bars, period = 14) {
  * @param {number} slowPeriod   - default 26
  * @param {number} signalPeriod - default 9
  * @returns {{
- *   macd:      Array<{time, value}>,
- *   signal:    Array<{time, value}>,
- *   histogram: Array<{time, value}>,
- *   signalObj: {value, bias, strength}
+ *   macd:       Array<{time, value}>,
+ *   signalLine: Array<{time, value}>,
+ *   histogram:  Array<{time, value}>,
+ *   signal:     {value, bias, strength}
  * }}
  */
 export function macd(bars, fastPeriod = 12, slowPeriod = 26, signalPeriod = 9) {
   const empty = {
-    macd: [], signal: [], histogram: [],
-    signalObj: { value: null, bias: 'neutral', strength: 'weak' },
+    macd: [], signalLine: [], histogram: [],
+    signal: { value: null, bias: 'neutral', strength: 'weak' },
   }
 
   if (!bars || bars.length < slowPeriod + signalPeriod) return empty
@@ -398,9 +412,9 @@ export function macd(bars, fastPeriod = 12, slowPeriod = 26, signalPeriod = 9) {
   const finalStrength = crossover ? 'strong' : growing ? strength : 'weak'
 
   return {
-    macd:      macdLine,
-    signal:    signalLine,
+    macd:       macdLine,
+    signalLine,
     histogram,
-    signalObj: { value: lastHist, bias, strength: finalStrength },
+    signal:     { value: lastHist, bias, strength: finalStrength },
   }
 }

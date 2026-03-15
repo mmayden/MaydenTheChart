@@ -79,27 +79,32 @@ export default function App() {
     return () => clearInterval(id)
   }, [])
 
+  // ── Pre-compute groupBarsByDay once for both atrGauge and dayType ──────────
+  const byDay = useMemo(() => {
+    if (!bars?.length) return null
+    return groupBarsByDay(bars)
+  }, [bars])
+
   // ── ATR gauge values ────────────────────────────────────────────────────────
   // ATR(14) must come from daily bars so the "budget" is the 14-day average
   // true range — not 14 intraday candles. Today's range used comes from the
   // current timeframe's bars (intraday session high − low).
   const atrGauge = useMemo(() => {
-    if (!dailyBars?.length || !bars?.length) return null
+    if (!dailyBars?.length || !byDay) return null
     const { series: atrSeries } = atr(dailyBars, 14)
     if (!atrSeries.length) return null
     const atr14 = atrSeries[atrSeries.length - 1].value
-    const byDay = groupBarsByDay(bars)
     const days  = Array.from(byDay.keys()).sort()
     return getDailyRangeStatus(byDay.get(days[days.length - 1]) ?? [], atr14)
-  }, [dailyBars, bars])
+  }, [dailyBars, byDay])
 
   // ── Day type classification ─────────────────────────────────────────────────
   const dayType = useMemo(() => {
-    if (!bars?.length) return null
-    const { prevHigh, prevLow } = getPreviousLevels(bars)
+    if (!byDay) return null
+    const { prevHigh, prevLow } = getPreviousLevels(bars, byDay)
     if (!prevHigh || !prevLow) return null
-    return classifyDayType(bars, prevHigh, prevLow)
-  }, [bars])
+    return classifyDayType(bars, prevHigh, prevLow, byDay)
+  }, [bars, byDay])
 
 
   return (

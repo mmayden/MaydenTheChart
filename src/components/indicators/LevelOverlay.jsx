@@ -13,7 +13,7 @@
 
 import { useEffect, useRef } from 'react'
 import { LineSeries } from 'lightweight-charts'
-import { getPreviousLevels, getOpenOfDay, getORBZone } from '../../utils/levels'
+import { groupBarsByDay, getPreviousLevels, getOpenOfDay, getORBZone } from '../../utils/levels'
 import {
   PREV_LEVEL_COLOR,
   ODC_COLOR,
@@ -39,9 +39,10 @@ export function LevelOverlay({ chart, candleSeries, bars, showORB = true, visibl
       odcSeriesRef.current = null
     }
 
-    const { prevHigh, prevLow } = getPreviousLevels(bars)
-    const odc                   = getOpenOfDay(bars)
-    const orb                   = getORBZone(bars)
+    const byDay                 = groupBarsByDay(bars)
+    const { prevHigh, prevLow } = getPreviousLevels(bars, byDay)
+    const odc                   = getOpenOfDay(bars, byDay)
+    const orb                   = getORBZone(bars, 15, byDay)
 
     const addLine = (price, options) => {
       if (price == null || !visible) return

@@ -340,21 +340,21 @@ describe('rsi()', () => {
 // ─── MACD tests ───────────────────────────────────────────────────────────────
 
 describe('macd()', () => {
-  it('returns { macd, signal, histogram, signalObj } shape', () => {
+  it('returns { macd, signalLine, histogram, signal } shape', () => {
     const bars   = makeBars(Array.from({ length: 60 }, (_, i) => 400 + i * 0.5))
     const result = macd(bars)
     expect(result).toHaveProperty('macd')
-    expect(result).toHaveProperty('signal')
+    expect(result).toHaveProperty('signalLine')
     expect(result).toHaveProperty('histogram')
-    expect(result).toHaveProperty('signalObj')
-    expect(result.signalObj).toHaveProperty('bias')
+    expect(result).toHaveProperty('signal')
+    expect(result.signal).toHaveProperty('bias')
   })
 
   it('histogram = macd - signal for every point', () => {
     const bars   = makeBars(Array.from({ length: 80 }, (_, i) => 400 + Math.sin(i * 0.3) * 5))
     const result = macd(bars)
 
-    const signalMap = new Map(result.signal.map((p) => [p.time, p.value]))
+    const signalMap = new Map(result.signalLine.map((p) => [p.time, p.value]))
     result.histogram.forEach((p) => {
       const macdVal = result.macd.find((m) => m.time === p.time)?.value
       const sigVal  = signalMap.get(p.time)
@@ -371,13 +371,13 @@ describe('macd()', () => {
     const result = macd(bars)
     const lastHist = result.histogram[result.histogram.length - 1]?.value
     expect(lastHist).toBeGreaterThan(0)
-    expect(result.signalObj.bias).toBe('bull')
+    expect(result.signal.bias).toBe('bull')
   })
 
   it('returns empty on insufficient data', () => {
     const bars   = makeBars(Array.from({ length: 10 }, (_, i) => 400 + i))
     const result = macd(bars)
     expect(result.macd).toHaveLength(0)
-    expect(result.signalObj.value).toBeNull()
+    expect(result.signal.value).toBeNull()
   })
 })
