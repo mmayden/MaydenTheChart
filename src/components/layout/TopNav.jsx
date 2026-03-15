@@ -13,6 +13,20 @@ import { useAlertsStore } from '../../store/useAlertsStore'
 
 const PANEL_BUTTONS = [
   {
+    id: 'watchlist',
+    title: 'Watchlist',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="8" y1="6" x2="21" y2="6" />
+        <line x1="8" y1="12" x2="21" y2="12" />
+        <line x1="8" y1="18" x2="21" y2="18" />
+        <line x1="3" y1="6" x2="3.01" y2="6" />
+        <line x1="3" y1="12" x2="3.01" y2="12" />
+        <line x1="3" y1="18" x2="3.01" y2="18" />
+      </svg>
+    ),
+  },
+  {
     id: 'backtest',
     title: 'Backtest',
     icon: (
@@ -28,20 +42,6 @@ const PANEL_BUTTONS = [
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
         <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-      </svg>
-    ),
-  },
-  {
-    id: 'watchlist',
-    title: 'Watchlist',
-    icon: (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="8" y1="6" x2="21" y2="6" />
-        <line x1="8" y1="12" x2="21" y2="12" />
-        <line x1="8" y1="18" x2="21" y2="18" />
-        <line x1="3" y1="6" x2="3.01" y2="6" />
-        <line x1="3" y1="12" x2="3.01" y2="12" />
-        <line x1="3" y1="18" x2="3.01" y2="18" />
       </svg>
     ),
   },
@@ -79,25 +79,9 @@ export function TopNav() {
 
       <div className="flex-1" />
 
-      {/* Panel toggle icons */}
+      {/* Panel toggle icons — order: Alerts, Watchlist, Backtest, Journal */}
       <div className="flex items-center gap-0.5">
-        {PANEL_BUTTONS.map(({ id, title, icon }) => (
-          <button
-            key={id}
-            onClick={() => setActivePanel(id)}
-            className={`flex items-center justify-center w-8 h-8 rounded transition-colors touch-target ${
-              activePanel === id
-                ? 'text-accent'
-                : 'nav-icon hover:bg-theme-hover'
-            }`}
-            style={activePanel === id ? { backgroundColor: 'var(--nav-active-bg)' } : undefined}
-            title={title}
-          >
-            {icon}
-          </button>
-        ))}
-
-        {/* Alerts bell (with badge) */}
+        {/* Alerts bell (with badge) — first position */}
         <button
           onClick={() => setActivePanel('alerts')}
           className="relative flex items-center justify-center w-8 h-8 rounded transition-colors touch-target hover:bg-theme-hover"
@@ -118,6 +102,22 @@ export function TopNav() {
             </span>
           )}
         </button>
+
+        {PANEL_BUTTONS.map(({ id, title, icon }) => (
+          <button
+            key={id}
+            onClick={() => setActivePanel(id)}
+            className={`flex items-center justify-center w-8 h-8 rounded transition-colors touch-target ${
+              activePanel === id
+                ? 'text-accent'
+                : 'nav-icon hover:bg-theme-hover'
+            }`}
+            style={activePanel === id ? { backgroundColor: 'var(--nav-active-bg)' } : undefined}
+            title={title}
+          >
+            {icon}
+          </button>
+        ))}
       </div>
 
       {/* Divider */}
