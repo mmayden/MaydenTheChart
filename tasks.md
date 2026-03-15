@@ -230,50 +230,30 @@
 
 ---
 
-## 🔲 Phase 8 — Saved Chart Presets
+## ✅ Phase 8 — Saved Chart Presets — COMPLETE
 
-> Lightweight layout system — symbol-agnostic presets that save indicator config + timeframe + theme.
-> Attacks the #1 universal complaint across TradingView, thinkorswim, and Webull: settings not persisting.
-> Design: symbol floats freely (not tied to preset), matching TradingView's consensus model.
+**Committed on `main`** — 169/169 tests passing, build clean
 
-### Step 1 — Preset Data Layer
-- 🔲 `src/constants/presets.js` — default preset definitions:
-  - **Full**: all indicators on, 5m timeframe, current theme
-  - **Clean**: all indicators off, 5m timeframe
-  - **Scalp**: ema + vwap on, others off, 5m timeframe
-  - **Swing**: ema + levels + sr on, others off, 4h timeframe
-- 🔲 `src/store/usePresetsStore.js` — Zustand store:
-  - `activePresetId` — currently applied preset
-  - `presets` — map of all presets (defaults + user-created)
-  - `applyPreset(id)` — applies indicator toggles + timeframe + theme from preset to `useChartStore`
-  - `saveCurrentAsPreset(name)` — snapshots current `useChartStore` state into a new preset
-  - `renamePreset(id, newName)` / `deletePreset(id)` — manage user presets (defaults not deletable)
-  - localStorage persistence (auto-save on every mutation, no manual save button)
-- 🔲 Unit tests for preset store (save, load, apply, rename, delete, localStorage round-trip)
+- ✅ `src/constants/presets.js` — 4 default presets (Clean, Full, Scalp, Swing)
+- ✅ `src/store/usePresetsStore.js` — Zustand store with applyPreset, saveCurrentAsPreset, renamePreset, deletePreset, markModified, localStorage persistence
+- ✅ `src/components/ui/PresetSelector.jsx` — 2×2 pill grid for defaults, expandable custom list, "Save current" inline flow, rename/delete on hover
+- ✅ `src/store/usePresetsStore.test.js` — 21 unit tests (apply, save, rename, delete, localStorage round-trip, markModified)
+- ✅ Preset switching applies correct indicator states + timeframe, toast notification
+- ✅ Custom presets survive page refresh via localStorage
+- ✅ Default presets cannot be deleted or renamed
+- ✅ Manual indicator/timeframe changes call `markModified()` — shows "Custom (modified)" state
 
-### Step 2 — Preset Selector UI
-- 🔲 `src/components/ui/PresetSelector.jsx` — sidebar dropdown (above indicator toggles):
-  - Dropdown shows all presets, active one highlighted
-  - "Save Current as..." option at bottom → inline name input
-  - Right-click or icon menu on user presets: rename / delete
-  - Default presets are not deletable (but can be overridden by saving with same name? TBD)
-  - Toast notification on preset switch
-- 🔲 Wire into `App.jsx` / sidebar layout
+---
 
-### Step 3 — Integration & Polish
-- 🔲 Keyboard shortcut for preset cycling (e.g., `P` or `[`/`]` to cycle presets)
-- 🔲 Indicator toggles update live when preset is applied (Zustand subscription)
-- 🔲 Persist `activePresetId` across page refresh
-- 🔲 Edge cases: what happens if user manually toggles an indicator after loading a preset? (becomes "modified" state, or auto-creates a custom preset? TBD — discuss with user)
+## ✅ QOL Fixes — RVOL, Preset Sync, API Pagination (2026-03-15)
 
-### Tests & Verification
-- 🔲 **RUN: `npm run test`** — all unit tests green
-- 🔲 Preset switching applies correct indicator states
-- 🔲 Custom presets survive page refresh
-- 🔲 Default presets cannot be deleted
-- 🔲 Toast fires on preset switch
-- 🔲 **RUN: `npm run build`** — zero errors before committing
-- 🔲 **COMMIT:** `feat(presets): saved chart presets with default layouts and custom save/load`
+- ✅ RVOL toggle wired up — volume bars highlight amber (≥1.5x) and red (≥2x) when RVOL is enabled
+- ✅ RSI/MACD tab toggles call `markModified()` — preset system correctly tracks manual changes
+- ✅ Timeframe selector calls `markModified()` — prevents silent snap-back when re-clicking preset
+- ✅ VWAP toggle disabled + dimmed on non-intraday TFs (1h/4h/1D) with tooltip
+- ✅ `api/bars.js` pagination — follows Alpaca `next_page_token` for complete data (fixes 4h truncation)
+- ✅ `api/bars.js` symbol regex accepts dotted tickers (e.g. `BRK.B`)
+- ✅ 169/169 tests passing, build clean
 
 ---
 

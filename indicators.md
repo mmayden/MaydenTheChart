@@ -316,9 +316,13 @@ RVOL < 1.0 → below average volume, treat breakouts with caution
 ```
 
 ### Rendering
-- Volume bars are colored by candle direction: green (close ≥ open), red (close < open), semi-transparent
-- RVOL math remains available in `relativeVolume()` for future use (backtester, RVOL toggle in settings)
-- Tooltip shows RVOL multiplier on hover (planned)
+- **RVOL toggle OFF** (default): volume bars colored by candle direction — green (close ≥ open), red (close < open), semi-transparent
+- **RVOL toggle ON**: volume bars highlight when relative volume exceeds threshold:
+  - ≥1.5x average → amber (`#f59e0bcc`) — notable institutional volume
+  - ≥2.0x average → red (`#ef4444cc`) — extreme volume spike
+  - Below threshold → normal candle-direction coloring
+- RVOL toggle is in the sidebar `IndicatorToggle` and managed by presets (Full preset enables it)
+- `CandlestickChart.jsx` builds an RVOL lookup map and applies colors per bar when toggle is on
 
 ### Code signature
 ```js

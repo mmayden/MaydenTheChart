@@ -240,8 +240,9 @@ Component state (useState — local only):
 - [x] QOL phase — crosshair OHLCV legend, toast notifications, viewport persistence, smooth loading transitions
 - [x] Full project health audit (reusable audit.md template, 8-category assessment)
 - [x] P0–P3 audit fixes: ErrorBoundary, input validation, security headers, shared timezone.js, mini chart extraction, alert hook extraction, WS auto-recovery, dead code cleanup, doc sync
-- [x] 82/82 tests passing, build clean
-- [ ] Phase 8 — Saved chart presets (lightweight layout system with default + custom presets)
+- [x] Phase 8 — Saved chart presets (4 defaults, custom save/rename/delete, localStorage, 21 preset tests)
+- [x] QOL fixes: RVOL toggle wired, preset sync (markModified on RSI/MACD/TF), API pagination, symbol regex
+- [x] 169/169 tests passing, build clean
 
 ---
 
@@ -270,3 +271,4 @@ Component state (useState — local only):
 | 2026-03-15 | Code health audit: 3 bug fixes (ResizeObserver null guards in CandlestickChart + IndicatorTabView, toast ID collision → crypto.randomUUID()), 3 smell fixes (shared normalizeBar utility deduplicating 3 files, LevelOverlay accepts pre-computed byDay prop, SettingsModal Escape key close). 77/77 tests, build clean. |
 | 2026-03-15 | Full project health audit: created reusable audit.md template (10 categories), ran 8 parallel agents across build/architecture/code quality/security/performance/resilience/testing/docs. P0 fixes: React ErrorBoundary, /api/bars input validation, vercel.json security headers. P1 fixes: shared timezone.js, chart.js constants wired into indicators, console gating, dead file deletion, RSI Infinity fix, doc signature sync. P2 fixes: RSIMiniChart/MACDMiniChart extracted, useToast moved to store/, useAlertChecker hook extracted from NotificationBell, App.jsx Zustand subscriptions narrowed. P3: WS auto-recovery after max retries. P4: normalizeBar tests added. 82/82 tests, build clean. |
 | 2026-03-15 | Phase 8 design: researched TradingView/thinkorswim/NinjaTrader/Webull/Sierra Chart layout systems. Consensus: layout = indicator config + style + timeframe, symbol floats freely. #1 trader complaint = settings not persisting. Designed lightweight preset system (Zustand + localStorage, sidebar dropdown, 4 default presets). Updated project.md, tasks.md, CLAUDE.md with Phase 8 plan. |
+| 2026-03-15 | Chart QA + fixes: evaluated all 6 timeframes via screenshots. Fixed: RVOL toggle wired to highlight volume bars (amber ≥1.5x, red ≥2x). RSI/MACD/timeframe toggles now call markModified() for correct preset sync. VWAP toggle disabled on non-intraday TFs. API proxy follows Alpaca next_page_token pagination (fixes 4h data truncation). Symbol regex accepts dotted tickers (BRK.B). 169/169 tests, build clean. |
