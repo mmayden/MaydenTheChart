@@ -37,14 +37,14 @@ const SCHEMES = [
   {
     id: 'terminal',
     name: 'Terminal',
-    description: 'Phosphor green on black — old-school CRT',
+    description: 'Sage green on deep black — easy on the eyes',
     preview: {
-      bg:      '#000000',
-      surface: '#050a05',
-      border:  '#0a3a0a',
-      text:    '#33ff33',
-      muted:   '#1a7a1a',
-      accent:  '#00ff41',
+      bg:      '#060806',
+      surface: '#0a100a',
+      border:  '#1a2e1a',
+      text:    '#a8d8a8',
+      muted:   '#4a7a4a',
+      accent:  '#50d050',
     },
   },
 ]

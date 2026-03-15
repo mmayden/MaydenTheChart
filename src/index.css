@@ -52,15 +52,15 @@ body,
 }
 
 [data-theme="terminal"] {
-  --bg-base:      #000000;
-  --bg-surface:   #050a05;
-  --border:       #0a3a0a;
-  --border-mid:   #146414;
-  --text-primary: #33ff33;
-  --text-muted:   #1a7a1a;
-  --hover-bg:     #0a1a0a;
-  --accent:       #00ff41;
-  --accent-dim:   #002a08;
+  --bg-base:      #060806;
+  --bg-surface:   #0a100a;
+  --border:       #1a2e1a;
+  --border-mid:   #2a4a2a;
+  --text-primary: #a8d8a8;
+  --text-muted:   #4a7a4a;
+  --hover-bg:     #0e180e;
+  --accent:       #50d050;
+  --accent-dim:   #0a280a;
 }
 
 [data-theme="lumpia"] {
