@@ -403,6 +403,23 @@
 - ✅ `src/components/ui/OnboardingTour.jsx` — 4-step tooltip tour (Day Type → ATR → Presets → Cmd+K)
 - ✅ `data-tour` attributes on DayTypeBanner, Sidebar (presets + ATR), TopNav (Cmd+K)
 
+### UX Polish — Per-Panel Colors + Nav Animations (2026-03-15)
+- ✅ Per-panel icon colors: unique CSS custom property per button across all 3 themes
+  - Dark: alerts `#e5a54b`, watchlist `#5bc0be`, backtest `#a78bfa`, journal `#f87171`, cmd-palette `#a78bfa`
+  - Terminal: alerts `#b8a040`, watchlist `#68c0a8`, backtest `#88a0d0`, journal `#c8a050`, cmd-palette `#9080c0`
+  - Lumpia: alerts `#c8a040`, watchlist `#70b8a0`, backtest `#e07050`, journal `#88b870`, cmd-palette `#a88098`
+- ✅ Settings gear unique color per theme: dark `#22d3ee` (cyan), terminal `#58d8b0` (mint), lumpia `#e8c088` (warm gold)
+- ✅ Replaced remaining hardcoded Tailwind classes: `bg-blue-600` → `.btn-primary`, `bg-[#0a0a0a]` → `.bg-input`, `accent-blue-500` → `accentColor: var(--accent)`, `border-gray-500` → `.border-theme-mid`
+- ✅ Panel button order: alerts → watchlist → backtest → journal
+- ✅ Nav hover micro-animations (CSS-only keyframes, all pop 1.25-1.4x):
+  - Bell: shakes 24° at 1.3x scale
+  - Watchlist: bounces up with translateY oscillation
+  - Backtest: EKG double-tap pulse to 1.4x
+  - Journal: tilts open 12° from left spine at 1.25x
+  - Search: bouncy spring zoom to 1.3x
+  - Settings gear: 60° spin + themed glow drop-shadow
+- ✅ Sound alerts default to ON for new users (localStorage check flipped: `!== 'false'`)
+
 ---
 
 ## 📌 Deferred — Mobile Polish (low priority)

@@ -42,6 +42,14 @@ TopNav → Sidebar (left) → Chart (center) → RightPanel (right, one at a tim
 Values: `null | 'alerts' | 'backtest' | 'journal' | 'watchlist'`. Same panel = close,
 different panel = switch. On mobile (<768px), panels become full-screen overlays.
 
+**Color architecture:** All colors flow from CSS custom properties in `src/index.css`
+(lines 42-133). Each theme defines 25+ variables. Components use semantic CSS classes
+(`.btn-primary`, `.bg-input`, `.border-theme`, `.text-accent`, etc.) or inline
+`var(--name)` references — never hardcoded Tailwind color classes. Each panel button
+has its own `--{id}-color` and `--{id}-active-bg` variables. The settings gear has
+`--settings-color` and `--settings-glow`. Nav button hover animations are CSS-only
+keyframes in `src/index.css` (`.nav-btn-{id}` classes).
+
 ## Key file locations
 
 ### App Shell
