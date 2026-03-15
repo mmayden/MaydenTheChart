@@ -139,7 +139,7 @@ export function TopNav() {
       {/* Settings */}
       <button
         onClick={() => setSettingsOpen(true)}
-        className="flex items-center justify-center w-7 h-7 rounded nav-icon hover:bg-theme-hover transition-colors touch-target"
+        className="settings-gear flex items-center justify-center w-7 h-7 rounded hover:bg-theme-hover touch-target"
         title="Settings"
       >
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

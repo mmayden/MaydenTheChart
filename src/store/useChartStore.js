@@ -65,7 +65,7 @@ export const useChartStore = create((set) => ({
   toggleSidebar:         () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
 
   // ─── Sound alerts ─────────────────────────────────────────────────────────
-  soundAlerts: (() => { try { return localStorage.getItem('lumpia-sound-alerts') === 'true' } catch { return false } })(),
+  soundAlerts: (() => { try { return localStorage.getItem('lumpia-sound-alerts') !== 'false' } catch { return true } })(),
   setSoundAlerts: (enabled) => {
     try { localStorage.setItem('lumpia-sound-alerts', String(enabled)) } catch { /* storage unavailable */ }
     set({ soundAlerts: enabled })
