@@ -296,10 +296,9 @@ RVOL < 1.0 → below average volume, treat breakouts with caution
 ```
 
 ### Rendering
-- Normal volume bars: standard gray/white
-- RVOL ≥ 1.5: brighter color (orange or yellow highlight)
-- RVOL ≥ 2.0: even more pronounced (full bright accent)
-- Tooltip shows RVOL multiplier on hover
+- Volume bars are colored by candle direction: green (close ≥ open), red (close < open), semi-transparent
+- RVOL math remains available in `relativeVolume()` for future use (backtester, RVOL toggle in settings)
+- Tooltip shows RVOL multiplier on hover (planned)
 
 ### Code signature
 ```js

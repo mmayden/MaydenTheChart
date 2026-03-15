@@ -21,11 +21,9 @@ import { createChart, CandlestickSeries, HistogramSeries } from 'lightweight-cha
 import {
   CHART_BG_COLOR,
   GRID_COLOR,
-  VOLUME_NORMAL_COLOR,
-  VOLUME_RVOL_COLOR,
-  VOLUME_HIGH_COLOR,
+  VOLUME_UP_COLOR,
+  VOLUME_DOWN_COLOR,
 } from '../../constants/chart'
-import { relativeVolume } from '../../utils/indicators'
 
 const CANDLE_COLORS = {
   dark:    { up: '#22c55e', down: '#ef4444' },
@@ -107,7 +105,7 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
 
     // Volume bars — as a histogram in the main pane, scaled down
     const volumeSeries = chart.addSeries(HistogramSeries, {
-      color:    VOLUME_NORMAL_COLOR,
+      color:    VOLUME_UP_COLOR,
       priceFormat: { type: 'volume' },
       priceScaleId: 'volume',
     })
@@ -155,18 +153,11 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
 
     candleRef.current.setData(bars)
 
-    // Compute RVOL for volume color coding
-    const rvolData   = relativeVolume(bars).series
-    const rvolMap    = new Map(rvolData.map((r) => [r.time, r]))
-
-    const volumeData = bars.map((bar) => {
-      const rvol = rvolMap.get(bar.time)
-      let color  = VOLUME_NORMAL_COLOR
-      if (rvol?.rvol >= 2.0) color = VOLUME_HIGH_COLOR
-      else if (rvol?.highlight)   color = VOLUME_RVOL_COLOR
-
-      return { time: bar.time, value: bar.volume, color }
-    })
+    const volumeData = bars.map((bar) => ({
+      time:  bar.time,
+      value: bar.volume,
+      color: bar.close >= bar.open ? VOLUME_UP_COLOR : VOLUME_DOWN_COLOR,
+    }))
 
     volumeRef.current.setData(volumeData)
     chartRef.current.timeScale().fitContent()

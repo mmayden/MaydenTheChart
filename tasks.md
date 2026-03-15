@@ -160,6 +160,15 @@
 
 ---
 
+## ✅ Volume Bar Color Update (2026-03-14)
+
+- ✅ Replaced RVOL-based volume coloring (gray/amber/red) with candle-direction coloring (green up / red down, semi-transparent)
+- ✅ Removed `relativeVolume` import from CandlestickChart (math still available in `indicators.js` for backtester)
+- ✅ Updated `VOLUME_UP_COLOR` / `VOLUME_DOWN_COLOR` constants (replaced `VOLUME_NORMAL_COLOR` / `VOLUME_RVOL_COLOR` / `VOLUME_HIGH_COLOR`)
+- ✅ 45/45 tests passing, build clean
+
+---
+
 ## 🔲 Phase 7b — Stretch Goals
 
 - 🔲 `src/utils/backtest.js` — replay historical days using same indicator math, output win rate / R:R / by day type

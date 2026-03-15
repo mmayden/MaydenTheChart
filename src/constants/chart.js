@@ -20,10 +20,9 @@ export const PREV_LEVEL_COLOR = '#eab308'  // gold — prev day H/L
 export const ODC_COLOR        = '#f3f4f6'  // near-white — open of day candle
 export const ORB_COLOR        = '#6366f1'  // indigo — ORB zone
 
-// ─── Volume colors ────────────────────────────────────────────────────────────
-export const VOLUME_NORMAL_COLOR = '#374151'   // dim gray
-export const VOLUME_RVOL_COLOR   = '#f59e0b'   // amber — RVOL ≥ 1.5x
-export const VOLUME_HIGH_COLOR   = '#ef4444'   // red   — RVOL ≥ 2.0x (rare spike)
+// ─── Volume colors (candle-direction: green up / red down) ───────────────────
+export const VOLUME_UP_COLOR   = '#22c55e80'   // green semi-transparent — close >= open
+export const VOLUME_DOWN_COLOR = '#ef444480'   // red   semi-transparent — close < open
 
 // ─── Chart background / grid ──────────────────────────────────────────────────
 export const CHART_BG_COLOR   = '#0a0a0a'

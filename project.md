@@ -113,8 +113,8 @@ These make the tool functional. Without them, nothing else matters.
 | Feature | Why it's here |
 |---|---|
 | Candlestick chart (OHLCV) | Foundation |
-| Volume bars | Confirms breakout strength |
-| **Relative Volume (RVOL) highlight** | Volume 1.5x+ daily average = institutional conviction; visual highlight on bars |
+| Volume bars (green up / red down) | Confirms breakout strength; colored by candle direction |
+| **Relative Volume (RVOL) math** | Volume 1.5x+ daily average = institutional conviction; available for backtester and future RVOL toggle |
 | Timeframe switcher (1m, 5m, 15m, 1h, 4h, 1D) | Multi-timeframe analysis is the entire system |
 | **Previous day High/Low lines** | Nick's Rule 1 — drawn automatically every morning; most important level |
 | **15-minute Opening Range zone** | Shaded box for first 15 min of session; ORB zone validated by SSRN research |
@@ -235,3 +235,4 @@ Component state (useState — local only):
 | 2026-03-14 | Phase 5: Live WebSocket feed. `api/ws-auth.js` credential proxy, `src/services/websocket.js` connection manager (auth + exponential backoff reconnect), `src/hooks/useAlpacaSocket.js` (market-hours gating, 1-min bar aggregation into any timeframe, TanStack cache injection). StatusBar shows Live/Connecting/Reconnecting/Market Closed. REST polling auto-disabled when WS active. 45/45 tests, build clean. |
 | 2026-03-14 | Multi-symbol base: stripped all QQQ hardcoding (MacroStatusBar removed, params saved to qqq-specific-features.txt). SymbolInput component (click-to-edit ticker). WebSocket uses dynamic getSymbol callback. NotificationBell, SettingsModal, loading message all symbol-agnostic. 45/45 tests, build clean. |
 | 2026-03-14 | Symbol autocomplete: SYMBOL_SUGGESTIONS (~80 tickers) in chart.js for dropdown suggestions. SymbolInput rewritten with autocomplete dropdown (prefix filter, usage-frequency sorting via localStorage, arrow key nav, bold prefix highlight). Alpaca validation remains final gate. 45/45 tests, build clean. |
+| 2026-03-14 | Volume bars: switched from RVOL-based color coding (gray/amber/red) to candle-direction coloring (green up / red down, semi-transparent). RVOL math retained in `relativeVolume()` for backtester and future settings toggle. 45/45 tests, build clean. |
