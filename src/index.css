@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Self-hosted fonts ─────────────────────────────────────────────────── */
+
+@font-face {
+  font-family: 'Boogaloo';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/boogaloo-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/inter-800.woff2') format('woff2');
+}
+
 /* ── Global resets for terminal feel ─────────────────────────────────────── */
 
 *,
@@ -326,4 +344,46 @@ body,
 .alerts-panel-enter-active {
   transform: translateX(0);
   transition: transform 300ms ease-out;
+}
+
+/* ── Reduced motion — respect user accessibility preference ────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Disable all nav button hover animations */
+  .nav-btn-alerts:hover svg,
+  .nav-btn-watchlist:hover svg,
+  .nav-btn-backtest:hover svg,
+  .nav-btn-journal:hover svg,
+  .nav-btn-search:hover svg {
+    animation: none;
+  }
+
+  /* Disable settings gear spin + glow */
+  .settings-gear {
+    transition: none;
+  }
+  .settings-gear:hover {
+    filter: none;
+    transform: none;
+  }
+
+  /* Disable panel slide transition */
+  .alerts-panel-enter-active {
+    transition: none;
+  }
+
+  /* Disable crosshair legend fade */
+  .crosshair-legend {
+    transition: none;
+  }
+
+  /* Disable symbol hover underline transition */
+  .symbol-display {
+    transition: none;
+  }
+
+  /* Disable button transitions */
+  .btn-primary {
+    transition: none;
+  }
 }
