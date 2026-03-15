@@ -175,21 +175,27 @@ export function PresetSelector() {
                 </button>
 
                 {/* Manage icons */}
-                <div className="flex gap-0.5 shrink-0">
+                <div
+                  className="flex items-center shrink-0 rounded-full border"
+                  style={{
+                    borderColor: confirmDeleteId === preset.id ? 'rgba(239,68,68,0.3)' : 'var(--border-mid, var(--border))',
+                    backgroundColor: confirmDeleteId === preset.id ? 'rgba(239,68,68,0.06)' : 'var(--bg-surface, transparent)',
+                  }}
+                >
                   {confirmDeleteId === preset.id ? (
                     <>
                       <button
                         onClick={() => handleDelete(preset.id)}
-                        className="px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold transition-colors"
-                        style={{ backgroundColor: 'rgba(239,68,68,0.2)', color: '#f87171' }}
+                        className="px-2 py-0.5 rounded-l-full text-[9px] font-mono font-semibold transition-colors"
+                        style={{ color: '#f87171' }}
                         title="Confirm delete"
                       >
                         Delete?
                       </button>
                       <button
                         onClick={() => setConfirmDeleteId(null)}
-                        className="px-1 py-0.5 rounded text-[9px] font-mono transition-colors"
-                        style={{ color: 'var(--text-muted)' }}
+                        className="px-1.5 py-0.5 rounded-r-full text-[9px] font-mono transition-colors border-l"
+                        style={{ color: 'var(--text-muted)', borderColor: 'rgba(239,68,68,0.2)' }}
                         title="Cancel"
                       >
                         ✕
@@ -199,16 +205,16 @@ export function PresetSelector() {
                     <>
                       <button
                         onClick={() => { setEditingId(preset.id); setEditName(preset.name); setConfirmDeleteId(null) }}
-                        className="px-1 py-0.5 rounded text-[11px] transition-colors hover:brightness-150"
-                        style={{ color: 'var(--text-secondary, var(--text-muted))' }}
+                        className="px-1.5 py-0.5 rounded-l-full text-[11px] transition-colors hover:brightness-150"
+                        style={{ color: 'var(--text-muted)' }}
                         title="Rename"
                       >
                         ✎
                       </button>
                       <button
                         onClick={() => handleDelete(preset.id)}
-                        className="px-1 py-0.5 rounded text-[11px] transition-colors hover:text-red-400"
-                        style={{ color: 'var(--text-secondary, var(--text-muted))' }}
+                        className="px-1.5 py-0.5 rounded-r-full text-[11px] transition-colors hover:text-red-400 border-l"
+                        style={{ color: 'var(--text-muted)', borderColor: 'var(--border-mid, var(--border))' }}
                         title="Delete"
                       >
                         ✕
