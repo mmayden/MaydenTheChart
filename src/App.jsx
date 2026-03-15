@@ -55,6 +55,7 @@ export default function App() {
   const selectedTimeframe = useChartStore((s) => s.selectedTimeframe)
   const showEma           = useChartStore((s) => s.indicators.ema)
   const showVwap          = useChartStore((s) => s.indicators.vwap)
+  const showRvol          = useChartStore((s) => s.indicators.rvol)
   const showLevels        = useChartStore((s) => s.indicators.levels)
   const showSr            = useChartStore((s) => s.indicators.sr)
   const theme             = useChartStore((s) => s.theme)
@@ -246,7 +247,7 @@ export default function App() {
             </div>
           )}
 
-          <CandlestickChart ref={chartRef} bars={bars ?? []} theme={theme} dataUpdatedAt={dataUpdatedAt} />
+          <CandlestickChart ref={chartRef} bars={bars ?? []} theme={theme} dataUpdatedAt={dataUpdatedAt} showRvol={showRvol} />
 
           {chart && candleSeries && bars && (
             <>

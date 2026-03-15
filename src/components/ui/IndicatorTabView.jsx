@@ -7,6 +7,7 @@
  */
 
 import { useChartStore } from '../../store/useChartStore'
+import { usePresetsStore } from '../../store/usePresetsStore'
 import { RSIMiniChart } from './RSIMiniChart'
 import { MACDMiniChart } from './MACDMiniChart'
 
@@ -14,6 +15,7 @@ export function IndicatorTabView({ bars }) {
   const rsiEnabled      = useChartStore((s) => s.indicators.rsi)
   const macdEnabled     = useChartStore((s) => s.indicators.macd)
   const toggleIndicator = useChartStore((s) => s.toggleIndicator)
+  const markModified    = usePresetsStore((s) => s.markModified)
 
   if (!bars?.length) return null
 
@@ -27,7 +29,7 @@ export function IndicatorTabView({ bars }) {
           return (
             <button
               key={tab}
-              onClick={() => toggleIndicator(key)}
+              onClick={() => { toggleIndicator(key); markModified() }}
               className={[
                 'px-2 py-1 text-xs font-mono font-semibold rounded border transition-colors',
                 on

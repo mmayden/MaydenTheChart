@@ -5,16 +5,19 @@
 
 import { useQueryClient } from '@tanstack/react-query'
 import { useChartStore } from '../../store/useChartStore'
+import { usePresetsStore } from '../../store/usePresetsStore'
 import { TIMEFRAME_ORDER, TIMEFRAME_CONFIG } from '../../constants/chart'
 
 export function TimeframeSelector() {
   const selectedTimeframe = useChartStore((s) => s.selectedTimeframe)
   const selectedSymbol    = useChartStore((s) => s.selectedSymbol)
   const setTimeframe      = useChartStore((s) => s.setTimeframe)
+  const markModified      = usePresetsStore((s) => s.markModified)
   const queryClient       = useQueryClient()
 
   function handleSelect(tf) {
     setTimeframe(tf)
+    markModified()
     queryClient.invalidateQueries({ queryKey: ['bars', selectedSymbol, tf] })
   }
 

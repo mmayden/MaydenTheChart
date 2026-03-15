@@ -26,8 +26,8 @@ export default async function handler(req, res) {
 
   // Input validation
   const VALID_TIMEFRAMES = ['1Min', '5Min', '15Min', '30Min', '1Hour', '4Hour', '1Day', '1Week', '1Month']
-  if (!/^[A-Z]{1,10}$/.test(symbol)) {
-    return res.status(400).json({ error: 'Invalid symbol — must be 1-10 uppercase letters' })
+  if (!/^[A-Z]{1,10}(\.[A-Z]{1,2})?$/.test(symbol)) {
+    return res.status(400).json({ error: 'Invalid symbol — must be 1-10 uppercase letters (optional .X or .XX suffix)' })
   }
   if (!VALID_TIMEFRAMES.includes(timeframe)) {
     return res.status(400).json({ error: `Invalid timeframe — must be one of: ${VALID_TIMEFRAMES.join(', ')}` })
@@ -53,35 +53,45 @@ export default async function handler(req, res) {
   }
 
   try {
-    const params = new URLSearchParams({
-      timeframe,
-      start,
-      end,
-      limit: String(parsedLimit),
-      adjustment: 'raw',
-      feed: 'iex',
-    })
-
-    const response = await fetch(
-      `${dataUrl}/stocks/${encodeURIComponent(symbol)}/bars?${params}`,
-      {
-        headers: {
-          'APCA-API-KEY-ID': apiKey,
-          'APCA-API-SECRET-KEY': secretKey,
-        },
-      }
-    )
-
-    if (!response.ok) {
-      console.error('[bars] Alpaca API error:', response.status, await response.text())
-      return res.status(response.status).json({ error: `Upstream API error (${response.status})` })
+    const headers = {
+      'APCA-API-KEY-ID': apiKey,
+      'APCA-API-SECRET-KEY': secretKey,
     }
+    const baseUrl = `${dataUrl}/stocks/${encodeURIComponent(symbol)}/bars`
 
-    const data = await response.json()
+    let allBars = []
+    let pageToken = null
+    const MAX_PAGES = 10 // safety cap to avoid runaway loops
+
+    for (let page = 0; page < MAX_PAGES; page++) {
+      const params = new URLSearchParams({
+        timeframe,
+        start,
+        end,
+        limit: String(parsedLimit),
+        adjustment: 'raw',
+        feed: 'iex',
+      })
+      if (pageToken) params.set('page_token', pageToken)
+
+      const response = await fetch(`${baseUrl}?${params}`, { headers })
+
+      if (!response.ok) {
+        console.error('[bars] Alpaca API error:', response.status, await response.text())
+        return res.status(response.status).json({ error: `Upstream API error (${response.status})` })
+      }
+
+      const data = await response.json()
+      const bars = data.bars ?? []
+      allBars = allBars.concat(bars)
+      pageToken = data.next_page_token ?? null
+
+      if (!pageToken) break
+    }
 
     // Cache for 30 seconds — data doesn't change that fast
     res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60')
-    return res.status(200).json(data)
+    return res.status(200).json({ bars: allBars })
   } catch (err) {
     console.error('[bars] Fetch failed:', err.message)
     return res.status(500).json({ error: 'Failed to fetch market data' })

@@ -20,6 +20,7 @@ import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import { createChart, CandlestickSeries, HistogramSeries } from 'lightweight-charts'
 import { useViewportPersistence } from '../../hooks/useViewportPersistence'
 import { useChartStore } from '../../store/useChartStore'
+import { relativeVolume } from '../../utils/indicators'
 import {
   CHART_BG_COLOR,
   GRID_COLOR,
@@ -28,13 +29,17 @@ import {
   VOLUME_DOWN_COLOR,
 } from '../../constants/chart'
 
+// RVOL highlight colors — amber for ≥1.5x, hot red for ≥2x
+const RVOL_AMBER = '#f59e0bcc'  // amber semi-transparent
+const RVOL_HOT   = '#ef4444cc'  // red semi-transparent
+
 const CANDLE_COLORS = {
   dark:    { up: '#22c55e', down: '#ef4444' },
   lumpia: { up: '#48B068', down: '#D44020' },
 }
 
 export const CandlestickChart = forwardRef(function CandlestickChart(
-  { bars, children, theme = 'dark', dataUpdatedAt },
+  { bars, children, theme = 'dark', dataUpdatedAt, showRvol = false },
   ref
 ) {
   const containerRef = useRef(null)
@@ -164,11 +169,22 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
     const prev = prevBarsRef.current
     const last = bars[bars.length - 1]
 
-    const makeVolBar = (bar) => ({
-      time:  bar.time,
-      value: bar.volume,
-      color: bar.close >= bar.open ? VOLUME_UP_COLOR : VOLUME_DOWN_COLOR,
-    })
+    // Build RVOL lookup when enabled — maps time → rvol value for highlighting
+    let rvolMap = null
+    if (showRvol) {
+      const { series: rvolSeries } = relativeVolume(bars)
+      rvolMap = new Map(rvolSeries.map((r) => [r.time, r.rvol]))
+    }
+
+    const makeVolBar = (bar) => {
+      const baseColor = bar.close >= bar.open ? VOLUME_UP_COLOR : VOLUME_DOWN_COLOR
+      if (!rvolMap) return { time: bar.time, value: bar.volume, color: baseColor }
+
+      const rv = rvolMap.get(bar.time)
+      if (rv != null && rv >= 2.0) return { time: bar.time, value: bar.volume, color: RVOL_HOT }
+      if (rv != null && rv >= 1.5) return { time: bar.time, value: bar.volume, color: RVOL_AMBER }
+      return { time: bar.time, value: bar.volume, color: baseColor }
+    }
 
     // Determine if we can use the lightweight update() path
     let didUpdate = false
@@ -211,7 +227,7 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
 
     prevBarsRef.current = bars
     if (shouldFit) chartRef.current.timeScale().fitContent()
-  }, [bars, shouldFit])
+  }, [bars, shouldFit, showRvol])
 
   // Expose chart instance to parent for overlays
   useImperativeHandle(ref, () => ({

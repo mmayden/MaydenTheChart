@@ -5,6 +5,7 @@
 
 import { useChartStore } from '../../store/useChartStore'
 import { usePresetsStore } from '../../store/usePresetsStore'
+import { TIMEFRAME_CONFIG } from '../../constants/chart'
 
 const TOGGLES = [
   { key: 'ema',    label: 'EMA'    },
@@ -15,27 +16,36 @@ const TOGGLES = [
 ]
 
 export function IndicatorToggle() {
-  const indicators     = useChartStore((s) => s.indicators)
+  const indicators      = useChartStore((s) => s.indicators)
   const toggleIndicator = useChartStore((s) => s.toggleIndicator)
   const markModified    = usePresetsStore((s) => s.markModified)
+  const timeframe       = useChartStore((s) => s.selectedTimeframe)
+
+  const tfConfig = TIMEFRAME_CONFIG[timeframe]
 
   return (
     <div className="flex flex-col gap-1">
       {TOGGLES.map(({ key, label }) => {
         const on = indicators[key]
+        // VWAP is only available on intraday timeframes
+        const disabled = key === 'vwap' && !tfConfig?.showVWAP
         return (
           <button
             key={key}
-            onClick={() => { toggleIndicator(key); markModified() }}
+            onClick={() => { if (!disabled) { toggleIndicator(key); markModified() } }}
+            disabled={disabled}
             className={[
               'px-2 py-1 text-xs font-mono font-semibold rounded border transition-colors text-left',
-              on
-                ? 'border-blue-500 bg-blue-950'
-                : 'border-gray-700 bg-transparent hover:border-gray-600 hover:bg-gray-800/50',
+              disabled
+                ? 'border-gray-800 bg-transparent cursor-not-allowed opacity-40'
+                : on
+                  ? 'border-blue-500 bg-blue-950'
+                  : 'border-gray-700 bg-transparent hover:border-gray-600 hover:bg-gray-800/50',
             ].join(' ')}
-            style={{ color: on ? 'var(--text-primary, #e8e0d0)' : 'var(--text-muted, #9ca3af)' }}
+            style={{ color: disabled ? 'var(--text-muted, #9ca3af)' : on ? 'var(--text-primary, #e8e0d0)' : 'var(--text-muted, #9ca3af)' }}
+            title={disabled ? 'VWAP is only available on intraday timeframes' : undefined}
           >
-            <span className="mr-1.5 opacity-50">{on ? '●' : '○'}</span>
+            <span className="mr-1.5 opacity-50">{on && !disabled ? '●' : '○'}</span>
             {label}
           </button>
         )
