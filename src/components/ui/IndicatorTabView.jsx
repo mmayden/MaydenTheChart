@@ -61,6 +61,7 @@ function RSIMiniChart({ bars }) {
     seriesRef.current = { line, r70, r50, r30 }
 
     const ro = new ResizeObserver(() => {
+      if (!containerRef.current) return
       chart.applyOptions({ width: containerRef.current.clientWidth, height: containerRef.current.clientHeight })
     })
     ro.observe(containerRef.current)
@@ -106,6 +107,7 @@ function MACDMiniChart({ bars }) {
     seriesRef.current = { hist, macdLine, signalLine }
 
     const ro = new ResizeObserver(() => {
+      if (!containerRef.current) return
       chart.applyOptions({ width: containerRef.current.clientWidth, height: containerRef.current.clientHeight })
     })
     ro.observe(containerRef.current)

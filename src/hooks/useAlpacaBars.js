@@ -14,24 +14,7 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import { fetchBars } from '../services/alpaca'
 import { useChartStore } from '../store/useChartStore'
 import { TIMEFRAME_CONFIG } from '../constants/chart'
-
-// When the WebSocket is actively streaming bars, disable REST polling
-// to avoid redundant API calls and potential data conflicts.
-
-/**
- * Convert an Alpaca bar to the shape lightweight-charts expects.
- * Alpaca bar timestamp is ISO 8601; lw-charts v5 needs Unix seconds.
- */
-function normalizebar(bar) {
-  return {
-    time:   Math.floor(new Date(bar.t).getTime() / 1000),
-    open:   bar.o,
-    high:   bar.h,
-    low:    bar.l,
-    close:  bar.c,
-    volume: bar.v,
-  }
-}
+import { normalizeBar } from '../utils/normalizeBar'
 
 export function useAlpacaBars() {
   const symbol    = useChartStore((s) => s.selectedSymbol)
@@ -60,7 +43,7 @@ export function useAlpacaBars() {
       // Sort oldest → newest, normalize to lw-charts shape
       return raw
         .sort((a, b) => new Date(a.t) - new Date(b.t))
-        .map(normalizebar)
+        .map(normalizeBar)
     },
     enabled:         !!symbol && !!timeframe,
     // Keep stale data visible while the new timeframe loads — prevents

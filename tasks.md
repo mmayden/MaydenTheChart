@@ -218,6 +218,18 @@
 
 ---
 
+## ✅ Code Health Audit (2026-03-15)
+
+- ✅ 77/77 tests passing — no stale or broken tests
+- ✅ Bug fix: ResizeObserver null guard in `CandlestickChart.jsx`, `IndicatorTabView.jsx` (RSI + MACD mini charts) — prevents crash on fast unmount
+- ✅ Bug fix: `useToast.js` toast IDs changed from `Date.now()` to `crypto.randomUUID()` — prevents collision on rapid toast creation
+- ✅ Smell fix: deduplicated 3 identical `normalizeBar` functions into shared `src/utils/normalizeBar.js`
+- ✅ Smell fix: `LevelOverlay` now accepts `byDay` prop from App.jsx — eliminates redundant `groupBarsByDay()` call
+- ✅ Smell fix: `SettingsModal` now closes on Escape key (was backdrop-click only)
+- ✅ 77/77 tests, build clean
+
+---
+
 ## 🔲 Phase 7b — Stretch Goals
 
 - 🔲 `src/utils/backtest.js` — replay historical days using same indicator math, output win rate / R:R / by day type

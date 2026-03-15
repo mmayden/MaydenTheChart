@@ -8,6 +8,7 @@
  */
 
 import axios from 'axios'
+import { normalizeBar } from '../utils/normalizeBar'
 
 const WS_URL = 'wss://stream.data.alpaca.markets/v2/iex'
 const MAX_RETRIES = 10
@@ -22,23 +23,6 @@ async function fetchCredentials() {
   const headers = token ? { Authorization: `Bearer ${token}` } : {}
   const { data } = await axios.get('/api/ws-auth', { headers })
   return data
-}
-
-/**
- * Normalize an Alpaca WebSocket bar to the shape lightweight-charts expects.
- *
- * WS bar shape: { T:'b', S:'AAPL', o, h, l, c, v, t:'2026-03-14T14:30:00Z', n, vw }
- * Output:       { time (unix seconds), open, high, low, close, volume }
- */
-function normalizeWsBar(bar) {
-  return {
-    time:   Math.floor(new Date(bar.t).getTime() / 1000),
-    open:   bar.o,
-    high:   bar.h,
-    low:    bar.l,
-    close:  bar.c,
-    volume: bar.v,
-  }
 }
 
 /**
@@ -111,7 +95,7 @@ export function createAlpacaSocket({ onBar, onStatus, getSymbol }) {
 
             // Bar data
             if (msg.T === 'b') {
-              onBar(normalizeWsBar(msg))
+              onBar(normalizeBar(msg))
             }
 
             // Auth error

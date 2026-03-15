@@ -4,6 +4,7 @@
  * Currently: Color Scheme selection.
  */
 
+import { useEffect } from 'react'
 import { useChartStore } from '../../store/useChartStore'
 
 const SCHEMES = [
@@ -106,6 +107,12 @@ function SchemeCard({ scheme, active, onSelect }) {
 export function SettingsModal({ onClose }) {
   const theme    = useChartStore((s) => s.theme)
   const setTheme = useChartStore((s) => s.setTheme)
+
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
 
   return (
     /* Backdrop */

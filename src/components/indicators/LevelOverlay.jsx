@@ -20,7 +20,7 @@ import {
   ORB_COLOR,
 } from '../../constants/chart'
 
-export function LevelOverlay({ chart, candleSeries, bars, showORB = true, visible = true }) {
+export function LevelOverlay({ chart, candleSeries, bars, byDay: byDayProp = null, showORB = true, visible = true }) {
   const linesRef    = useRef([])  // array of { line, series } for cleanup
   const odcSeriesRef = useRef(null)
 
@@ -39,7 +39,7 @@ export function LevelOverlay({ chart, candleSeries, bars, showORB = true, visibl
       odcSeriesRef.current = null
     }
 
-    const byDay                 = groupBarsByDay(bars)
+    const byDay                 = byDayProp ?? groupBarsByDay(bars)
     const { prevHigh, prevLow } = getPreviousLevels(bars, byDay)
     const odc                   = getOpenOfDay(bars, byDay)
     const orb                   = getORBZone(bars, 15, byDay)

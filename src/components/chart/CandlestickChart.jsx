@@ -127,6 +127,7 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
 
     // Responsive resize
     const ro = new ResizeObserver(() => {
+      if (!containerRef.current) return
       chart.applyOptions({
         width:  containerRef.current.clientWidth,
         height: containerRef.current.clientHeight,

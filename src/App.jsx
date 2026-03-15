@@ -241,6 +241,7 @@ export default function App() {
                 chart={chart}
                 candleSeries={candleSeries}
                 bars={bars}
+                byDay={byDay}
                 showORB={tfConfig.showORB}
                 visible={indicators.levels}
               />

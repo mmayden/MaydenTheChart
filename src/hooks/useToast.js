@@ -26,7 +26,7 @@ export const useToast = create((set, get) => ({
    * @param {{ message: string, type?: 'info'|'success'|'warning'|'error', duration?: number }} opts
    */
   add: ({ message, type = 'info', duration = 4000 }) => {
-    const id = Date.now()
+    const id = crypto.randomUUID()
     const toast = { id, message, type, createdAt: Date.now() }
 
     set((state) => {
