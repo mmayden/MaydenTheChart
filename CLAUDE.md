@@ -31,7 +31,15 @@ The live chart and the backtester share identical math. Never duplicate indicato
 ## Key file locations
 - Indicator math: `src/utils/indicators.js`
 - Level math: `src/utils/levels.js`
+- S/R detection: `src/utils/supportResistance.js`
 - Zustand store: `src/store/useChartStore.js`
 - Constants (Nick's EMA colors etc): `src/constants/chart.js`
 - Main chart: `src/components/chart/CandlestickChart.jsx`
+- Symbol input + autocomplete: `src/components/chart/SymbolInput.jsx`
+- Crosshair OHLCV legend: `src/components/ui/CrosshairLegend.jsx`
+- Toast notifications: `src/hooks/useToast.js` + `src/components/ui/ToastContainer.jsx`
+- Viewport persistence: `src/hooks/useViewportPersistence.js`
+- WebSocket live feed: `src/hooks/useAlpacaSocket.js` + `src/services/websocket.js`
+- Alert system: `src/store/useAlertsStore.js` + `src/components/ui/NotificationBell.jsx`
 - App layout: `src/App.jsx`
+- Feature ideas (not committed tasks): `feature-ideas.md`

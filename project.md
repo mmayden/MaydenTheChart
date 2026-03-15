@@ -221,6 +221,10 @@ Component state (useState — local only):
 - [x] Phase 5 — live WebSocket (ws-auth proxy, websocket.js manager, useAlpacaSocket hook, StatusBar live indicator)
 - [x] Phase 6 — Vercel deployment (api/bars.js serverless proxy, cheechart.space custom domain, SSL pending)
 - [x] Alert system (Tier 3 stretch) — price-level and candle-streak alerts with browser notifications
+- [x] Multi-symbol support — dynamic symbol input, autocomplete, Alpaca validation, all systems symbol-agnostic
+- [x] Indicator deep assessment — 6 fixes (VWAP timezone, ATR thresholds, RVOL bias, MACD naming, byDay dedup, levels tests)
+- [x] QOL phase — crosshair OHLCV legend, toast notifications, viewport persistence, smooth loading transitions
+- [x] 77/77 tests passing, build clean
 
 ---
 
@@ -241,3 +245,5 @@ Component state (useState — local only):
 | 2026-03-14 | Symbol autocomplete: SYMBOL_SUGGESTIONS (~80 tickers) in chart.js for dropdown suggestions. SymbolInput rewritten with autocomplete dropdown (prefix filter, usage-frequency sorting via localStorage, arrow key nav, bold prefix highlight). Alpaca validation remains final gate. 45/45 tests, build clean. |
 | 2026-03-14 | Volume bars: switched from RVOL-based color coding (gray/amber/red) to candle-direction coloring (green up / red down, semi-transparent). RVOL math retained in `relativeVolume()` for backtester and future settings toggle. 45/45 tests, build clean. |
 | 2026-03-14 | ODC line fix: was rendering as full-width price line bleeding across all days. Changed `getOpenOfDay()` to return `{ price, startTime, endTime }`. LevelOverlay now renders ODC as a `LineSeries` scoped to today's session. Build clean. |
+| 2026-03-14 | Indicator deep assessment: 6 fixes — VWAP ET timezone for day reset, ATR %-based strength thresholds, RVOL candle-direction bias, MACD return shape contract, byDay dedup optimization, 32 new levels tests. ODC color amber dashed. 77/77 tests. |
+| 2026-03-14 | QOL phase: CrosshairLegend (OHLCV on hover, ref-based zero-rerender), useToast + ToastContainer (slide-in notifications), useViewportPersistence (preserves zoom during live updates), smooth loading overlay, symbol change toasts. feature-ideas.md for keyboard shortcuts. 77/77 tests, build clean. |
