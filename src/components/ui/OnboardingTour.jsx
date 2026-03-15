@@ -79,12 +79,20 @@ export function OnboardingTour() {
     if (!current) return
 
     function updateRect() {
-      setRect(getRect(current.target))
+      const el = document.querySelector(current.target)
+      if (!el) { setRect(null); return }
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+      setRect(el.getBoundingClientRect())
     }
 
     updateRect()
+    // Re-measure after scroll animation settles
+    const scrollTimer = setTimeout(updateRect, 400)
     window.addEventListener('resize', updateRect)
-    return () => window.removeEventListener('resize', updateRect)
+    return () => {
+      clearTimeout(scrollTimer)
+      window.removeEventListener('resize', updateRect)
+    }
   }, [visible, step])
 
   const finish = useCallback(() => {
