@@ -90,10 +90,10 @@ export function PresetSelector() {
             <button
               key={preset.id}
               onClick={() => handleApply(preset.id)}
-              className="group relative flex items-center justify-center gap-1 px-1.5 py-1.5 text-[10px] font-mono font-semibold rounded-md border transition-all duration-150"
+              className="group relative flex items-center justify-center gap-1 px-1.5 py-1.5 text-[10px] font-mono font-semibold rounded-md border transition-all duration-150 hover:brightness-125"
               style={{
                 borderColor: isActive ? 'var(--accent)' : 'var(--border)',
-                backgroundColor: isActive ? 'var(--accent-dim)' : 'transparent',
+                backgroundColor: isActive ? 'var(--accent-dim)' : 'var(--bg-surface, transparent)',
                 color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
                 boxShadow: isActive ? '0 0 8px var(--accent-dim)' : 'none',
               }}
@@ -162,10 +162,10 @@ export function PresetSelector() {
               >
                 <button
                   onClick={() => handleApply(preset.id)}
-                  className="flex-1 flex items-center gap-1.5 px-2 py-1 text-[10px] font-mono font-semibold rounded-md border text-left transition-all duration-150 min-w-0"
+                  className="flex-1 flex items-center gap-1.5 px-2 py-1 text-[10px] font-mono font-semibold rounded-md border text-left transition-all duration-150 min-w-0 hover:brightness-125"
                   style={{
                     borderColor: isActive ? 'var(--accent)' : 'var(--border)',
-                    backgroundColor: isActive ? 'var(--accent-dim)' : 'transparent',
+                    backgroundColor: isActive ? 'var(--accent-dim)' : 'var(--bg-surface, transparent)',
                     color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
                     boxShadow: isActive ? '0 0 8px var(--accent-dim)' : 'none',
                   }}
@@ -264,7 +264,7 @@ export function PresetSelector() {
       ) : (
         <button
           onClick={() => setSaving(true)}
-          className="flex items-center justify-center gap-1 px-2 py-1.5 text-[10px] font-mono rounded-md border border-dashed transition-all duration-150 hover:border-solid"
+          className="flex items-center justify-center gap-1 px-2 py-1.5 text-[10px] font-mono rounded-md border border-dashed transition-all duration-150 hover:border-solid hover:brightness-125"
           style={{
             borderColor: 'var(--border-mid, var(--border))',
             color: 'var(--text-muted)',
