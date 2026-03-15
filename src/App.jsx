@@ -18,6 +18,7 @@ import { useRef, useState, useEffect, useMemo } from 'react'
 import { useAlpacaBars } from './hooks/useAlpacaBars'
 import { useDailyBars } from './hooks/useDailyBars'
 import { useAlpacaSocket } from './hooks/useAlpacaSocket'
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import { useChartStore } from './store/useChartStore'
 import { TIMEFRAME_CONFIG } from './constants/chart'
 import { atr, getDailyRangeStatus } from './utils/indicators'
@@ -54,12 +55,13 @@ export default function App() {
   const indicators        = useChartStore((s) => s.indicators)
   const theme             = useChartStore((s) => s.theme)
 
-  const { data: bars, isLoading, isError, error, dataUpdatedAt } = useAlpacaBars()
+  const { data: bars, isLoading, isError, error, dataUpdatedAt, refetch } = useAlpacaBars()
   const { data: dailyBars } = useDailyBars()
   const selectedSymbol = useChartStore((s) => s.selectedSymbol)
 
   // Live WebSocket — connects during market hours, injects bars into TanStack cache
   useAlpacaSocket()
+  useKeyboardShortcuts()
 
   const tfConfig = TIMEFRAME_CONFIG[selectedTimeframe]
 
@@ -214,7 +216,13 @@ export default function App() {
                 <span className="text-gray-400 text-xs">
                   {error?.message ?? 'Failed to load bars from Alpaca.'}
                 </span>
-                <span className="text-gray-500 text-xs mt-2">
+                <button
+                  onClick={() => refetch()}
+                  className="mt-3 px-4 py-1.5 text-xs font-mono font-semibold rounded border border-gray-600 text-gray-300 hover:border-gray-500 hover:bg-gray-800/50 transition-colors"
+                >
+                  Retry
+                </button>
+                <span className="text-gray-500 text-xs mt-1">
                   Check your .env has valid Alpaca paper trading keys.
                 </span>
               </div>

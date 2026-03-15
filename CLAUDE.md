@@ -41,6 +41,7 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - Viewport persistence: `src/hooks/useViewportPersistence.js`
 - WebSocket live feed: `src/hooks/useAlpacaSocket.js` + `src/services/websocket.js`
 - RSI/MACD toggle + mini charts: `src/components/ui/IndicatorTabView.jsx`
+- Keyboard shortcuts (1-6 timeframes): `src/hooks/useKeyboardShortcuts.js`
 - Sidebar indicator toggles (overlays only): `src/components/ui/IndicatorToggle.jsx`
 - Alert system: `src/store/useAlertsStore.js` + `src/components/ui/NotificationBell.jsx`
 - App layout: `src/App.jsx`

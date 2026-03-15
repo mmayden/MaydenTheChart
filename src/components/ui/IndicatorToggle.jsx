@@ -29,9 +29,9 @@ export function IndicatorToggle() {
               'px-2 py-1 text-xs font-mono font-semibold rounded border transition-colors text-left',
               on
                 ? 'border-blue-500 bg-blue-950'
-                : 'border-gray-700 bg-transparent hover:border-gray-600',
+                : 'border-gray-700 bg-transparent hover:border-gray-600 hover:bg-gray-800/50',
             ].join(' ')}
-            style={{ color: on ? '#e8e0d0' : '#d1ccc4' }}
+            style={{ color: on ? 'var(--text-primary, #e8e0d0)' : 'var(--text-muted, #9ca3af)' }}
           >
             <span className="mr-1.5 opacity-50">{on ? '●' : '○'}</span>
             {label}

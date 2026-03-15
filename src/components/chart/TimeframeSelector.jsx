@@ -30,7 +30,7 @@ export function TimeframeSelector() {
               'px-2 py-1 text-xs font-mono font-semibold rounded border transition-colors text-left',
               active
                 ? 'border-blue-500 text-blue-300 bg-blue-950'
-                : 'border-gray-700 text-gray-300 bg-transparent hover:border-gray-600 hover:text-gray-300',
+                : 'border-gray-700 text-gray-300 bg-transparent hover:border-gray-600 hover:bg-gray-800/50',
             ].join(' ')}
           >
             {active && <span className="mr-1.5">▸</span>}

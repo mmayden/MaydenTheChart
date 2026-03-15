@@ -63,13 +63,13 @@ export function CrosshairLegend({ chart, bars, indicators, theme = 'dark' }) {
 
     const handler = (param) => {
       if (!param.time) {
-        el.style.display = 'none'
+        el.style.opacity = '0'
         return
       }
 
       const bar = barsRef.current?.find(b => b.time === param.time)
       if (!bar) {
-        el.style.display = 'none'
+        el.style.opacity = '0'
         return
       }
 
@@ -77,7 +77,7 @@ export function CrosshairLegend({ chart, bars, indicators, theme = 'dark' }) {
       const closeClr  = bullish ? '#22c55e' : '#ef4444'
       const dimColor  = '#9ca3af'
 
-      el.style.display = 'block'
+      el.style.opacity = '1'
       el.innerHTML = [
         `<span style="color:${dimColor}">${formatTimeET(param.time)}</span>`,
         `<span style="color:${dimColor}">O</span> ${formatPrice(bar.open)}`,
@@ -98,17 +98,18 @@ export function CrosshairLegend({ chart, bars, indicators, theme = 'dark' }) {
   return (
     <div
       ref={legendRef}
+      className="crosshair-legend"
       style={{
         position:        'absolute',
         top:             8,
         left:            8,
         zIndex:          10,
         pointerEvents:   'none',
-        display:         'none',
+        opacity:         0,
         fontFamily:      'ui-monospace, "Cascadia Code", "Fira Code", Menlo, monospace',
         fontSize:        11,
         lineHeight:      1,
-        color:           '#d1d5db',
+        color:           'var(--text-primary, #d1d5db)',
         backgroundColor: 'rgba(10, 10, 10, 0.75)',
         padding:         '4px 8px',
         borderRadius:    4,

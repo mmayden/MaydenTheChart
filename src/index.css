@@ -87,6 +87,22 @@ body,
 [data-theme="lumpia"] .hover\:bg-gray-800:hover   { background-color: var(--hover-bg) !important; }
 [data-theme="lumpia"] .hover\:border-gray-600:hover { border-color: var(--border-mid) !important; }
 
+/* ── Crosshair legend fade ─────────────────────────────────────────────── */
+
+.crosshair-legend {
+  transition: opacity 0.15s ease;
+}
+
+/* ── Symbol hover underline ───────────────────────────────────────────── */
+
+.symbol-display {
+  border-bottom: 1px dashed transparent;
+  transition: border-color 0.15s ease;
+}
+.symbol-display:hover {
+  border-bottom-color: var(--text-muted);
+}
+
 /* ── lightweight-charts overrides ───────────────────────────────────────── */
 
 /* Ensure the chart container fills its parent fully */

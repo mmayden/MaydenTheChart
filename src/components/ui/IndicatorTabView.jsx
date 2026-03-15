@@ -12,11 +12,12 @@ import { useEffect, useRef } from 'react'
 import { createChart, LineSeries, HistogramSeries } from 'lightweight-charts'
 import { rsi as calcRsi, macd as calcMacd } from '../../utils/indicators'
 import { useChartStore } from '../../store/useChartStore'
+import { CHART_BG_COLOR, GRID_COLOR, CROSSHAIR_COLOR } from '../../constants/chart'
 
 const MINI_CHART_OPTS = {
   layout: {
-    background: { color: '#0a0a0a' },
-    textColor:  '#6b7280',
+    background: { color: CHART_BG_COLOR },
+    textColor:  CROSSHAIR_COLOR,
     fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
   },
   grid: {
@@ -24,11 +25,11 @@ const MINI_CHART_OPTS = {
     horzLines: { color: '#111827' },
   },
   crosshair: {
-    vertLine: { color: '#374151', labelBackgroundColor: '#1f2937' },
-    horzLine: { color: '#374151', labelBackgroundColor: '#1f2937' },
+    vertLine: { color: CROSSHAIR_COLOR, labelBackgroundColor: GRID_COLOR },
+    horzLine: { color: CROSSHAIR_COLOR, labelBackgroundColor: GRID_COLOR },
   },
-  rightPriceScale: { borderColor: '#1f2937' },
-  timeScale:       { borderColor: '#1f2937', timeVisible: true, secondsVisible: false, visible: false },
+  rightPriceScale: { borderColor: GRID_COLOR },
+  timeScale:       { borderColor: GRID_COLOR, timeVisible: true, secondsVisible: false, visible: false },
   handleScroll:    false,
   handleScale:     false,
 }
@@ -146,10 +147,10 @@ export function IndicatorTabView({ bars }) {
               key={tab}
               onClick={() => toggleIndicator(key)}
               className={[
-                'px-2.5 py-0.5 text-[10px] font-mono rounded border transition-colors tracking-widest',
+                'px-2 py-1 text-xs font-mono font-semibold rounded border transition-colors',
                 on
                   ? 'border-blue-500 text-blue-300 bg-blue-950'
-                  : 'border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600',
+                  : 'border-gray-700 text-gray-400 hover:text-gray-300 hover:border-gray-600 hover:bg-gray-800/50',
               ].join(' ')}
             >
               {tab}

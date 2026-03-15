@@ -23,6 +23,7 @@ import { useChartStore } from '../../store/useChartStore'
 import {
   CHART_BG_COLOR,
   GRID_COLOR,
+  CROSSHAIR_COLOR,
   VOLUME_UP_COLOR,
   VOLUME_DOWN_COLOR,
 } from '../../constants/chart'
@@ -62,8 +63,8 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
         horzLines:   { color: GRID_COLOR },
       },
       crosshair: {
-        vertLine: { color: '#6b7280', labelBackgroundColor: '#374151' },
-        horzLine: { color: '#6b7280', labelBackgroundColor: '#374151' },
+        vertLine: { color: CROSSHAIR_COLOR, labelBackgroundColor: GRID_COLOR },
+        horzLine: { color: CROSSHAIR_COLOR, labelBackgroundColor: GRID_COLOR },
       },
       rightPriceScale: {
         borderColor: GRID_COLOR,
@@ -179,7 +180,7 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
     <div className="relative w-full h-full">
       <div ref={containerRef} className="w-full h-full" />
       {/* Volume section label — sits above the volume bars (bottom ~15% of chart) */}
-      <div className="absolute left-2 bottom-[17%] text-[9px] text-gray-600 font-mono pointer-events-none select-none">
+      <div className="absolute left-2 bottom-[17%] text-[10px] text-gray-500 font-mono pointer-events-none select-none">
         VOL
       </div>
       {children}

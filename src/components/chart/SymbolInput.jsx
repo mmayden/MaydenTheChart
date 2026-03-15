@@ -232,15 +232,7 @@ export function SymbolInput() {
         title="Click to change symbol"
         className="text-left w-full flex items-center gap-1.5 group cursor-text"
       >
-        <span
-          style={{
-            ...SYMBOL_FONT,
-            borderBottom: '1px dashed transparent',
-            transition: 'border-color 0.15s',
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.borderBottomColor = 'var(--text-muted)'}
-          onMouseLeave={(e) => e.currentTarget.style.borderBottomColor = 'transparent'}
-        >
+        <span className="symbol-display" style={SYMBOL_FONT}>
           {selectedSymbol}
         </span>
       </button>

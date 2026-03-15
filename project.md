@@ -200,6 +200,7 @@ Component state (useState — local only):
 | `src/components/ui/ToastContainer.jsx` | Fixed bottom-right toast notification renderer |
 | `src/hooks/useToast.js` | Zustand toast notification store (add/remove/auto-dismiss) |
 | `src/hooks/useViewportPersistence.js` | Preserves chart zoom/scroll across live data updates |
+| `src/hooks/useKeyboardShortcuts.js` | Global keyboard shortcuts (1-6 for timeframes) |
 | `src/constants/chart.js` | All colors, periods, timeframe configs |
 | `src/main.jsx` | App entry: QueryClientProvider, validateEnv() call |
 | `src/App.jsx` | Root layout and routing |
@@ -246,3 +247,4 @@ Component state (useState — local only):
 | 2026-03-14 | Indicator deep assessment: 6 fixes — VWAP ET timezone for day reset, ATR %-based strength thresholds, RVOL candle-direction bias, MACD return shape contract, byDay dedup optimization, 32 new levels tests. ODC color amber dashed. 77/77 tests. |
 | 2026-03-14 | QOL phase: CrosshairLegend (OHLCV on hover, ref-based zero-rerender), useToast + ToastContainer (slide-in notifications), useViewportPersistence (preserves zoom during live updates), smooth loading overlay, symbol change toasts. feature-ideas.md for keyboard shortcuts. 77/77 tests, build clean. |
 | 2026-03-15 | UX cleanup: RSI/MACD removed from sidebar IndicatorToggle, now toggled via tab buttons in IndicatorTabView. Removed dead `ui.rsiPaneVisible`/`macdPaneVisible` state from Zustand store. Fixed stale doc references (RSIChart.jsx, MACDChart.jsx, rsi signature). Beta branding: browser tab → "Beta Cheechart", logo shows BETA superscript badge. 77/77 tests, build clean. |
+| 2026-03-15 | QOL polish: unified sidebar button hover states (bg-gray-800/50), bumped RSI/MACD tab + VOL label contrast, crosshair legend fade transition, error retry button, status bar shows data source (WebSocket/Polling), color variable cleanup (CROSSHAIR_COLOR constant, CSS theme vars), symbol input hover via CSS class, keyboard shortcuts (1-6 for timeframes via useKeyboardShortcuts hook). 77/77 tests, build clean. |
