@@ -132,8 +132,6 @@ export function IndicatorTabView({ bars }) {
   const macdEnabled     = useChartStore((s) => s.indicators.macd)
   const toggleIndicator = useChartStore((s) => s.toggleIndicator)
 
-  const anyVisible = rsiEnabled || macdEnabled
-
   if (!bars?.length) return null
 
   return (
@@ -160,11 +158,15 @@ export function IndicatorTabView({ bars }) {
         })}
       </div>
 
-      {/* Mini chart area — only rendered when at least one is on */}
-      {anyVisible && (
+      {/* Mini chart areas — each gets its own 82px slot */}
+      {rsiEnabled && (
         <div className="w-full bg-[#0a0a0a]" style={{ height: 82 }}>
-          {rsiEnabled  && <RSIMiniChart  bars={bars} />}
-          {macdEnabled && <MACDMiniChart bars={bars} />}
+          <RSIMiniChart bars={bars} />
+        </div>
+      )}
+      {macdEnabled && (
+        <div className="w-full bg-[#0a0a0a]" style={{ height: 82 }}>
+          <MACDMiniChart bars={bars} />
         </div>
       )}
     </div>
