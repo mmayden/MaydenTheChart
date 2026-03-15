@@ -75,12 +75,12 @@ export function LevelOverlay({ chart, candleSeries, bars, showORB = true, visibl
       })
     }
 
-    // Open of Day Candle — white line scoped to today's session only
+    // Open of Day Candle — amber dashed line scoped to today's session only
     if (odc && chart && visible) {
       const odcSeries = chart.addSeries(LineSeries, {
         color:                  ODC_COLOR,
         lineWidth:              1,
-        lineStyle:              0,   // solid
+        lineStyle:              2,   // dashed
         priceLineVisible:       false,
         lastValueVisible:       true,
         crosshairMarkerVisible: false,

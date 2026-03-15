@@ -17,7 +17,7 @@ export const VWAP_BAND2_COLOR = '#0e7490'  // darkest cyan — 2σ bands
 
 // ─── Level colors ─────────────────────────────────────────────────────────────
 export const PREV_LEVEL_COLOR = '#eab308'  // gold — prev day H/L
-export const ODC_COLOR        = '#f3f4f6'  // near-white — open of day candle
+export const ODC_COLOR        = '#f59e0b'  // amber — open of day candle
 export const ORB_COLOR        = '#6366f1'  // indigo — ORB zone
 
 // ─── Volume colors (candle-direction: green up / red down) ───────────────────
