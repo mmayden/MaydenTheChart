@@ -251,26 +251,20 @@ body,
   100% { transform: rotate(0); }
 }
 
-/* Watchlist — slide down */
-.nav-btn-watchlist svg { transition: transform 0.25s ease; }
-.nav-btn-watchlist:hover svg { transform: translateY(1.5px); }
+/* Watchlist — list expands outward */
+.nav-btn-watchlist svg { transition: transform 0.3s ease; }
+.nav-btn-watchlist:hover svg { transform: scaleY(1.15) scaleX(1.05); }
 
-/* Backtest pulse — heartbeat */
-.nav-btn-backtest svg { transition: transform 0.25s ease; }
-.nav-btn-backtest:hover svg {
-  animation: pulse-beat 0.6s ease;
-}
-@keyframes pulse-beat {
-  0%   { transform: scale(1); }
-  30%  { transform: scale(1.2); }
-  50%  { transform: scale(0.95); }
-  70%  { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
+/* Backtest — graph line stretches wider */
+.nav-btn-backtest svg { transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); }
+.nav-btn-backtest:hover svg { transform: scaleX(1.2) scaleY(1.05); }
 
-/* Journal — tilt like opening a page */
-.nav-btn-journal svg { transition: transform 0.3s ease; }
-.nav-btn-journal:hover svg { transform: rotate(-8deg) scale(1.05); }
+/* Journal — book cracks open */
+.nav-btn-journal svg {
+  transition: transform 0.3s ease;
+  transform-origin: left center;
+}
+.nav-btn-journal:hover svg { transform: perspective(80px) rotateY(-12deg) scale(1.05); }
 
 /* Command palette search — zoom */
 .nav-btn-search svg { transition: transform 0.25s ease; }
