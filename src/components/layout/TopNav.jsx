@@ -126,8 +126,9 @@ export function TopNav() {
       <button
         data-tour="cmd-k"
         onClick={() => setCommandPaletteOpen(true)}
-        className="flex items-center justify-center w-7 h-7 rounded nav-icon hover:bg-theme-hover transition-colors touch-target"
-        title="Search (⌘K)"
+        className="flex items-center justify-center w-7 h-7 rounded hover:bg-theme-hover transition-colors touch-target"
+        style={{ color: 'var(--cmd-palette-color)' }}
+        title="Command Palette (⌘K)"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
           <circle cx="11" cy="11" r="8" />
