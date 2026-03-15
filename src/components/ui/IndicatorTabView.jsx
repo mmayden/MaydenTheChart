@@ -20,7 +20,7 @@ export function IndicatorTabView({ bars }) {
   if (!bars?.length) return null
 
   return (
-    <div className="shrink-0 border-t border-theme">
+    <div className="shrink-0 border-t border-theme overflow-hidden">
       {/* Tab buttons — always visible, clicking toggles on/off */}
       <div className="flex items-center gap-1 px-3 py-1.5 border-b border-theme" style={{ backgroundColor: 'var(--bg-surface, #0d1117)' }}>
         {['RSI', 'MACD'].map((tab) => {
@@ -45,12 +45,12 @@ export function IndicatorTabView({ bars }) {
 
       {/* Mini chart areas — each gets its own 82px slot */}
       {rsiEnabled && (
-        <div className="w-full" style={{ backgroundColor: 'var(--bg-base)', height: 82 }}>
+        <div className="w-full overflow-hidden" style={{ backgroundColor: 'var(--bg-base)', height: 82 }}>
           <RSIMiniChart bars={bars} />
         </div>
       )}
       {macdEnabled && (
-        <div className="w-full" style={{ backgroundColor: 'var(--bg-base)', height: 82 }}>
+        <div className="w-full overflow-hidden" style={{ backgroundColor: 'var(--bg-base)', height: 82 }}>
           <MACDMiniChart bars={bars} />
         </div>
       )}
