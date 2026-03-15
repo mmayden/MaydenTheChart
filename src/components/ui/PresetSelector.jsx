@@ -25,6 +25,7 @@ export function PresetSelector() {
   const [saveName, setSaveName]   = useState('')
   const [editingId, setEditingId] = useState(null)
   const [editName, setEditName]   = useState('')
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
   const saveInputRef = useRef(null)
   const editInputRef = useRef(null)
 
@@ -44,6 +45,7 @@ export function PresetSelector() {
 
   function handleApply(id) {
     if (id === activePresetId) return
+    setConfirmDeleteId(null)
     applyPreset(id)
     const preset = presets.find((p) => p.id === id)
     toast.add({ message: `Switched to ${preset?.name ?? 'preset'}`, type: 'info', duration: 2000 })
@@ -67,8 +69,13 @@ export function PresetSelector() {
   }
 
   function handleDelete(id) {
+    if (confirmDeleteId !== id) {
+      setConfirmDeleteId(id)
+      return
+    }
     const preset = presets.find((p) => p.id === id)
     deletePreset(id)
+    setConfirmDeleteId(null)
     toast.add({ message: `Deleted "${preset?.name}"`, type: 'warning', duration: 3000 })
   }
 
@@ -167,24 +174,47 @@ export function PresetSelector() {
                   <span className="truncate">{preset.name}</span>
                 </button>
 
-                {/* Manage icons — visible on hover */}
-                <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                  <button
-                    onClick={() => { setEditingId(preset.id); setEditName(preset.name) }}
-                    className="p-0.5 rounded text-[10px] transition-colors"
-                    style={{ color: 'var(--text-muted)' }}
-                    title="Rename"
-                  >
-                    ✎
-                  </button>
-                  <button
-                    onClick={() => handleDelete(preset.id)}
-                    className="p-0.5 rounded text-[10px] transition-colors hover:text-red-400"
-                    style={{ color: 'var(--text-muted)' }}
-                    title="Delete"
-                  >
-                    ✕
-                  </button>
+                {/* Manage icons */}
+                <div className="flex gap-0.5 shrink-0">
+                  {confirmDeleteId === preset.id ? (
+                    <>
+                      <button
+                        onClick={() => handleDelete(preset.id)}
+                        className="px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold transition-colors"
+                        style={{ backgroundColor: 'rgba(239,68,68,0.2)', color: '#f87171' }}
+                        title="Confirm delete"
+                      >
+                        Delete?
+                      </button>
+                      <button
+                        onClick={() => setConfirmDeleteId(null)}
+                        className="px-1 py-0.5 rounded text-[9px] font-mono transition-colors"
+                        style={{ color: 'var(--text-muted)' }}
+                        title="Cancel"
+                      >
+                        ✕
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => { setEditingId(preset.id); setEditName(preset.name); setConfirmDeleteId(null) }}
+                        className="px-1 py-0.5 rounded text-[11px] transition-colors hover:brightness-150"
+                        style={{ color: 'var(--text-secondary, var(--text-muted))' }}
+                        title="Rename"
+                      >
+                        ✎
+                      </button>
+                      <button
+                        onClick={() => handleDelete(preset.id)}
+                        className="px-1 py-0.5 rounded text-[11px] transition-colors hover:text-red-400"
+                        style={{ color: 'var(--text-secondary, var(--text-muted))' }}
+                        title="Delete"
+                      >
+                        ✕
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             )

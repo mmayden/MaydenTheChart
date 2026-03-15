@@ -34,6 +34,19 @@ const SCHEMES = [
       accent:  '#C85818',
     },
   },
+  {
+    id: 'terminal',
+    name: 'Terminal',
+    description: 'Phosphor green on black — old-school CRT',
+    preview: {
+      bg:      '#000000',
+      surface: '#050a05',
+      border:  '#0a3a0a',
+      text:    '#33ff33',
+      muted:   '#1a7a1a',
+      accent:  '#00ff41',
+    },
+  },
 ]
 
 function SchemeCard({ scheme, active, onSelect }) {
@@ -130,7 +143,7 @@ export function SettingsModal({ onClose }) {
         onClick={(e) => e.stopPropagation()}
         data-theme={theme}
         style={{
-          width: 520,
+          width: 680,
           maxWidth: 'calc(100vw - 32px)',
           maxHeight: 'calc(100vh - 48px)',
           overflowY: 'auto',
@@ -175,7 +188,7 @@ export function SettingsModal({ onClose }) {
             <div style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 14 }}>
               Color Scheme
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
               {SCHEMES.map((s) => (
                 <SchemeCard
                   key={s.id}
