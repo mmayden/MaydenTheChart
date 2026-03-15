@@ -1,15 +1,19 @@
 /**
- * SymbolInput — Editable ticker input with live Alpaca validation.
+ * SymbolInput — Editable ticker input with autocomplete and Alpaca validation.
  *
- * Click the symbol to edit. Type any ticker, press Enter to submit.
- * Validates against Alpaca by fetching a small sample of bars — if
- * data comes back, the symbol is valid. If not, shows a brief error
- * message and reverts to the previous symbol.
+ * Click the symbol to edit. As you type, a dropdown shows matching suggestions
+ * sorted by usage frequency (most-selected first). Press Enter or click a
+ * suggestion to submit. Validates against Alpaca — if data comes back, the
+ * symbol is valid. If not, shows a brief error and reverts.
+ *
+ * Usage frequency is tracked in localStorage so frequently-used symbols
+ * float to the top across sessions.
  */
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { useChartStore } from '../../store/useChartStore'
 import { fetchBars } from '../../services/alpaca'
+import { SYMBOL_SUGGESTIONS } from '../../constants/chart'
 
 const SYMBOL_FONT = {
   fontFamily: "'Inter', sans-serif",
@@ -17,6 +21,27 @@ const SYMBOL_FONT = {
   fontWeight: 800,
   letterSpacing: '0.12em',
   color: 'var(--text-primary)',
+}
+
+const USAGE_KEY = 'cheechart-symbol-usage'
+const MAX_SUGGESTIONS = 8
+
+/** Read usage counts from localStorage. */
+function getUsageCounts() {
+  try {
+    return JSON.parse(localStorage.getItem(USAGE_KEY)) ?? {}
+  } catch {
+    return {}
+  }
+}
+
+/** Increment usage count for a symbol. */
+function recordUsage(symbol) {
+  const counts = getUsageCounts()
+  counts[symbol] = (counts[symbol] ?? 0) + 1
+  try {
+    localStorage.setItem(USAGE_KEY, JSON.stringify(counts))
+  } catch { /* quota exceeded — non-critical */ }
 }
 
 export function SymbolInput() {
@@ -27,7 +52,21 @@ export function SymbolInput() {
   const [draft, setDraft]           = useState(selectedSymbol)
   const [validating, setValidating] = useState(false)
   const [error, setError]           = useState(null)
-  const inputRef = useRef(null)
+  const [highlightIdx, setHighlightIdx] = useState(-1)
+  const inputRef    = useRef(null)
+  const dropdownRef = useRef(null)
+
+  // Filter + sort suggestions by draft text and usage frequency
+  const suggestions = useMemo(() => {
+    const q = draft.trim().toUpperCase()
+    if (!q) return []
+
+    const counts = getUsageCounts()
+    return SYMBOL_SUGGESTIONS
+      .filter((s) => s.startsWith(q) && s !== q)
+      .sort((a, b) => (counts[b] ?? 0) - (counts[a] ?? 0))
+      .slice(0, MAX_SUGGESTIONS)
+  }, [draft])
 
   // Focus + select all when entering edit mode
   useEffect(() => {
@@ -44,6 +83,11 @@ export function SymbolInput() {
     return () => clearTimeout(id)
   }, [error])
 
+  // Reset highlight when suggestions change
+  useEffect(() => {
+    setHighlightIdx(-1)
+  }, [suggestions])
+
   function startEditing() {
     setDraft(selectedSymbol)
     setError(null)
@@ -55,8 +99,8 @@ export function SymbolInput() {
     setDraft(selectedSymbol)
   }
 
-  async function submit() {
-    const cleaned = draft.trim().toUpperCase()
+  const submit = useCallback(async (symbol) => {
+    const cleaned = (symbol ?? draft).trim().toUpperCase()
 
     // No change or empty — just close
     if (!cleaned || cleaned === selectedSymbol) {
@@ -70,10 +114,11 @@ export function SymbolInput() {
     setError(null)
     try {
       const now = new Date()
-      const start = new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000) // 5 days back
+      const start = new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000)
       const bars = await fetchBars(cleaned, '1Day', start.toISOString(), now.toISOString(), 5)
 
       if (bars.length > 0) {
+        recordUsage(cleaned)
         setSymbol(cleaned)
         setEditing(false)
       } else {
@@ -88,21 +133,42 @@ export function SymbolInput() {
     } finally {
       setValidating(false)
     }
-  }
+  }, [draft, selectedSymbol, setSymbol])
 
   function handleKeyDown(e) {
+    // Arrow navigation within dropdown
+    if (suggestions.length > 0) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setHighlightIdx((i) => Math.min(i + 1, suggestions.length - 1))
+        return
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setHighlightIdx((i) => Math.max(i - 1, -1))
+        return
+      }
+    }
+
     if (e.key === 'Enter') {
       e.preventDefault()
-      submit()
+      // If a suggestion is highlighted, use it; otherwise use typed text
+      const target = highlightIdx >= 0 ? suggestions[highlightIdx] : draft
+      submit(target)
     } else if (e.key === 'Escape') {
       cancel()
     }
   }
 
-  // Editing state — show input
+  function handleSuggestionMouseDown(symbol) {
+    // mouseDown instead of click so it fires before onBlur
+    submit(symbol)
+  }
+
+  // Editing state — show input + dropdown
   if (editing) {
     return (
-      <div>
+      <div className="relative">
         <div className="flex items-center gap-1.5">
           <input
             ref={inputRef}
@@ -122,6 +188,34 @@ export function SymbolInput() {
             <div className="w-3 h-3 border border-blue-500 border-t-transparent rounded-full animate-spin shrink-0" />
           )}
         </div>
+
+        {/* Autocomplete dropdown */}
+        {suggestions.length > 0 && !validating && (
+          <div
+            ref={dropdownRef}
+            className="absolute left-0 right-0 mt-1 rounded border border-gray-700 overflow-hidden z-50 shadow-lg"
+            style={{ backgroundColor: 'var(--bg-surface)' }}
+          >
+            {suggestions.map((sym, i) => (
+              <div
+                key={sym}
+                onMouseDown={() => handleSuggestionMouseDown(sym)}
+                onMouseEnter={() => setHighlightIdx(i)}
+                className="px-2 py-1 cursor-pointer text-xs font-mono tracking-wider transition-colors"
+                style={{
+                  backgroundColor: i === highlightIdx ? 'var(--bg-hover, rgba(255,255,255,0.08))' : 'transparent',
+                  color: i === highlightIdx ? 'var(--text-primary)' : 'var(--text-muted)',
+                }}
+              >
+                {/* Highlight the matching prefix */}
+                <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>
+                  {sym.slice(0, draft.trim().length)}
+                </span>
+                <span>{sym.slice(draft.trim().length)}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     )
   }

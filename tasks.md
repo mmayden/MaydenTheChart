@@ -136,6 +136,21 @@
 
 ---
 
+## ✅ Phase 7a.1 — Symbol Autocomplete — COMPLETE
+
+- ✅ `src/constants/chart.js` — `SYMBOL_SUGGESTIONS` array (~80 popular tickers, suggestion-only, not a restriction)
+- ✅ `src/components/chart/SymbolInput.jsx` — autocomplete dropdown with:
+  - Prefix-match filtering as user types
+  - Usage frequency sorting (most-selected symbols first)
+  - localStorage persistence (`cheechart-symbol-usage`)
+  - Arrow key navigation + Enter to select
+  - Bold matched prefix in suggestions
+  - Max 8 visible suggestions
+  - Alpaca validation still gates final submission
+- ✅ 45/45 tests passing, build clean
+
+---
+
 ## 🔲 Phase 7b — Stretch Goals
 
 - 🔲 `src/utils/backtest.js` — replay historical days using same indicator math, output win rate / R:R / by day type

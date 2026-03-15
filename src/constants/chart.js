@@ -113,3 +113,29 @@ export const TIMEFRAME_ORDER = ['1Min', '5Min', '15Min', '1Hour', '4Hour', '1Day
 // ─── Default symbol ───────────────────────────────────────────────────────────
 export const DEFAULT_SYMBOL    = 'QQQ'
 export const DEFAULT_TIMEFRAME = '5Min'
+
+// ─── Symbol suggestions (autocomplete only — not a restriction) ─────────────
+// Any symbol can be typed and validated via Alpaca. This list just powers
+// the autocomplete dropdown for fast access to popular tickers.
+export const SYMBOL_SUGGESTIONS = [
+  // Major indices / ETFs
+  'QQQ', 'SPY', 'IWM', 'DIA', 'VTI', 'VOO',
+  // Leveraged ETFs
+  'TQQQ', 'SQQQ', 'SPXL', 'SPXS', 'UPRO', 'SDOW',
+  // Sector ETFs
+  'XLF', 'XLE', 'XLK', 'XLV', 'XLI', 'XLP', 'XLU', 'XLRE', 'XLC', 'XLB', 'XLY',
+  // Mega caps
+  'AAPL', 'MSFT', 'AMZN', 'GOOGL', 'GOOG', 'META', 'NVDA', 'TSLA', 'BRK.B',
+  // Semi / AI
+  'AMD', 'INTC', 'AVGO', 'QCOM', 'MU', 'ARM', 'SMCI', 'MRVL',
+  // Financials
+  'JPM', 'GS', 'MS', 'BAC', 'WFC', 'C', 'V', 'MA',
+  // Energy
+  'XOM', 'CVX', 'COP', 'SLB', 'USO',
+  // Other popular
+  'NFLX', 'DIS', 'PYPL', 'SQ', 'COIN', 'HOOD', 'PLTR', 'SOFI',
+  'BA', 'CAT', 'UNH', 'JNJ', 'PFE', 'LLY', 'ABBV',
+  'CRM', 'ORCL', 'ADBE', 'NOW', 'SNOW',
+  // Volatility / bonds
+  'VIX', 'TLT', 'HYG', 'GLD', 'SLV',
+]
