@@ -65,7 +65,7 @@ export function TopNav() {
       {/* Sidebar toggle */}
       <button
         onClick={toggleSidebar}
-        className="flex items-center justify-center w-8 h-8 rounded text-theme-muted hover:text-theme hover:bg-theme-hover transition-colors touch-target"
+        className="flex items-center justify-center w-8 h-8 rounded nav-icon hover:bg-theme-hover transition-colors touch-target"
         title="Toggle sidebar"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -87,9 +87,10 @@ export function TopNav() {
             onClick={() => setActivePanel(id)}
             className={`flex items-center justify-center w-8 h-8 rounded transition-colors touch-target ${
               activePanel === id
-                ? 'bg-blue-500/10 text-accent'
-                : 'text-theme-muted hover:text-theme hover:bg-theme-hover'
+                ? 'text-accent'
+                : 'nav-icon hover:bg-theme-hover'
             }`}
+            style={activePanel === id ? { backgroundColor: 'var(--nav-active-bg)' } : undefined}
             title={title}
           >
             {icon}
@@ -99,11 +100,11 @@ export function TopNav() {
         {/* Alerts bell (with badge) */}
         <button
           onClick={() => setActivePanel('alerts')}
-          className={`relative flex items-center justify-center w-8 h-8 rounded transition-colors touch-target ${
-            activePanel === 'alerts'
-              ? 'bg-yellow-500/10 text-yellow-300'
-              : 'text-yellow-400 hover:bg-theme-hover hover:text-yellow-300'
-          }`}
+          className="relative flex items-center justify-center w-8 h-8 rounded transition-colors touch-target hover:bg-theme-hover"
+          style={{
+            color: 'var(--alert-color)',
+            backgroundColor: activePanel === 'alerts' ? 'var(--alert-active-bg)' : undefined,
+          }}
           title="Alerts"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="w-4 h-4">
@@ -126,7 +127,7 @@ export function TopNav() {
       <button
         data-tour="cmd-k"
         onClick={() => setCommandPaletteOpen(true)}
-        className="flex items-center justify-center w-7 h-7 rounded text-theme-muted hover:text-theme hover:bg-theme-hover transition-colors touch-target"
+        className="flex items-center justify-center w-7 h-7 rounded nav-icon hover:bg-theme-hover transition-colors touch-target"
         title="Search (⌘K)"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -138,7 +139,7 @@ export function TopNav() {
       {/* Settings */}
       <button
         onClick={() => setSettingsOpen(true)}
-        className="flex items-center justify-center w-7 h-7 rounded text-theme-muted hover:text-theme hover:bg-theme-hover transition-colors touch-target"
+        className="flex items-center justify-center w-7 h-7 rounded nav-icon hover:bg-theme-hover transition-colors touch-target"
         title="Settings"
       >
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -57,7 +57,7 @@ export function WatchlistPanel() {
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-theme shrink-0">
         <span className="text-[11px] text-theme-muted">{symbols.length} symbols</span>
         {isLoading && (
-          <div className="w-3 h-3 border border-blue-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-3 h-3 border border-accent border-t-transparent rounded-full animate-spin" />
         )}
       </div>
 
@@ -116,13 +116,13 @@ export function WatchlistPanel() {
           value={newSymbol}
           onChange={(e) => setNewSymbol(e.target.value)}
           placeholder="Add symbol..."
-          className="flex-1 bg-[#0a0a0a] border border-theme-mid rounded px-2 py-1.5 text-xs text-theme placeholder-theme-muted focus:outline-none focus:border-accent font-mono"
+          className="flex-1 bg-input border border-theme-mid rounded px-2 py-1.5 text-xs text-theme placeholder-theme-muted focus:outline-none focus:border-accent font-mono"
           maxLength={10}
         />
         <button
           type="submit"
           disabled={!newSymbol.trim()}
-          className="px-3 py-1.5 text-xs font-semibold rounded bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white transition-colors"
+          className="px-3 py-1.5 text-xs font-semibold rounded btn-primary disabled:opacity-40 text-white transition-colors"
         >
           Add
         </button>

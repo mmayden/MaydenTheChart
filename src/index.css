@@ -50,6 +50,15 @@ body,
   --accent:       #60a5fa;
   --accent-dim:   #172554;
   --symbol-color: #ffffff;
+  --nav-icon:     #8b95a5;
+  --nav-icon-hover: #c9d1d9;
+  --nav-active-bg: rgba(96,165,250,0.10);
+  --alert-color:  #e5a54b;
+  --alert-active-bg: rgba(229,165,75,0.10);
+  --btn-primary:  #2563eb;
+  --btn-primary-hover: #3b82f6;
+  --input-bg:     #0a0a0a;
+  --focus-ring:   #3b82f6;
 }
 
 [data-theme="terminal"] {
@@ -63,6 +72,15 @@ body,
   --accent:       #50d050;
   --accent-dim:   #0a280a;
   --symbol-color: #c8f0c8;
+  --nav-icon:     #5a8a5a;
+  --nav-icon-hover: #90c890;
+  --nav-active-bg: rgba(80,208,80,0.10);
+  --alert-color:  #b8a040;
+  --alert-active-bg: rgba(184,160,64,0.10);
+  --btn-primary:  #1a6b1a;
+  --btn-primary-hover: #228b22;
+  --input-bg:     #060806;
+  --focus-ring:   #50d050;
 }
 
 [data-theme="lumpia"] {
@@ -76,6 +94,15 @@ body,
   --accent:       #C85818;
   --accent-dim:   #481808;
   --symbol-color: #e8d8c0;
+  --nav-icon:     #a08868;
+  --nav-icon-hover: #c8b090;
+  --nav-active-bg: rgba(200,88,24,0.10);
+  --alert-color:  #c8a040;
+  --alert-active-bg: rgba(200,160,64,0.10);
+  --btn-primary:  #a04010;
+  --btn-primary-hover: #c85818;
+  --input-bg:     #080808;
+  --focus-ring:   #C85818;
 }
 
 /* Shell backgrounds (root + sidebar) — set via inline style in components */
@@ -103,6 +130,24 @@ body,
 .hover\:bg-theme-hover:hover     { background-color: var(--hover-bg); }
 .hover\:text-theme:hover         { color: var(--text-primary); }
 .hover\:border-theme-mid:hover   { border-color: var(--border-mid); }
+
+/* Nav icon colors — themed resting + hover states */
+.nav-icon       { color: var(--nav-icon); }
+.nav-icon:hover { color: var(--nav-icon-hover); }
+
+/* Primary action buttons */
+.btn-primary {
+  background-color: var(--btn-primary);
+  color: #fff;
+  transition: background-color 150ms ease;
+}
+.btn-primary:hover { background-color: var(--btn-primary-hover); }
+
+/* Form input backgrounds */
+.bg-input { background-color: var(--input-bg); }
+
+/* Focus ring — themed */
+.focus\:border-accent:focus { border-color: var(--accent); }
 
 /* ── Crosshair legend fade ─────────────────────────────────────────────── */
 

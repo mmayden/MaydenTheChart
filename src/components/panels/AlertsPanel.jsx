@@ -83,13 +83,13 @@ export function AlertsPanel() {
               onClick={() => setAlertType(val)}
               className={`flex-1 py-2.5 text-xs font-medium transition-colors flex items-center justify-center gap-1.5 ${
                 alertType === val
-                  ? 'text-accent border-b-2 border-accent -mb-px bg-blue-500/5'
+                  ? 'text-accent border-b-2 border-accent -mb-px bg-accent-dim'
                   : 'text-theme-muted hover:text-theme'
               }`}
             >
               {label}
               {tabCount > 0 && (
-                <span className="flex items-center justify-center w-4 h-4 rounded-full bg-blue-500/20 text-accent text-[9px] font-bold">
+                <span className="flex items-center justify-center w-4 h-4 rounded-full bg-accent-dim text-accent text-[9px] font-bold">
                   {tabCount}
                 </span>
               )}
@@ -109,12 +109,12 @@ export function AlertsPanel() {
               placeholder="Price"
               value={priceInput}
               onChange={(e) => setPriceInput(e.target.value)}
-              className="flex-1 bg-[#0a0a0a] border border-theme-mid rounded px-2 py-1.5 text-xs text-theme placeholder-theme-muted focus:outline-none focus:border-accent font-mono"
+              className="flex-1 bg-input border border-theme-mid rounded px-2 py-1.5 text-xs text-theme placeholder-theme-muted focus:outline-none focus:border-accent font-mono"
             />
             <select
               value={condition}
               onChange={(e) => setCondition(e.target.value)}
-              className="bg-[#0a0a0a] border border-theme-mid rounded px-2 py-1.5 text-xs text-theme focus:outline-none focus:border-accent"
+              className="bg-input border border-theme-mid rounded px-2 py-1.5 text-xs text-theme focus:outline-none focus:border-accent"
             >
               <option value="above">Above</option>
               <option value="below">Below</option>
@@ -126,7 +126,7 @@ export function AlertsPanel() {
               Alert when N candles close in a row of the same color.
             </p>
             <div className="flex gap-2">
-              <div className="flex items-center gap-1.5 flex-1 bg-[#0a0a0a] border border-theme-mid rounded px-2 py-1.5">
+              <div className="flex items-center gap-1.5 flex-1 bg-input border border-theme-mid rounded px-2 py-1.5">
                 <input
                   type="number"
                   min="2"
@@ -140,7 +140,7 @@ export function AlertsPanel() {
               <select
                 value={streakDir}
                 onChange={(e) => setStreakDir(e.target.value)}
-                className="bg-[#0a0a0a] border border-theme-mid rounded px-2 py-1.5 text-xs text-theme focus:outline-none focus:border-accent"
+                className="bg-input border border-theme-mid rounded px-2 py-1.5 text-xs text-theme focus:outline-none focus:border-accent"
               >
                 <option value="either">Either color</option>
                 <option value="green">Green only</option>
@@ -163,7 +163,7 @@ export function AlertsPanel() {
         <button
           type="submit"
           disabled={!canSubmit}
-          className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold py-2 rounded transition-colors"
+          className="w-full btn-primary disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold py-2 rounded"
         >
           Set Alert
         </button>

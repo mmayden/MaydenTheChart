@@ -180,7 +180,7 @@ export function BacktestPanel() {
                 type="checkbox"
                 checked={volumeFilter}
                 onChange={(e) => setVolumeFilter(e.target.checked)}
-                className="accent-blue-500"
+                style={{ accentColor: 'var(--accent)' }}
               />
               Require RVOL ≥ 1.5x
             </label>
@@ -191,7 +191,7 @@ export function BacktestPanel() {
                 type="checkbox"
                 checked={requireTrend}
                 onChange={(e) => setRequireTrend(e.target.checked)}
-                className="accent-blue-500"
+                style={{ accentColor: 'var(--accent)' }}
               />
               Require aligned day type
             </label>

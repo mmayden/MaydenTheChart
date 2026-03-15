@@ -45,12 +45,12 @@ export function IndicatorTabView({ bars }) {
 
       {/* Mini chart areas — each gets its own 82px slot */}
       {rsiEnabled && (
-        <div className="w-full bg-[#0a0a0a]" style={{ height: 82 }}>
+        <div className="w-full" style={{ backgroundColor: 'var(--bg-base)', height: 82 }}>
           <RSIMiniChart bars={bars} />
         </div>
       )}
       {macdEnabled && (
-        <div className="w-full bg-[#0a0a0a]" style={{ height: 82 }}>
+        <div className="w-full" style={{ backgroundColor: 'var(--bg-base)', height: 82 }}>
           <MACDMiniChart bars={bars} />
         </div>
       )}

@@ -167,7 +167,7 @@ export function JournalPanel() {
           )}
           <button
             onClick={() => setShowForm(!showForm)}
-            className="px-2.5 py-1 text-[11px] font-semibold rounded bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+            className="px-2.5 py-1 text-[11px] font-semibold rounded btn-primary text-white transition-colors"
           >
             {showForm ? 'Cancel' : '+ Log'}
           </button>
@@ -258,7 +258,7 @@ export function JournalPanel() {
                 type="text"
                 value={symbol}
                 onChange={(e) => setSymbol(e.target.value)}
-                className="w-full bg-[#0a0a0a] border border-theme-mid rounded px-2 py-1.5 text-xs text-theme font-mono focus:outline-none focus:border-accent"
+                className="w-full bg-input border border-theme-mid rounded px-2 py-1.5 text-xs text-theme font-mono focus:outline-none focus:border-accent"
                 maxLength={10}
               />
             </div>
@@ -267,7 +267,7 @@ export function JournalPanel() {
               <select
                 value={setup}
                 onChange={(e) => setSetup(e.target.value)}
-                className="w-full bg-[#0a0a0a] border border-theme-mid rounded px-2 py-1.5 text-xs text-theme focus:outline-none focus:border-accent"
+                className="w-full bg-input border border-theme-mid rounded px-2 py-1.5 text-xs text-theme focus:outline-none focus:border-accent"
               >
                 {SETUPS.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
@@ -320,13 +320,13 @@ export function JournalPanel() {
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Notes..."
-            className="w-full bg-[#0a0a0a] border border-theme-mid rounded px-2 py-1.5 text-xs text-theme placeholder-theme-muted focus:outline-none focus:border-accent resize-none"
+            className="w-full bg-input border border-theme-mid rounded px-2 py-1.5 text-xs text-theme placeholder-theme-muted focus:outline-none focus:border-accent resize-none"
             rows={2}
           />
 
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2 rounded transition-colors"
+            className="w-full btn-primary text-white text-xs font-bold py-2 rounded transition-colors"
           >
             Save Entry
           </button>

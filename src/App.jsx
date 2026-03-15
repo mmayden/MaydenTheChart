@@ -217,19 +217,19 @@ export default function App() {
             {isLoading && (
               <div
                 className="absolute inset-0 flex items-center justify-center z-10 transition-opacity duration-300"
-                style={{ backgroundColor: bars ? 'rgba(10, 10, 10, 0.6)' : '#0a0a0a' }}
+                style={{ backgroundColor: bars ? 'color-mix(in srgb, var(--bg-base) 85%, transparent)' : 'var(--bg-base)' }}
               >
                 <div className="flex flex-col items-center gap-3">
-                  <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
                   <span className="text-theme-muted text-sm">Loading {selectedSymbol}…</span>
                 </div>
               </div>
             )}
 
             {isError && (
-              <div className="absolute inset-0 flex items-center justify-center z-10 bg-[#0a0a0a]">
+              <div className="absolute inset-0 flex items-center justify-center z-10" style={{ backgroundColor: 'var(--bg-base)' }}>
                 <div className="flex flex-col items-center gap-2 max-w-md text-center px-8">
-                  <span className="text-red-400 text-sm font-bold">Data Error</span>
+                  <span className="text-sm font-bold" style={{ color: '#ef4444' }}>Data Error</span>
                   <span className="text-theme-muted text-xs">
                     {error?.message ?? 'Failed to load bars from Alpaca.'}
                   </span>

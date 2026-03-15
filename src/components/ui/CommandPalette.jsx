@@ -215,7 +215,7 @@ export function CommandPalette() {
                       onMouseEnter={() => setSelectedIdx(idx)}
                       className={`w-full flex items-center gap-3 px-4 py-2 text-left text-sm transition-colors ${
                         idx === selectedIdx
-                          ? 'bg-blue-500/10 text-accent'
+                          ? 'bg-accent-dim text-accent'
                           : 'text-theme hover:bg-theme-hover'
                       }`}
                     >

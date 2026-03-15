@@ -187,11 +187,11 @@ export function SymbolInput() {
             maxLength={10}
             spellCheck={false}
             autoComplete="off"
-            className="w-full bg-transparent border-b border-gray-500 focus:border-blue-500 outline-none"
+            className="w-full bg-transparent border-b border-theme-mid focus:border-accent outline-none"
             style={{ ...SYMBOL_FONT, padding: '0 0 2px 0', opacity: validating ? 0.5 : 1 }}
           />
           {validating && (
-            <div className="w-3 h-3 border border-blue-500 border-t-transparent rounded-full animate-spin shrink-0" />
+            <div className="w-3 h-3 border border-accent border-t-transparent rounded-full animate-spin shrink-0" />
           )}
         </div>
 
@@ -199,7 +199,7 @@ export function SymbolInput() {
         {suggestions.length > 0 && !validating && (
           <div
             ref={dropdownRef}
-            className="absolute left-0 right-0 mt-1 rounded border border-gray-700 overflow-hidden z-50 shadow-lg"
+            className="absolute left-0 right-0 mt-1 rounded border border-theme-mid overflow-hidden z-50 shadow-lg"
             style={{ backgroundColor: 'var(--bg-surface)' }}
           >
             {suggestions.map((sym, i) => (
