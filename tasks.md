@@ -180,6 +180,34 @@
 
 ---
 
+## ✅ Indicator Deep Assessment — 6 Fixes (2026-03-14)
+
+- ✅ VWAP: use ET timezone for day reset instead of browser local time
+- ✅ ATR: percentage-based strength thresholds for multi-symbol support
+- ✅ RVOL: incorporate candle direction (close vs open) into bias signal
+- ✅ MACD: renamed return fields (`signal`→`signalLine`, `signalObj`→`signal`) per contract
+- ✅ `levels.js`: accept optional `byDay` param to eliminate redundant `groupBarsByDay()` calls
+- ✅ `App.jsx` / `LevelOverlay.jsx`: pre-compute `byDay` once, share across all consumers
+- ✅ New: 32 unit tests for `levels.js` (groupBarsByDay, getPreviousLevels, getOpenOfDay, getORBZone, classifyDayType)
+- ✅ ODC color changed from near-white (#f3f4f6) to amber dashed (#f59e0b) — distinct from EMA 200
+- ✅ 77/77 tests passing, build clean
+
+---
+
+## ✅ QOL — Crosshair Legend + Toasts + Viewport Persistence (2026-03-14)
+
+- ✅ `src/components/ui/CrosshairLegend.jsx` — OHLCV data overlay on crosshair hover (ref-based DOM updates, no React re-renders per mouse move)
+- ✅ `src/hooks/useToast.js` — Zustand toast store (add/remove, auto-dismiss, max 5 visible)
+- ✅ `src/components/ui/ToastContainer.jsx` — fixed bottom-right toast renderer with slide-in animation
+- ✅ `src/hooks/useViewportPersistence.js` — preserves zoom/scroll across live data updates, only fitContent on symbol/TF change
+- ✅ `CandlestickChart.jsx` — integrated viewport persistence (conditional fitContent)
+- ✅ `SymbolInput.jsx` — toast on symbol change (success/error)
+- ✅ `App.jsx` — smooth loading overlay (semi-transparent when previous data exists), wired CrosshairLegend + ToastContainer
+- ✅ `feature-ideas.md` — keyboard shortcuts idea documented
+- ✅ 77/77 tests passing, build clean
+
+---
+
 ## 🔲 Phase 7b — Stretch Goals
 
 - 🔲 `src/utils/backtest.js` — replay historical days using same indicator math, output win rate / R:R / by day type

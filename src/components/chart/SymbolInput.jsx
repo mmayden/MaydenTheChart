@@ -12,6 +12,7 @@
 
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { useChartStore } from '../../store/useChartStore'
+import { useToast } from '../../hooks/useToast'
 import { fetchBars } from '../../services/alpaca'
 import { SYMBOL_SUGGESTIONS } from '../../constants/chart'
 
@@ -47,6 +48,7 @@ function recordUsage(symbol) {
 export function SymbolInput() {
   const selectedSymbol = useChartStore((s) => s.selectedSymbol)
   const setSymbol      = useChartStore((s) => s.setSymbol)
+  const toastAdd       = useToast((s) => s.add)
 
   const [editing, setEditing]       = useState(false)
   const [draft, setDraft]           = useState(selectedSymbol)
@@ -120,9 +122,11 @@ export function SymbolInput() {
       if (bars.length > 0) {
         recordUsage(cleaned)
         setSymbol(cleaned)
+        toastAdd({ message: `Switched to ${cleaned}`, type: 'success', duration: 2500 })
         setEditing(false)
       } else {
         setError(`"${cleaned}" not found`)
+        toastAdd({ message: `Symbol "${cleaned}" not found`, type: 'error' })
         setDraft(selectedSymbol)
         setEditing(false)
       }
@@ -133,7 +137,7 @@ export function SymbolInput() {
     } finally {
       setValidating(false)
     }
-  }, [draft, selectedSymbol, setSymbol])
+  }, [draft, selectedSymbol, setSymbol, toastAdd])
 
   function handleKeyDown(e) {
     // Arrow navigation within dropdown

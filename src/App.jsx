@@ -40,6 +40,8 @@ import { IndicatorTabView } from './components/ui/IndicatorTabView'
 import { NotificationBell } from './components/ui/NotificationBell'
 import Logo from './components/ui/Logo'
 import { SettingsModal } from './components/ui/SettingsModal'
+import { CrosshairLegend } from './components/ui/CrosshairLegend'
+import { ToastContainer } from './components/ui/ToastContainer'
 
 export default function App() {
   const chartRef = useRef(null)
@@ -115,6 +117,7 @@ export default function App() {
     >
 
       {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
+      <ToastContainer />
 
       {/* ══ SIDEBAR ══════════════════════════════════════════════════════════ */}
       <aside
@@ -193,7 +196,10 @@ export default function App() {
         <div className="flex-1 relative overflow-hidden min-h-0">
 
           {isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center z-10 bg-[#0a0a0a]">
+            <div
+              className="absolute inset-0 flex items-center justify-center z-10 transition-opacity duration-300"
+              style={{ backgroundColor: bars ? 'rgba(10, 10, 10, 0.6)' : '#0a0a0a' }}
+            >
               <div className="flex flex-col items-center gap-3">
                 <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
                 <span className="text-gray-500 text-sm">Loading {selectedSymbol}…</span>
@@ -215,7 +221,7 @@ export default function App() {
             </div>
           )}
 
-          <CandlestickChart ref={chartRef} bars={bars ?? []} theme={theme} />
+          <CandlestickChart ref={chartRef} bars={bars ?? []} theme={theme} dataUpdatedAt={dataUpdatedAt} />
 
           {chart && candleSeries && bars && (
             <>
@@ -235,6 +241,7 @@ export default function App() {
                 bars={bars}
                 visible={indicators.sr}
               />
+              <CrosshairLegend chart={chart} bars={bars} indicators={indicators} theme={theme} />
             </>
           )}
         </div>

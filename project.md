@@ -198,6 +198,10 @@ Component state (useState — local only):
 | `src/services/websocket.js` | Alpaca WebSocket connection manager — auth, subscribe, reconnect with exponential backoff |
 | `src/hooks/useAlpacaSocket.js` | React hook — connects WS during market hours, aggregates 1-min bars into selected timeframe, injects into TanStack Query cache |
 | `api/ws-auth.js` | Vercel serverless function — returns Alpaca WS credentials, protected by bearer token |
+| `src/components/ui/CrosshairLegend.jsx` | OHLCV data overlay on crosshair hover (ref-based, no re-renders) |
+| `src/components/ui/ToastContainer.jsx` | Fixed bottom-right toast notification renderer |
+| `src/hooks/useToast.js` | Zustand toast notification store (add/remove/auto-dismiss) |
+| `src/hooks/useViewportPersistence.js` | Preserves chart zoom/scroll across live data updates |
 | `src/constants/chart.js` | All colors, periods, timeframe configs |
 | `src/main.jsx` | App entry: QueryClientProvider, validateEnv() call |
 | `src/App.jsx` | Root layout and routing |

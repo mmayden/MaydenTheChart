@@ -18,6 +18,8 @@
 
 import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import { createChart, CandlestickSeries, HistogramSeries } from 'lightweight-charts'
+import { useViewportPersistence } from '../../hooks/useViewportPersistence'
+import { useChartStore } from '../../store/useChartStore'
 import {
   CHART_BG_COLOR,
   GRID_COLOR,
@@ -31,7 +33,7 @@ const CANDLE_COLORS = {
 }
 
 export const CandlestickChart = forwardRef(function CandlestickChart(
-  { bars, children, theme = 'dark' },
+  { bars, children, theme = 'dark', dataUpdatedAt },
   ref
 ) {
   const containerRef = useRef(null)
@@ -40,6 +42,10 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
   const volumeRef    = useRef(null)
   const themeRef     = useRef(theme)
   themeRef.current   = theme  // always current, readable inside effects
+
+  const symbol    = useChartStore((s) => s.selectedSymbol)
+  const timeframe = useChartStore((s) => s.selectedTimeframe)
+  const shouldFit = useViewportPersistence(symbol, timeframe, dataUpdatedAt)
 
   // Init chart on mount
   useEffect(() => {
@@ -160,8 +166,8 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
     }))
 
     volumeRef.current.setData(volumeData)
-    chartRef.current.timeScale().fitContent()
-  }, [bars])
+    if (shouldFit) chartRef.current.timeScale().fitContent()
+  }, [bars, shouldFit])
 
   // Expose chart instance to parent for overlays
   useImperativeHandle(ref, () => ({
