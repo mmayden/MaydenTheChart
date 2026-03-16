@@ -1,4 +1,4 @@
-# Lumpia — Claude Session Instructions
+# Cheechart — Claude Session Instructions
 
 ## Start of every session
 Read these files in order before doing anything else:
@@ -26,6 +26,8 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - Vite 8 + React 19 + lightweight-charts **v5** (NOT v4)
 - TanStack Query v5, Zustand v5, Axios, Tailwind CSS 4 (`@tailwindcss/postcss`), Vitest v3
 - ESLint 9 + eslint-plugin-react-hooks (flat config, `eslint.config.js`)
+- Husky 9 + lint-staged — pre-commit hooks run ESLint on staged files
+- GitHub Actions CI — lint + test + build on every push/PR to `main`
 - JavaScript (not TypeScript — tests provide sufficient coverage at current scale)
 - `feed: 'iex'` required on all Alpaca data fetches (free tier)
 - **No react-router-dom** — single-page app, panel-based architecture
@@ -47,6 +49,8 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - All API endpoints must have rate limiting (in-memory per-instance, IP-based, TTL cleanup every 2min, 10K entry cap)
 - `ALPACA_DATA_URL` must be validated against `ALLOWED_DATA_HOSTS` via `new URL().hostname` exact match (SSRF guard)
 - All user input from URL params, forms, and localStorage must be regex-validated before use
+- `SYMBOL_RE` lives in `src/constants/patterns.js` — single source of truth for client-side symbol validation
+  (server-side `api/*.js` files keep inline copies for zero-import serverless deploys — keep in sync)
 - API errors must never leak upstream status codes, URLs, or stack traces to clients
 - ErrorBoundary shows raw error messages only in `import.meta.env.DEV`
 - Service worker `CACHE_NAME` is auto-versioned at build time (Vite plugin in `vite.config.js`)
@@ -198,8 +202,16 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Self-hosted fonts: `public/fonts/boogaloo-regular.woff2`, `public/fonts/inter-800.woff2`
 - Icons: `public/icons/icon-192.png`, `public/icons/icon-512.png`
 
+### Constants
+- Chart constants (EMA colors, timeframes): `src/constants/chart.js`
+- Shared validation patterns (SYMBOL_RE): `src/constants/patterns.js`
+- Default preset definitions: `src/constants/presets.js`
+- Accent color presets (per-theme): `src/constants/accents.js`
+
 ### Tooling
 - ESLint config (flat): `eslint.config.js`
+- Pre-commit hooks: `.husky/pre-commit` → `lint-staged` (ESLint on staged files)
+- CI pipeline: `.github/workflows/ci.yml` — lint + test + build on push/PR
 - Vite config + SW versioning plugin: `vite.config.js`
 - PostCSS config (`@tailwindcss/postcss`): `postcss.config.js`
 - Tailwind theme tokens: `src/index.css` `@theme` block (no `tailwind.config.js` — TW4)
@@ -213,6 +225,12 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Health audit template: `audit.md`
 - Bug tracker: `bugs.md`
 - Sidebar layout bug audit: `left-bar-problems.md`
+
+## Developer workflow
+- **Pre-commit:** `husky` + `lint-staged` runs `eslint --max-warnings=0` on staged `src/` and `api/` files
+- **CI:** GitHub Actions runs `npm run lint` → `npx vitest run` → `npm run build` on every push/PR to `main`
+- **Scripts:** `npm run lint` (check), `npm run lint:fix` (auto-fix), `npm test` (watch), `npx vitest run` (single-run)
+- **Quality gate:** No ESLint warnings allowed in commits (enforced by lint-staged `--max-warnings=0`)
 
 ## Production infrastructure rules
 - Static assets (`/assets/*`): `Cache-Control: public, max-age=31536000, immutable` (Vite content-hashes filenames)

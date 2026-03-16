@@ -1,4 +1,4 @@
-# Architecture — Lumpia (Cheechart)
+# Architecture — Cheechart
 
 > Current as of Phase 12E infinite scroll (2026-03-16). Update this file whenever architecture changes.
 

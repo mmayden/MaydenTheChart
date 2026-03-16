@@ -11,6 +11,7 @@ import { useState } from 'react'
 import { useChartStore } from '../../store/useChartStore'
 import { useWatchlistQuotes } from '../../hooks/useWatchlistQuotes'
 import { validateWatchlist } from '../../utils/validate'
+import { SYMBOL_RE } from '../../constants/patterns'
 
 const STORAGE_KEY = 'cheechart-watchlist'
 const DEFAULT_WATCHLIST = ['QQQ', 'SPY', 'AAPL', 'NVDA', 'TSLA']
@@ -34,8 +35,6 @@ export function WatchlistPanel() {
   const setSymbol      = useChartStore((s) => s.setSymbol)
   const selectedSymbol = useChartStore((s) => s.selectedSymbol)
   const { quotes, isLoading } = useWatchlistQuotes(symbols)
-
-  const SYMBOL_RE = /^[A-Z]{1,10}(\.[A-Z]{1,2})?$/
 
   function addSymbol(e) {
     e.preventDefault()

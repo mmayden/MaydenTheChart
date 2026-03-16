@@ -1,4 +1,4 @@
-# Bug Tracker — Lumpia (Cheechart)
+# Bug Tracker — Cheechart
 
 > Known bugs, regressions, and unresolved issues.
 > Use GitHub Issues for external/public tracking once the project is shared.

@@ -1,4 +1,4 @@
-# Alpaca API Reference — Lumpia
+# Alpaca API Reference — Cheechart
 
 > Notes on every endpoint we use. Keep updated as quirks are discovered.
 

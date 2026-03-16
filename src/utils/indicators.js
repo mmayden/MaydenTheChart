@@ -1,5 +1,5 @@
 /**
- * indicators.js — Pure math for every indicator in Lumpia.
+ * indicators.js — Pure math for every indicator in Cheechart.
  *
  * CONTRACT: Every exported function returns BOTH:
  *   series: [{ time, value }]  — ready for lightweight-charts series.setData()

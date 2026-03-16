@@ -1,4 +1,4 @@
-# Git Conventions — Lumpia (Cheechart)
+# Git Conventions — Cheechart
 
 > Current as of Phase 12B (2026-03-15).
 

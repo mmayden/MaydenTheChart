@@ -12,6 +12,7 @@ import { useEffect, useRef } from 'react'
 import { useChartStore } from '../store/useChartStore'
 import { usePresetsStore } from '../store/usePresetsStore'
 import { TIMEFRAME_CONFIG, DEFAULT_SYMBOL, DEFAULT_TIMEFRAME } from '../constants/chart'
+import { SYMBOL_RE } from '../constants/patterns'
 
 // Map between URL-friendly labels and internal timeframe keys
 const TF_TO_LABEL = {}
@@ -43,7 +44,6 @@ export function useURLState() {
     const p     = params.get('p')
     const panel = params.get('panel')
 
-    const SYMBOL_RE = /^[A-Z]{1,10}(\.[A-Z]{1,2})?$/
     if (s && SYMBOL_RE.test(s.toUpperCase()) && s.toUpperCase() !== DEFAULT_SYMBOL) setSymbol(s.toUpperCase())
     if (tf) {
       const tfKey = LABEL_TO_TF[tf.toLowerCase()]

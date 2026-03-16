@@ -8,11 +8,11 @@
 import { create } from 'zustand'
 import { DEFAULT_SYMBOL, DEFAULT_TIMEFRAME, TIMEFRAME_CONFIG } from '../constants/chart'
 import { ACCENT_LOOKUP } from '../constants/accents'
+import { SYMBOL_RE } from '../constants/patterns'
 
 // ─── Read URL params at module load (synchronous, before first render) ─────
 // This ensures the store initializes with URL-specified values so queries
 // don't fire with defaults before useURLState's useEffect runs.
-const SYMBOL_RE = /^[A-Z]{1,10}(\.[A-Z]{1,2})?$/
 const _urlTfLabelToKey = {}
 Object.entries(TIMEFRAME_CONFIG).forEach(([key, cfg]) => {
   _urlTfLabelToKey[cfg.label.toLowerCase()] = key

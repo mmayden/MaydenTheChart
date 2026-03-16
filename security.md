@@ -1,4 +1,4 @@
-# Security Standards — Lumpia (Cheechart)
+# Security Standards — Cheechart
 
 > Current as of Code Quality Audit (2026-03-16). Security is non-negotiable.
 
@@ -146,16 +146,37 @@ Browser ──key+secret──► wss://stream.data.alpaca.markets/v2/iex
 
 ---
 
-## Pre-Commit Security Check
+## Pre-Commit Enforcement
 
+### Automated (husky + lint-staged)
+Every `git commit` triggers `lint-staged`, which runs `eslint --max-warnings=0`
+on all staged `src/**/*.{js,jsx}` and `api/**/*.js` files. Commits with ESLint
+errors or warnings are rejected automatically.
+
+### CI Pipeline (GitHub Actions)
+Every push/PR to `main` runs lint → test → build. Failed CI blocks merge.
+Config: `.github/workflows/ci.yml`
+
+### Manual Security Check
 ```bash
-git status
 git diff --staged | grep -i "ALPACA\|api_key\|secret\|token"
 ```
 
 If you see real credential values in staged changes — **stop and fix**.
 
 ---
+
+## Shared Validation Patterns
+
+`SYMBOL_RE` is defined once in `src/constants/patterns.js` and imported by all
+client-side consumers (useChartStore, useURLState, WatchlistPanel, validate.js).
+Server-side `api/*.js` files keep inline copies (serverless functions can't import
+from `src/`) — **these must be kept in sync manually**.
+
+```js
+// Single source of truth: src/constants/patterns.js
+export const SYMBOL_RE = /^[A-Z]{1,10}(\.[A-Z]{1,2})?$/
+```
 
 ## Dependency Security
 

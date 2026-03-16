@@ -65,7 +65,7 @@ export default async function handler(req, res) {
 
   for (const sym of symbolList) {
     if (!/^[A-Z]{1,10}(\.[A-Z]{1,2})?$/.test(sym)) {
-      return res.status(400).json({ error: `Invalid symbol: ${sym}` })
+      return res.status(400).json({ error: 'Invalid symbol format' })
     }
   }
 

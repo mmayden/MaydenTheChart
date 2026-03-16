@@ -1,4 +1,4 @@
-# Project Health Audit — Cheechart (Lumpia)
+# Project Health Audit — Cheechart
 
 > Reusable top-down assessment template. Run at any milestone for a consistent health snapshot.
 > Last run: 2026-03-16 (Code Quality Audit complete)

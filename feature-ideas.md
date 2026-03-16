@@ -1,4 +1,4 @@
-# Feature Ideas — Cheechart (Lumpia)
+# Feature Ideas — Cheechart
 
 > Ideas and enhancements under consideration — not committed to a sprint.
 > Shipped features have been moved to tasks.md.

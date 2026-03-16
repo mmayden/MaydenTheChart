@@ -1,4 +1,4 @@
-# Task List — Lumpia
+# Task List — Cheechart
 
 > Living task board. Update status as work progresses.
 > 🔲 not started | 🔄 in progress | ✅ done | ❌ blocked
@@ -8,7 +8,7 @@
 ## ✅ Completed Sprint — Project Bootstrap
 
 ### Setup & Infrastructure
-- ✅ Vite 7 + React 18 scaffolded in Lumpia/ root (not a subdirectory)
+- ✅ Vite 7 + React 18 scaffolded in project root (not a subdirectory)
 - ✅ All deps installed — lightweight-charts v5, axios, zustand, @tanstack/react-query v5, vitest v3
 - ✅ Zero vulnerabilities
 - ✅ `.env.example` committed, `.env` in `.gitignore`
@@ -623,6 +623,32 @@
 - ✅ Labels positioned top-left via `position: absolute` on `relative` container in `IndicatorTabView.jsx`
 - ✅ RSI label: purple (#a78bfa), MACD label: blue (#3b82f6) — matches indicator line colors
 - ✅ Removed canvas watermark config from `RSIMiniChart.jsx` and `MACDMiniChart.jsx`
+
+---
+
+## ✅ Process Hardening — Pre-commit + CI + Code Quality (2026-03-16)
+
+**298/298 tests passing, build clean, ESLint 0 errors**
+
+### Developer Workflow
+- ✅ `husky` 9 + `lint-staged` 16 installed and configured
+- ✅ Pre-commit hook runs `eslint --max-warnings=0` on all staged `src/` and `api/` files
+- ✅ `npm run lint` and `npm run lint:fix` scripts added to `package.json`
+- ✅ `.github/workflows/ci.yml` — GitHub Actions CI: lint → test → build on push/PR to `main`
+
+### Code Quality
+- ✅ Extracted `SYMBOL_RE` to `src/constants/patterns.js` — single source of truth (was duplicated in 5 files)
+- ✅ Updated imports in: `useChartStore.js`, `useURLState.js`, `WatchlistPanel.jsx`, `validate.js`
+- ✅ Server-side `api/*.js` keep inline copies (documented: serverless zero-import constraint)
+- ✅ `api/snapshot.js` error message changed from `Invalid symbol: ${sym}` to `Invalid symbol format` (minimal disclosure)
+
+### Performance
+- ✅ Font preload tags added to `index.html` for Boogaloo + Inter 800 (faster first paint)
+
+### Documentation
+- ✅ `CLAUDE.md` — added Developer Workflow section, Constants file locations, pre-commit/CI docs, SYMBOL_RE pattern note
+- ✅ `security.md` — added Pre-Commit Enforcement section (husky + CI), Shared Validation Patterns section
+- ✅ `tasks.md` — this entry
 
 ---
 

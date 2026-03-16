@@ -7,8 +7,7 @@
  */
 
 import { TIMEFRAME_ORDER } from '../constants/chart'
-
-const SYMBOL_RE = /^[A-Z]{1,10}(\.[A-Z]{1,2})?$/
+import { SYMBOL_RE } from '../constants/patterns'
 const INDICATOR_KEYS = ['ema', 'vwap', 'rvol', 'rsi', 'macd', 'levels', 'sr', 'bollinger']
 const VALID_RESULTS = ['win', 'loss', 'breakeven']
 const MAX_PRESET_NAME = 50
