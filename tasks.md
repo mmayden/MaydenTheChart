@@ -544,7 +544,7 @@
 **298/298 tests passing, build clean, ESLint 0 errors**
 
 ### Data Sync & Chart Coherence
-- ✅ Crosshair sync: main chart crosshair position mirrored to RSI/MACD mini-charts via `subscribeCrosshairMove` → `setCrosshairPosition`
+- ✅ Multi-pane sync: RSI/MACD mini-charts fully synced to main chart — crosshair position (`subscribeCrosshairMove`) + visible time range (`subscribeVisibleLogicalRangeChange`). Scroll/zoom drives all three panes as one unit
 - ✅ URL state race condition: store initializers now read URL params synchronously at module load (before first render), so `useAlpacaBars` fetches correct symbol/timeframe immediately
 - ✅ Verified: all indicator overlays use identical `bars` array from single `useAlpacaBars` source
 - ✅ Verified: WebSocket live updates propagate to all consumers (chart, RSI, MACD, confluence, alerts, day type)

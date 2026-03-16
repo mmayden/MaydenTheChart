@@ -95,8 +95,11 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - CSS-only: nav hover keyframes, skeleton shimmer, settings gear spin+glow
 - **Sidebar resize:** Emits `cheechart:layout-resize` event after transition;
   all chart instances call `chart.resize()` to match new container size.
-- **Crosshair sync:** Main chart crosshair position is mirrored to RSI/MACD
-  mini-charts via `subscribeCrosshairMove` → `setCrosshairPosition`.
+- **Multi-pane sync:** RSI/MACD mini-charts are fully synced to the main chart:
+  crosshair position (`subscribeCrosshairMove` → `setCrosshairPosition`) and
+  visible time range (`subscribeVisibleLogicalRangeChange` → `setVisibleLogicalRange`).
+  Scroll/zoom on the main chart drives all three panes as one unit.
+  Mini-charts have `handleScroll/handleScale: false` (no independent interaction).
 
 ## Key file locations
 
