@@ -7,25 +7,26 @@
 
 ## What We're Building
 
-A professional day trading chart terminal for QQQ (Nasdaq 100 ETF) using real Alpaca paper
-trading data. The goal is a tool that encodes a rules-based trading system — validated
+A professional day trading chart terminal supporting any US equity symbol, using real Alpaca
+paper trading data. The goal is a tool that encodes a rules-based trading system — validated
 against academic research and professional trader consensus — into a visual interface that
 makes high-probability setups obvious and low-probability conditions clearly flagged.
 
-This is not a generic charting tool. It is purpose-built around a specific, documented,
-rules-based system with a proven academic edge (ORB strategy on QQQ, 33% annualized alpha
-per Concretum Group/SSRN research, 2016–2023).
+Originally built around QQQ (Nasdaq 100 ETF), now multi-symbol with autocomplete for ~80
+popular tickers. The system is purpose-built around a specific, documented, rules-based
+approach with a proven academic edge (ORB strategy on QQQ, 33% annualized alpha per
+Concretum Group/SSRN research, 2016–2023), applicable to any liquid equity.
 
 ---
 
 ## User Profile
 
 - Learning day trading / technical analysis from scratch
-- Studying QQQ specifically — familiar with the rules-based trading system
+- Primarily studies QQQ — familiar with the rules-based trading system, now trading multiple symbols
 - Comfortable in VS Code
 - Has Alpaca paper trading account with API keys ready
 - Node.js + npm installed
-- Wants local dev first, then Vercel deployment
+- Local dev + Vercel deployment (live at cheechart.space)
 
 ---
 
@@ -147,7 +148,7 @@ friction — you can't see backtest results alongside the chart that produced th
 │ Indic. │                                          │ [Watchlist]  │
 │ ATR    │                                          │ [Alerts]     │
 │        ├──────────────────────────────────────────┤              │
-│        │  RSI / MACD tabs                         │              │
+│        │  RSI / MACD mini-charts (labeled)          │              │
 │        ├──────────────────────────────────────────┤              │
 │        │  Status bar                              │              │
 └────────┴──────────────────────────────────────────┴──────────────┘

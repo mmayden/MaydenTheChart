@@ -21,10 +21,7 @@ export function MACDMiniChart({ bars, mainChart }) {
     const chart = createChart(containerRef.current, {
       ...MINI_CHART_OPTS,
       autoSize: true,
-      layout: {
-        ...MINI_CHART_OPTS.layout,
-        watermark: { text: 'MACD', color: 'rgba(59, 130, 246, 0.5)', visible: true, fontSize: 11, fontFamily: "'JetBrains Mono', monospace", fontStyle: 'bold', horzAlign: 'left', vertAlign: 'top' },
-      },
+      layout: { ...MINI_CHART_OPTS.layout },
     })
 
     const hist       = chart.addSeries(HistogramSeries, { priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false })

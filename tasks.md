@@ -532,7 +532,7 @@
 - ✅ All charts switched to `autoSize: true` (lw-charts v5 built-in, replaces manual ResizeObserver)
 - ✅ RSI/MACD toggles moved back to sidebar IndicatorToggle (they're indicators, not a separate category)
 - ✅ Removed separate RSI/MACD tab button strip below chart
-- ✅ RSI/MACD labels via lw-charts watermark (auto-aligned inside plotting area)
+- ✅ RSI/MACD labels via HTML overlay (`.mini-chart-label` class, positioned top-left, indicator-colored)
 - ✅ Mini chart price scales `minimumWidth: 60` for right-edge alignment with main chart
 - ✅ Created `bugs.md` tracker and `left-bar-problems.md` audit doc
 - ✅ **BUG-001 resolved:** Sidebar emits `cheechart:layout-resize` event after transition; all charts call `chart.resize()` to match new container
@@ -613,6 +613,16 @@
 - ✅ `CandlestickChart.jsx` — detects prepend (bars grew at front), saves/restores `getVisibleRange()`, skips `fitContent()` on prepend
 - ✅ All overlay components already handle growing bars array (bars prop is single source of truth)
 - 🔲 IndexedDB cache via Dexie.js deferred (nice-to-have, not required for core functionality)
+
+---
+
+## ✅ Mini Chart Labels — HTML Overlay (2026-03-16)
+
+- ✅ Replaced lightweight-charts watermark labels with HTML overlay `<span>` elements
+- ✅ `.mini-chart-label` CSS class: monospace 10px, semibold, uppercase, 70% opacity, `pointer-events: none`
+- ✅ Labels positioned top-left via `position: absolute` on `relative` container in `IndicatorTabView.jsx`
+- ✅ RSI label: purple (#a78bfa), MACD label: blue (#3b82f6) — matches indicator line colors
+- ✅ Removed canvas watermark config from `RSIMiniChart.jsx` and `MACDMiniChart.jsx`
 
 ---
 

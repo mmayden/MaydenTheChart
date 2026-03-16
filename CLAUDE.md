@@ -95,7 +95,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - **Design rule:** Never use Motion's mount/unmount (`AnimatePresence`) for elements that
   affect flex layout. Motion is only for content inside persistent containers.
 - All animations respect `prefers-reduced-motion` via `useReducedMotion()` hook
-- CSS-only: nav hover keyframes, skeleton shimmer, settings gear spin+glow
+- CSS-only: nav hover keyframes, skeleton shimmer, settings gear spin+glow, mini chart labels (`.mini-chart-label`)
 - **Sidebar resize:** Emits `cheechart:layout-resize` event after transition;
   all chart instances call `chart.resize()` to match new container size.
 - **Multi-pane sync:** RSI/MACD mini-charts are fully synced to the main chart:
@@ -128,7 +128,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Main chart: `src/components/chart/CandlestickChart.jsx`
 - Symbol input + autocomplete: `src/components/chart/SymbolInput.jsx`
 - Crosshair OHLCV legend: `src/components/ui/CrosshairLegend.jsx`
-- RSI/MACD mini charts: `src/components/ui/IndicatorTabView.jsx` + `RSIMiniChart.jsx` + `MACDMiniChart.jsx`
+- RSI/MACD mini charts: `src/components/ui/IndicatorTabView.jsx` (container + HTML labels) + `RSIMiniChart.jsx` + `MACDMiniChart.jsx`
 - Bollinger Bands overlay: `src/components/indicators/BollingerOverlay.jsx`
 - Sidebar indicator toggles (all indicators): `src/components/ui/IndicatorToggle.jsx`
 

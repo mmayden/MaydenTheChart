@@ -116,8 +116,8 @@ Rewrote sidebar to match:
 - Added `pointer-events-none` when closed
 - Background transparent when closed
 
-**Result:** Not yet confirmed. User screenshot shows sidebar closed, RSI/MACD appear
-full-width in final state. Issue may be during transition or canvas rendered at stale width.
+**Result:** Partially resolved. User screenshot shows sidebar closed, RSI/MACD appear
+full-width in final state. Full fix came in attempt #4 + `cheechart:layout-resize` event.
 
 ### Fix attempt #4 — Today (commit `99b1f62`)
 **Changed: Dispatch window resize after sidebar transition**
@@ -131,7 +131,8 @@ chart instances. This bypasses any ResizeObserver timing issues.
 
 **File:** `src/store/useChartStore.js`
 
-**Result:** Not yet confirmed.
+**Result:** Confirmed working. Combined with `cheechart:layout-resize` event in Sidebar.jsx
+(fires after CSS transition), all chart instances resize correctly. BUG-001 resolved.
 
 ---
 

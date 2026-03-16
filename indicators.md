@@ -359,6 +359,12 @@ RSI = 100 - (100 / (1 + RS))
 - First avg_loss = SMA of first 14 losses
 - Then use Wilder's smoothing: avg = (prev_avg × 13 + current) / 14
 
+### Rendering
+- RSI line: solid purple (#a78bfa), 1.5px
+- Reference lines: 70 (red, dashed), 50 (gray, dashed), 30 (green, dashed)
+- HTML overlay label "RSI" in purple at top-left of mini chart (`.mini-chart-label` CSS class, `pointer-events: none`)
+- Rendered in 82px tall mini chart pane below the main chart via `IndicatorTabView`
+
 ### Key levels
 | Level | Meaning |
 |---|---|
@@ -398,9 +404,10 @@ Histogram   = MACD Line - Signal Line
 - Zero line cross → trend direction shift
 
 ### Rendering
-- MACD line: solid blue
-- Signal line: solid orange
+- MACD line: solid blue (#3b82f6)
+- Signal line: solid orange (#f97316)
 - Histogram: green bars above zero, red bars below zero
+- HTML overlay label "MACD" in blue at top-left of mini chart (`.mini-chart-label` CSS class, `pointer-events: none`)
 
 ### Code signature
 ```js

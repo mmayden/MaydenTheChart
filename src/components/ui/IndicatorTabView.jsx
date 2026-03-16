@@ -3,8 +3,8 @@
  *
  * RSI and MACD are toggled from the sidebar IndicatorToggle (same as all
  * other indicators). This component renders the mini chart areas when
- * enabled. Labels are handled by lightweight-charts watermark (auto-aligned
- * inside the chart plotting area).
+ * enabled. Labels are HTML overlay spans (.mini-chart-label CSS class)
+ * positioned top-left, colored to match each indicator's line color.
  */
 
 import { useChartStore } from '../../store/useChartStore'
@@ -20,12 +20,14 @@ export function IndicatorTabView({ bars, mainChart }) {
   return (
     <div className="shrink-0 border-t border-theme overflow-hidden">
       {rsiEnabled && (
-        <div className="w-full overflow-hidden" style={{ backgroundColor: 'var(--bg-base)', height: 82 }}>
+        <div className="w-full overflow-hidden relative" style={{ backgroundColor: 'var(--bg-base)', height: 82 }}>
+          <span className="mini-chart-label" style={{ color: '#a78bfa' }}>RSI</span>
           <RSIMiniChart bars={bars} mainChart={mainChart} />
         </div>
       )}
       {macdEnabled && (
-        <div className="w-full overflow-hidden" style={{ backgroundColor: 'var(--bg-base)', height: 82 }}>
+        <div className="w-full overflow-hidden relative" style={{ backgroundColor: 'var(--bg-base)', height: 82 }}>
+          <span className="mini-chart-label" style={{ color: '#3b82f6' }}>MACD</span>
           <MACDMiniChart bars={bars} mainChart={mainChart} />
         </div>
       )}
