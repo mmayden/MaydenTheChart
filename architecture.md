@@ -102,13 +102,13 @@ App.jsx
       └──► components/ui/
                 ├── ConfluenceBar.jsx           ← traffic light pill + expandable breakdown
                 ├── MTFStrip.jsx                ← multi-timeframe EMA alignment dots
-                ├── IndicatorTabView.jsx        ← RSI/MACD toggle + mini charts
-                ├── RSIMiniChart.jsx            ← RSI subchart (separate lw-charts instance)
-                ├── MACDMiniChart.jsx           ← MACD subchart (separate lw-charts instance)
+                ├── IndicatorTabView.jsx        ← RSI/MACD mini chart containers (labeled)
+                ├── RSIMiniChart.jsx            ← RSI subchart (separate lw-charts instance, autoSize)
+                ├── MACDMiniChart.jsx           ← MACD subchart (separate lw-charts instance, autoSize)
                 ├── CrosshairLegend.jsx         ← OHLCV on hover (ref-based, no re-renders)
                 ├── ATRGauge.jsx                ← daily range meter (fuel gauge)
                 ├── DayTypeBanner.jsx           ← Trend/Range/Chop live classification
-                ├── IndicatorToggle.jsx         ← sidebar overlay show/hide toggles
+                ├── IndicatorToggle.jsx         ← sidebar show/hide toggles (all indicators incl RSI/MACD)
                 ├── PresetSelector.jsx          ← preset grid (4 defaults + custom)
                 ├── CommandPalette.jsx           ← Cmd+K search (symbols, TFs, indicators, panels)
                 ├── SettingsModal.jsx            ← themes, accent colors, shortcuts, sound
@@ -217,8 +217,7 @@ Two-tier approach: CSS transitions for layout, Motion v12 for content.
 **Layout transitions (CSS — persistent DOM elements):**
 - **RightPanel wrapper:** `transition-[transform,width,min-width] duration-300` —
   chart area resizes smoothly as panel opens/closes
-- **Sidebar:** `transition-all duration-200` — chart + RSI/MACD mini charts resize
-  in lockstep via ResizeObserver
+- **Sidebar:** `transition-all duration-200` — simple CSS width transition
 
 **Content transitions (Motion — mount/unmount):**
 - **RightPanel content:** `AnimatePresence mode="wait"` opacity fade between panels
@@ -285,9 +284,11 @@ Vite 7 → dist/
 
 ## lightweight-charts v5 Integration
 
+All chart instances use `autoSize: true` (v5 built-in) for automatic container tracking.
+
 ```jsx
 // CandlestickChart.jsx pattern (simplified)
-const chart = createChart(container, { layout, grid, crosshair, timeScale })
+const chart = createChart(container, { autoSize: true, layout, grid, crosshair, timeScale })
 const candleSeries = chart.addCandlestickSeries({ upColor, downColor, ... })
 
 // Volume as histogram on same pane
@@ -299,6 +300,7 @@ const volumeSeries = chart.addHistogramSeries({ priceScaleId: 'volume' })
 
 // RSI/MACD are separate chart instances in RSIMiniChart/MACDMiniChart
 // (not v5 panes — separate instances for independent sizing)
+// Each has a corner label (RSI purple, MACD blue) for identification
 ```
 
 Crosshair data is read via `subscribeCrosshairMove` and rendered in

@@ -84,9 +84,9 @@ both the store (`setAccentColor`) and the SettingsModal UI. Overrides 5 CSS vari
 via inline styles on `<html>`. Resets when theme changes. Persisted to `localStorage`.
 
 **Animation system:** Two-tier approach — CSS transitions for layout flow, Motion v12 for content.
-- **Layout transitions (CSS):** Sidebar and RightPanel wrappers are persistent DOM elements
-  with CSS `transition-all` / `transition-[transform,width,min-width]`. This ensures flex
-  siblings (chart, RSI/MACD mini charts) resize smoothly in lockstep via ResizeObserver.
+- **Layout transitions (CSS):** Sidebar uses `transition-all`. RightPanel wrapper uses
+  `transition-[transform,width,min-width]`. Both are persistent DOM elements so flex
+  siblings resize smoothly.
 - **Content transitions (Motion):** RightPanel uses `AnimatePresence` opacity fade for
   panel switching. CommandPalette and SettingsModal use scale+fade entrance/exit.
 - **Design rule:** Never use Motion's mount/unmount (`AnimatePresence`) for elements that
@@ -114,9 +114,9 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Main chart: `src/components/chart/CandlestickChart.jsx`
 - Symbol input + autocomplete: `src/components/chart/SymbolInput.jsx`
 - Crosshair OHLCV legend: `src/components/ui/CrosshairLegend.jsx`
-- RSI/MACD toggle + mini charts: `src/components/ui/IndicatorTabView.jsx` + `RSIMiniChart.jsx` + `MACDMiniChart.jsx`
+- RSI/MACD mini charts: `src/components/ui/IndicatorTabView.jsx` + `RSIMiniChart.jsx` + `MACDMiniChart.jsx`
 - Bollinger Bands overlay: `src/components/indicators/BollingerOverlay.jsx`
-- Sidebar indicator toggles (overlays only): `src/components/ui/IndicatorToggle.jsx`
+- Sidebar indicator toggles (all indicators): `src/components/ui/IndicatorToggle.jsx`
 
 ### Synthesis Layer
 - Confluence bar: `src/components/ui/ConfluenceBar.jsx` — setup quality readout
@@ -185,6 +185,8 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Indicator math reference: `indicators.md`
 - Competitive research + vision: `brainstorming.md`
 - Health audit template: `audit.md`
+- Bug tracker: `bugs.md`
+- Sidebar layout bug audit: `left-bar-problems.md`
 
 ## Production infrastructure rules
 - Static assets (`/assets/*`): `Cache-Control: public, max-age=31536000, immutable` (Vite content-hashes filenames)

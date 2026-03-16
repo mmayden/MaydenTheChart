@@ -494,7 +494,7 @@
 **274/274 tests passing, build clean, ESLint 0 errors**
 
 - ✅ Added Motion v12 library (`motion` package, 125KB lazy chunk)
-- ✅ Panel content transitions via `AnimatePresence` (opacity fade for panel switching, persistent wrapper for layout)
+- ✅ RightPanel: persistent wrapper with CSS width transitions + `AnimatePresence` opacity fade for panel switching
 - ✅ Command palette scale+fade entrance/exit animation (`AnimatePresence` internal)
 - ✅ Settings modal scale+fade entrance animation (`motion.div` backdrop + card)
 - ✅ Skeleton loading states: `.skeleton-shimmer` CSS + `PanelSkeleton` component (Suspense fallback in RightPanel)
@@ -526,9 +526,14 @@
 - ✅ Files updated: StatusBar, TopNav, PriceDisplay, JournalPanel, BacktestPanel, WatchlistPanel, AlertsPanel, ConfluenceBar, SymbolInput, PresetSelector, App.jsx, index.css, tailwind.config.js
 - ✅ Removed dead CSS: `.alerts-panel-enter` / `.alerts-panel-enter-active` (Motion replaced these)
 
-### Layout Transition Fix (2026-03-16)
+### Layout + UX Fixes (2026-03-16)
 - ✅ RightPanel: reverted from Motion mount/unmount to persistent wrapper div with CSS `transition-[transform,width,min-width]` — chart resizes seamlessly instead of close-pause-jump
-- ✅ Sidebar: restored `transition-all duration-200` (was `transition-transform md:transition-none`) — RSI/MACD mini charts now resize properly when sidebar opens/closes
+- ✅ Sidebar: reverted to original clean form (pre-audit `dca2cad`) with `transition-all duration-200`
+- ✅ All charts switched to `autoSize: true` (lw-charts v5 built-in, replaces manual ResizeObserver)
+- ✅ RSI/MACD toggles moved back to sidebar IndicatorToggle (they're indicators, not a separate category)
+- ✅ Removed separate RSI/MACD tab button strip below chart
+- ✅ Added corner labels to RSI/MACD mini charts (RSI purple, MACD blue) for identification
+- ✅ Created `bugs.md` tracker and `left-bar-problems.md` audit doc
 
 ---
 

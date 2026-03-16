@@ -9,23 +9,20 @@
 ## Open
 
 ### BUG-001: RSI/MACD mini charts don't resize on sidebar toggle
-**Status:** Open — parked. 4 fix attempts reverted to avoid codebase clutter.
-**Severity:** Medium — visual only, cosmetic during sidebar transition
+**Status:** Low priority — partially mitigated by UX change
+**Severity:** Low — RSI/MACD toggles moved to sidebar, tab strip removed
 **First noticed:** 2026-03-16
-**Introduced:** Unclear — may predate Phase 12B, first reported after code quality audit
+**Introduced:** Unclear — may predate Phase 12B
 
 **Symptoms:**
 - When left sidebar opens/closes, RSI and MACD mini chart canvases may not
-  expand/contract to fill available width
+  expand/contract to fill available width during transition
 - Main chart and status bar resize correctly
 - Right panel resize works perfectly
 
-**Root cause:** Unknown. Needs DevTools inspection to determine if the container
-div is actually changing width and whether the canvas is picking up the change.
-
-**Current state:** Sidebar reverted to original clean form (pre-audit, commit `dca2cad`).
-Charts use `autoSize: true` (cleaner than manual ResizeObserver, kept regardless).
-No hacks or workarounds in the codebase.
+**Mitigation:** RSI/MACD toggles moved back to sidebar IndicatorToggle (where they
+belong as indicators). Removed the separate tab button strip. Sidebar reverted to
+original clean form. Charts use `autoSize: true`. No hacks in codebase.
 
 **Tracking doc:** `left-bar-problems.md` — full change history and diagnostic plan
 
