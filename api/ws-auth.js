@@ -29,9 +29,17 @@ function timingSafeEqual(a, b) {
 const rateLimitMap = new Map()
 const RATE_LIMIT_WINDOW = 60_000 // 1 minute
 const RATE_LIMIT_MAX = 5         // max 5 requests per IP per minute
+const RATE_LIMIT_MAX_ENTRIES = 10_000
+let lastCleanup = 0
 
 function isRateLimited(ip) {
   const now = Date.now()
+  if (now - lastCleanup > 120_000 || rateLimitMap.size > RATE_LIMIT_MAX_ENTRIES) {
+    for (const [key, val] of rateLimitMap) {
+      if (now - val.start > RATE_LIMIT_WINDOW) rateLimitMap.delete(key)
+    }
+    lastCleanup = now
+  }
   const entry = rateLimitMap.get(ip)
   if (!entry || now - entry.start > RATE_LIMIT_WINDOW) {
     rateLimitMap.set(ip, { start: now, count: 1 })

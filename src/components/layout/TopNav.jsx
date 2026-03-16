@@ -97,7 +97,7 @@ export function TopNav() {
             />
           </svg>
           {activeCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-3.5 h-3.5 rounded-full bg-red-500 text-[8px] font-bold text-white leading-none">
+            <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-3.5 h-3.5 rounded-full bg-badge text-[8px] font-bold text-white leading-none">
               {activeCount > 9 ? '9+' : activeCount}
             </span>
           )}

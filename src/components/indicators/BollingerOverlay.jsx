@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useRef } from 'react'
+import { LineSeries } from 'lightweight-charts'
 import { bollingerBands } from '../../utils/indicators'
 import { BOLLINGER_MIDDLE_COLOR, BOLLINGER_BAND_COLOR } from '../../constants/chart'
 
@@ -14,29 +15,36 @@ export function BollingerOverlay({ chart, bars, visible }) {
   const upperRef  = useRef(null)
   const lowerRef  = useRef(null)
 
+  // Create series once when chart is available
   useEffect(() => {
-    if (!chart || !visible) return
+    if (!chart) return
 
-    const middle = chart.addLineSeries({
+    const middle = chart.addSeries(LineSeries, {
       color: BOLLINGER_MIDDLE_COLOR,
       lineWidth: 1,
       lineStyle: 0,
       priceLineVisible: false,
       lastValueVisible: false,
+      crosshairMarkerVisible: false,
+      visible,
     })
-    const upper = chart.addLineSeries({
+    const upper = chart.addSeries(LineSeries, {
       color: BOLLINGER_BAND_COLOR,
       lineWidth: 1,
       lineStyle: 2,
       priceLineVisible: false,
       lastValueVisible: false,
+      crosshairMarkerVisible: false,
+      visible,
     })
-    const lower = chart.addLineSeries({
+    const lower = chart.addSeries(LineSeries, {
       color: BOLLINGER_BAND_COLOR,
       lineWidth: 1,
       lineStyle: 2,
       priceLineVisible: false,
       lastValueVisible: false,
+      crosshairMarkerVisible: false,
+      visible,
     })
 
     middleRef.current = middle
@@ -53,17 +61,26 @@ export function BollingerOverlay({ chart, bars, visible }) {
       upperRef.current  = null
       lowerRef.current  = null
     }
-  }, [chart, visible])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chart])
 
+  // Update data when bars change
   useEffect(() => {
-    if (!visible || !bars?.length) return
+    if (!bars?.length) return
     if (!middleRef.current || !upperRef.current || !lowerRef.current) return
 
     const { middle, upper, lower } = bollingerBands(bars)
     middleRef.current.setData(middle)
     upperRef.current.setData(upper)
     lowerRef.current.setData(lower)
-  }, [bars, visible])
+  }, [bars])
+
+  // Toggle visibility without re-creating series
+  useEffect(() => {
+    if (middleRef.current) middleRef.current.applyOptions({ visible })
+    if (upperRef.current)  upperRef.current.applyOptions({ visible })
+    if (lowerRef.current)  lowerRef.current.applyOptions({ visible })
+  }, [visible])
 
   return null
 }

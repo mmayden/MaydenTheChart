@@ -90,7 +90,7 @@ export function WatchlistPanel() {
                       {q.price.toFixed(2)}
                     </span>
                     <span className={`text-[11px] font-mono font-semibold min-w-[52px] text-right ${
-                      isPositive ? 'text-green-400' : isNegative ? 'text-red-400' : 'text-theme-muted'
+                      isPositive ? 'text-bull' : isNegative ? 'text-bear' : 'text-theme-muted'
                     }`}>
                       {isPositive ? '+' : ''}{q.changePercent}%
                     </span>
@@ -101,7 +101,7 @@ export function WatchlistPanel() {
 
                 <button
                   onClick={() => removeSymbol(sym)}
-                  className="opacity-0 group-hover:opacity-100 text-theme-muted hover:text-red-400 text-xs transition-all shrink-0"
+                  className="opacity-0 group-hover:opacity-100 text-theme-muted hover:text-bear text-xs transition-all shrink-0"
                 >
                   ×
                 </button>

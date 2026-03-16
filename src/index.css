@@ -150,6 +150,18 @@ body,
   --focus-ring:   #C85818;
 }
 
+/* ── Semantic data colors (bull/bear, status, warnings) ────────────────── */
+/* These are universal trading/data colors — intentionally NOT theme-varied
+   because green=bullish and red=bearish are universal conventions.         */
+:root {
+  --color-bull:    #22c55e;
+  --color-bear:    #ef4444;
+  --color-warn:    #eab308;
+  --color-info:    #60a5fa;
+  --color-neutral: #6b7280;
+  --color-badge:   #ef4444;
+}
+
 /* Shell backgrounds (root + sidebar) — set via inline style in components */
 [data-theme] {
   color: var(--text-primary);
@@ -193,6 +205,20 @@ body,
 
 /* Focus ring — themed */
 .focus\:border-accent:focus { border-color: var(--accent); }
+
+/* Data color utilities — bull/bear, status, warnings */
+.text-bull           { color: var(--color-bull); }
+.text-bear           { color: var(--color-bear); }
+.text-warn           { color: var(--color-warn); }
+.text-info           { color: var(--color-info); }
+.text-neutral        { color: var(--color-neutral); }
+.bg-bull             { background-color: var(--color-bull); }
+.bg-bear             { background-color: var(--color-bear); }
+.bg-warn             { background-color: var(--color-warn); }
+.bg-info             { background-color: var(--color-info); }
+.bg-neutral          { background-color: var(--color-neutral); }
+.bg-badge            { background-color: var(--color-badge); }
+.hover\:text-bear:hover { color: var(--color-bear); }
 
 /* ── Crosshair legend fade ─────────────────────────────────────────────── */
 
@@ -382,16 +408,6 @@ body,
   transform: rotate(60deg);
 }
 
-/* ── Alerts panel slide transition ───────────────────────────────────────── */
-
-.alerts-panel-enter {
-  transform: translateX(100%);
-}
-.alerts-panel-enter-active {
-  transform: translateX(0);
-  transition: transform 300ms ease-out;
-}
-
 /* ── Reduced motion — respect user accessibility preference ────────────── */
 
 @media (prefers-reduced-motion: reduce) {
@@ -411,11 +427,6 @@ body,
   .settings-gear:hover {
     filter: none;
     transform: none;
-  }
-
-  /* Disable panel slide transition */
-  .alerts-panel-enter-active {
-    transition: none;
   }
 
   /* Disable crosshair legend fade */

@@ -124,7 +124,7 @@ export default function App() {
 
   const tfConfig = TIMEFRAME_CONFIG[selectedTimeframe]
 
-  // Chart instance detection (polls until found, then stops; re-polls on HMR)
+  // Chart instance detection (polls until found, then stops)
   useEffect(() => {
     function check() {
       const c  = chartRef.current?.chart?.()
@@ -141,7 +141,7 @@ export default function App() {
       if (check()) clearInterval(id)
     }, 100)
     return () => clearInterval(id)
-  }, [dataUpdatedAt])
+  }, [])
 
   // Pre-compute groupBarsByDay once
   const byDay = useMemo(() => {
@@ -233,7 +233,7 @@ export default function App() {
             {isError && (
               <div className="absolute inset-0 flex items-center justify-center z-10" style={{ backgroundColor: 'var(--bg-base)' }}>
                 <div className="flex flex-col items-center gap-2 max-w-md text-center px-8">
-                  <span className="text-sm font-bold" style={{ color: '#ef4444' }}>Data Error</span>
+                  <span className="text-sm font-bold text-bear">Data Error</span>
                   <span className="text-theme-muted text-xs">
                     {error?.message ?? 'Failed to load bars from Alpaca.'}
                   </span>

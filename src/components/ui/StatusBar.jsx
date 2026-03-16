@@ -10,18 +10,18 @@ import { useJournalStore } from '../../store/useJournalStore'
 /** Map market + WS state to visual properties. */
 function getConnectionStatus(isMarketOpen, wsStatus) {
   if (!isMarketOpen) {
-    return { dotClass: 'bg-gray-600', label: 'Market Closed', sublabel: null, labelColor: 'text-theme-muted' }
+    return { dotClass: 'bg-neutral', label: 'Market Closed', sublabel: null, labelColor: 'text-theme-muted' }
   }
   if (wsStatus === 'subscribed') {
-    return { dotClass: 'bg-green-400 animate-pulse', label: 'Live', sublabel: 'WebSocket', labelColor: 'text-green-400' }
+    return { dotClass: 'bg-bull animate-pulse', label: 'Live', sublabel: 'WebSocket', labelColor: 'text-bull' }
   }
   if (wsStatus === 'connecting' || wsStatus === 'authenticated') {
-    return { dotClass: 'bg-yellow-400 animate-pulse', label: 'Connecting…', sublabel: 'WebSocket', labelColor: 'text-yellow-400' }
+    return { dotClass: 'bg-warn animate-pulse', label: 'Connecting…', sublabel: 'WebSocket', labelColor: 'text-warn' }
   }
   if (wsStatus === 'error') {
-    return { dotClass: 'bg-red-400', label: 'Reconnecting…', sublabel: 'Polling', labelColor: 'text-red-400' }
+    return { dotClass: 'bg-bear', label: 'Reconnecting…', sublabel: 'Polling', labelColor: 'text-bear' }
   }
-  return { dotClass: 'bg-blue-400', label: 'Market Open', sublabel: 'Polling', labelColor: 'text-blue-400' }
+  return { dotClass: 'bg-info', label: 'Market Open', sublabel: 'Polling', labelColor: 'text-info' }
 }
 
 export function StatusBar({ lastUpdated }) {
@@ -70,8 +70,8 @@ export function StatusBar({ lastUpdated }) {
         <div className="flex items-center gap-1.5 ml-auto">
           <span className="text-theme-muted">Today:</span>
           <span className="text-theme">{sessionStats.trades}t</span>
-          <span className="text-green-400">{sessionStats.wins}W</span>
-          <span className="text-red-400">{sessionStats.losses}L</span>
+          <span className="text-bull">{sessionStats.wins}W</span>
+          <span className="text-bear">{sessionStats.losses}L</span>
         </div>
       )}
     </div>

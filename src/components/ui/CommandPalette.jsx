@@ -155,19 +155,20 @@ export function CommandPalette() {
   // Reset index when query changes
   useEffect(() => { setSelectedIdx(0) }, [query])
 
-  // Group by category
-  const grouped = useMemo(() => {
+  // Group by category + build flat index map for keyboard navigation
+  const { grouped, flatIndexMap } = useMemo(() => {
     const g = {}
+    const idxMap = new Map()
+    let idx = 0
     filtered.forEach((cmd) => {
       if (!g[cmd.category]) g[cmd.category] = []
       g[cmd.category].push(cmd)
+      idxMap.set(cmd.id, idx++)
     })
-    return g
+    return { grouped: g, flatIndexMap: idxMap }
   }, [filtered])
 
   const motionDuration = prefersReduced ? 0 : 0.2
-
-  let flatIdx = -1
 
   return (
     <AnimatePresence>
@@ -222,8 +223,7 @@ export function CommandPalette() {
                       {category}
                     </div>
                     {cmds.map((cmd) => {
-                      flatIdx++
-                      const idx = flatIdx
+                      const idx = flatIndexMap.get(cmd.id)
                       return (
                         <button
                           key={cmd.id}

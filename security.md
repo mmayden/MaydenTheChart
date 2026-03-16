@@ -1,164 +1,182 @@
-# Security Model — Cheechart (Lumpia)
+# Security Standards — Lumpia (Cheechart)
 
-> Non-negotiable rules. Follow every session without exception.
-> Last updated: 2026-03-15 (Phase 12B)
-
----
-
-## Architecture: Serverless Proxy Pattern
-
-API keys live on the server only. The browser never sees them.
-
-```
-Browser ──► /api/bars.js ──► Alpaca REST API
-        ──► /api/snapshot.js ──► Alpaca REST API
-        ──► /api/ws-auth.js ──► returns Alpaca creds for WS
-```
-
-All three endpoints are Vercel serverless functions in `api/`.
-The browser calls `/api/*` routes — never `data.alpaca.markets` directly.
+> Current as of Code Quality Audit (2026-03-16). Security is non-negotiable.
 
 ---
 
-## Server-Side Protections
+## Architecture — Server-Side Proxy Model
 
-### Rate Limiting (all 3 endpoints)
-
-| Endpoint | Limit | Window |
-|---|---|---|
-| `/api/ws-auth` | 5 requests | per IP per minute |
-| `/api/bars` | 60 requests | per IP per minute |
-| `/api/snapshot` | 30 requests | per IP per minute |
-
-In-memory per serverless instance (best-effort on Vercel's cold-start model).
-
-### SSRF Guard
-
-`ALPACA_DATA_URL` validated against `ALLOWED_DATA_HOSTS` allowlist before any fetch.
-Prevents attackers from redirecting API calls to internal networks via env var manipulation.
-
-### Input Validation
-
-| Input | Validation |
-|---|---|
-| `symbol` | `/^[A-Z]{1,10}(\.[A-Z]{1,2})?$/` (supports `BRK.B`) |
-| `timeframe` | Allowlist: `1Min`, `5Min`, `15Min`, `1Hour`, `4Hour`, `1Day` |
-| `limit` | Integer, 1–10000 |
-| `start`/`end` | ISO 8601 format with anchored regex (no trailing garbage) |
-| URL params (`?s=`) | Same symbol regex in `useURLState.js` |
-| Watchlist add | Same symbol regex in `WatchlistPanel.jsx` |
-
-### Error Sanitization
-
-API errors never leak upstream details to clients:
-- Status codes from Alpaca are not forwarded
-- Stack traces never reach the browser
-- Generic error messages only (e.g., "Failed to fetch bars")
-- Raw errors shown only in `import.meta.env.DEV` (ErrorBoundary)
-
----
-
-## Client-Side Protections
-
-### Security Headers (vercel.json)
+API keys **never** reach the browser. All Alpaca communication goes through
+Vercel serverless functions that hold credentials server-side.
 
 ```
-Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; ...
-X-Frame-Options: DENY
-X-Content-Type-Options: nosniff
-Referrer-Policy: strict-origin-when-cross-origin
+Browser ──► /api/bars.js ──► data.alpaca.markets/v2 (keys server-only)
+Browser ──► /api/snapshot.js ──► data.alpaca.markets/v2 (keys server-only)
+Browser ──► /api/ws-auth.js ──► returns WS credentials (bearer token gate)
 ```
 
-### localStorage Validation
-
-All persisted data is schema-validated on load (`src/utils/validate.js`, 29 tests):
-- Presets, journal entries, watchlist, symbol usage, alerts
-- Malformed data is silently discarded (falls back to defaults)
-
-### WebSocket Auth
-
-- `VITE_WS_AUTH_TOKEN` ships in the client bundle (intentional for paper trading)
-- This is NOT a real secret — rate limiting on `/api/ws-auth` is the actual gate
-- The token is a bearer token, not the Alpaca keys themselves
-- Document this risk for any future real-money migration
-
-### No innerHTML
-
-`CrosshairLegend.jsx` uses DOM element creation (not `innerHTML`).
-No `dangerouslySetInnerHTML` anywhere in the codebase.
+Environment variables use **no `VITE_` prefix** for API keys — they exist only
+in the Vercel runtime, never in the client bundle.
 
 ---
 
 ## Environment Variables
 
+### Server-only (Vercel dashboard + `.env`)
+```bash
+ALPACA_API_KEY=your_paper_key         # Never VITE_ prefixed
+ALPACA_SECRET_KEY=your_paper_secret   # Never VITE_ prefixed
+ALPACA_DATA_URL=https://data.alpaca.markets/v2
+WS_AUTH_TOKEN=random_uuid             # Protects /api/ws-auth endpoint
+```
+
+### Client-side (`.env`)
+```bash
+VITE_WS_AUTH_TOKEN=same_as_WS_AUTH_TOKEN   # Bearer token for WS auth proxy
+VITE_SENTRY_DSN=                           # Optional — Sentry error tracking
+```
+
 ### The two-file pattern
-
 ```
-.env          ← real keys, gitignored, NEVER committed
-.env.example  ← template with placeholder values, IS committed
-```
-
-### Server-only (no VITE_ prefix — never in browser bundle)
-
-```bash
-ALPACA_API_KEY=PKxxxxxxxxxxxxxxxx
-ALPACA_SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxx
-ALPACA_DATA_URL=https://data.alpaca.markets
-WS_AUTH_TOKEN=your_random_token
+.env          ← real values, gitignored, NEVER committed
+.env.example  ← template with placeholders, IS committed
 ```
 
-### Client-side (VITE_ prefix — visible in bundle)
+> **Note on `VITE_WS_AUTH_TOKEN`:** This bearer token ships in the client bundle.
+> It is NOT a real secret — it gates the ws-auth endpoint to prevent casual abuse.
+> Rate limiting is the actual security control. Documented in `api/ws-auth.js`.
 
-```bash
-VITE_WS_AUTH_TOKEN=your_random_token     # bearer token for WS auth endpoint
-VITE_SENTRY_DSN=                         # optional error tracking
+---
+
+## API Endpoint Security
+
+All three serverless endpoints have layered protections:
+
+### Rate Limiting (in-memory, per serverless instance)
+| Endpoint | Limit | Window |
+|---|---|---|
+| `/api/ws-auth` | 5 requests/IP | 1 minute |
+| `/api/bars` | 60 requests/IP | 1 minute |
+| `/api/snapshot` | 30 requests/IP | 1 minute |
+
+All rate limiters include TTL cleanup (expired entries purged every 2 minutes)
+and a 10K entry cap to prevent unbounded memory growth on warm instances.
+
+### SSRF Guard
+`ALPACA_DATA_URL` is validated via `new URL().hostname` exact match against
+an `ALLOWED_DATA_HOSTS` Set in both `api/bars.js` and `api/snapshot.js`.
+Prevents an attacker from manipulating the env var to proxy requests to
+internal services. Uses hostname parsing (not `startsWith()`) to prevent
+bypass via `data.alpaca.markets.evil.com`.
+
+### Input Validation
+| Input | Validation | Location |
+|---|---|---|
+| Symbol | `/^[A-Z]{1,10}(\.[A-Z]{1,2})?$/` | bars.js, snapshot.js, useURLState.js, WatchlistPanel.jsx |
+| Timeframe | Allowlist: `1Min, 5Min, 15Min, 1Hour, 4Hour, 1Day` | bars.js |
+| Date params | ISO 8601 regex with anchoring | bars.js |
+| Limit param | Integer 1–10000 | bars.js |
+| Bearer token | Constant-time comparison | ws-auth.js |
+
+### Error Sanitization
+API error responses **never** leak:
+- Upstream status codes from Alpaca
+- Upstream URLs or hostnames
+- Stack traces or internal error details
+- Only generic messages: `"Data temporarily unavailable"`, `"Invalid request"`
+
+---
+
+## Client-Side Security
+
+### localStorage Schema Validation
+All data loaded from localStorage is validated against schemas before use:
+- Presets: structure, field types, enum values
+- Journal entries: required fields, date format, rating bounds
+- Watchlist: array of valid symbol strings
+- Symbol usage: frequency map shape
+
+Implemented in `src/utils/validate.js` (29 unit tests).
+Wired into `usePresetsStore`, `useJournalStore`, `WatchlistPanel`, `SymbolInput`.
+
+### ErrorBoundary
+`src/components/ui/ErrorBoundary.jsx` wraps the entire app:
+- **Production:** shows generic error message + reload button
+- **Development:** shows raw error message + stack trace
+
+### URL Parameter Validation
+`src/hooks/useURLState.js` validates all URL params (`?s=`, `?tf=`, `?panel=`)
+against regex patterns and allowlists before applying to state.
+
+### Content Security Policy (vercel.json)
+```
+default-src 'self';
+script-src 'self';
+style-src 'self' 'unsafe-inline';
+connect-src 'self' wss://stream.data.alpaca.markets;
+font-src 'self';
+img-src 'self' data: blob:;
+worker-src 'self';
+manifest-src 'self';
+frame-ancestors 'none';
 ```
 
-### Vercel Dashboard
+### Additional Headers
+- `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`
+- `X-Frame-Options: DENY`
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Permissions-Policy: camera=(), microphone=(), geolocation=()`
 
-All env vars must be added in Vercel Project Settings → Environment Variables.
-Never put actual values in `vercel.json`.
+---
+
+## WebSocket Security
+
+WebSocket credentials are obtained through the `/api/ws-auth` proxy:
+
+```
+Browser ──bearer token──► /api/ws-auth ──► returns { key, secret }
+Browser ──key+secret──► wss://stream.data.alpaca.markets/v2/iex
+```
+
+- The ws-auth endpoint is rate-limited (5/IP/min)
+- The bearer token is the `VITE_WS_AUTH_TOKEN` value
+- Connection uses secure WebSocket (wss://)
+- Auth message is never logged to console
 
 ---
 
 ## Pre-Commit Security Check
 
 ```bash
-git status                                    # .env must NOT appear
-git diff --staged | grep -i "api_key\|secret" # must return nothing
+git status
+git diff --staged | grep -i "ALPACA\|api_key\|secret\|token"
 ```
 
----
-
-## .gitignore (required entries)
-
-```
-.env
-.env.local
-.env.*.local
-node_modules/
-dist/
-.DS_Store
-*.log
-```
-
----
-
-## Known Acceptable Risks
-
-1. **`VITE_WS_AUTH_TOKEN` in client bundle** — Paper trading only. Anyone can call `/api/ws-auth` with the token. Rate limiting (5/min) is the mitigation. Must be revisited for real money.
-
-2. **In-memory rate limiting resets on cold start** — Vercel serverless functions don't share state. A determined attacker could bypass limits by triggering cold starts. Acceptable for current scale.
-
-3. **No CSRF protection** — API endpoints are GET-only data fetches. No state-mutating server operations exist.
+If you see real credential values in staged changes — **stop and fix**.
 
 ---
 
 ## Dependency Security
 
 ```bash
-npm audit          # Must show 0 critical/high before deploy
-npm outdated       # Check for security patches
+npm audit               # Check for vulnerabilities (currently 0)
+npm outdated            # See what needs updating
 ```
 
-Current state: 0 vulnerabilities (as of 2026-03-15).
+Never proceed with critical/high vulnerabilities without understanding the impact.
+
+---
+
+## Threat Model Summary
+
+| Threat | Mitigation |
+|---|---|
+| API key exposure | Server-side proxy, no VITE_ prefix on keys |
+| SSRF via env manipulation | Host allowlist on ALPACA_DATA_URL |
+| API abuse / scraping | Per-IP rate limiting on all endpoints |
+| XSS via user input | No dangerouslySetInnerHTML, regex validation on all inputs |
+| localStorage poisoning | Schema validation on load |
+| Clickjacking | X-Frame-Options DENY, frame-ancestors none |
+| Error information leak | Sanitized API errors, ErrorBoundary in prod |
+| Stale cached code | SW auto-versioned at build time, immutable asset hashes |

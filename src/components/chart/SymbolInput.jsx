@@ -104,11 +104,12 @@ export function SymbolInput() {
   }
 
   const submit = useCallback(async (symbol) => {
+    const currentSymbol = useChartStore.getState().selectedSymbol
     const cleaned = (symbol ?? draft).trim().toUpperCase()
 
     // No change or empty — just close
-    if (!cleaned || cleaned === selectedSymbol) {
-      setDraft(selectedSymbol)
+    if (!cleaned || cleaned === currentSymbol) {
+      setDraft(currentSymbol)
       setEditing(false)
       return
     }
@@ -129,17 +130,17 @@ export function SymbolInput() {
       } else {
         setError(`"${cleaned}" not found`)
         toastAdd({ message: `Symbol "${cleaned}" not found`, type: 'error' })
-        setDraft(selectedSymbol)
+        setDraft(currentSymbol)
         setEditing(false)
       }
     } catch {
       setError('Validation failed')
-      setDraft(selectedSymbol)
+      setDraft(useChartStore.getState().selectedSymbol)
       setEditing(false)
     } finally {
       setValidating(false)
     }
-  }, [draft, selectedSymbol, setSymbol, toastAdd])
+  }, [draft, setSymbol, toastAdd])
 
   function handleKeyDown(e) {
     // Arrow navigation within dropdown
@@ -239,7 +240,7 @@ export function SymbolInput() {
         </span>
       </button>
       {error && (
-        <div className="text-[10px] mt-1 text-red-400 font-mono">{error}</div>
+        <div className="text-[10px] mt-1 text-bear font-mono">{error}</div>
       )}
     </div>
   )

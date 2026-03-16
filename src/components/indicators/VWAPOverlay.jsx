@@ -58,9 +58,8 @@ export function VWAPOverlay({ chart, bars, visible = true }) {
       const series = seriesRef.current[cfg.key]
       if (!series) continue
       series.setData(result[cfg.key] ?? [])
-      series.applyOptions({ visible })
     }
-  }, [bars, visible])
+  }, [bars])
 
   useEffect(() => {
     for (const cfg of SERIES_CONFIG) {

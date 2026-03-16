@@ -212,7 +212,7 @@ export function PresetSelector() {
                       </button>
                       <button
                         onClick={() => handleDelete(preset.id)}
-                        className="px-1.5 py-0.5 rounded-r-full text-[11px] transition-colors hover:text-red-400 border-l"
+                        className="px-1.5 py-0.5 rounded-r-full text-[11px] transition-colors hover:text-bear border-l"
                         style={{ color: 'var(--text-muted)', borderColor: 'var(--border-mid, var(--border))' }}
                         title="Delete"
                       >

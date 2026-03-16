@@ -93,7 +93,7 @@ export function ConfluenceBar({ confluence }) {
             <div className="px-3 py-2 space-y-1">
               {reasons.map((r, i) => (
                 <div key={i} className="flex items-start gap-2 text-theme">
-                  <span className="text-green-400 shrink-0 mt-px">✓</span>
+                  <span className="text-bull shrink-0 mt-px">✓</span>
                   <span>{r}</span>
                 </div>
               ))}
@@ -105,7 +105,7 @@ export function ConfluenceBar({ confluence }) {
             <div className="px-3 py-2 space-y-1 border-t border-theme">
               {warnings.map((w, i) => (
                 <div key={i} className="flex items-start gap-2 text-theme-muted">
-                  <span className="text-yellow-400 shrink-0 mt-px">⚠</span>
+                  <span className="text-warn shrink-0 mt-px">⚠</span>
                   <span>{w}</span>
                 </div>
               ))}

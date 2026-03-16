@@ -25,11 +25,11 @@ const STRATEGIES = [
 ]
 
 const DAY_TYPE_LABELS = {
-  'trend-bull': { label: 'Trend Bull', color: '#22c55e' },
-  'trend-bear': { label: 'Trend Bear', color: '#ef4444' },
-  'chop':       { label: 'Chop',       color: '#eab308' },
-  'range':      { label: 'Range',      color: '#6b7280' },
-  'unknown':    { label: 'Unknown',    color: '#4b5563' },
+  'trend-bull': { label: 'Trend Bull', color: 'var(--color-bull)' },
+  'trend-bear': { label: 'Trend Bear', color: 'var(--color-bear)' },
+  'chop':       { label: 'Chop',       color: 'var(--color-warn)' },
+  'range':      { label: 'Range',      color: 'var(--color-neutral)' },
+  'unknown':    { label: 'Unknown',    color: 'var(--color-neutral)' },
 }
 
 function StatRow({ label, value, positive }) {
@@ -37,7 +37,7 @@ function StatRow({ label, value, positive }) {
     <div className="flex items-center justify-between py-1.5">
       <span className="text-[11px] text-theme-muted">{label}</span>
       <span className={`text-xs font-mono font-semibold ${
-        positive === true ? 'text-green-400' : positive === false ? 'text-red-400' : 'text-theme'
+        positive === true ? 'text-bull' : positive === false ? 'text-bear' : 'text-theme'
       }`}>
         {value}
       </span>
@@ -62,13 +62,13 @@ function MiniEquityCurve({ curve }) {
   }).join(' ')
 
   const lastVal = values[values.length - 1]
-  const color = lastVal >= 0 ? '#22c55e' : '#ef4444'
+  const color = lastVal >= 0 ? 'var(--color-bull)' : 'var(--color-bear)'
 
   return (
     <div className="px-4 py-2 border-b border-theme">
       <div className="flex items-center justify-between mb-1">
         <span className="text-[10px] text-theme-muted uppercase tracking-widest">Equity Curve</span>
-        <span className={`text-xs font-mono font-semibold ${lastVal >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+        <span className={`text-xs font-mono font-semibold ${lastVal >= 0 ? 'text-bull' : 'text-bear'}`}>
           {lastVal >= 0 ? '+' : ''}{lastVal}%
         </span>
       </div>
@@ -113,10 +113,10 @@ function DayTypeBreakdown({ breakdown }) {
               />
               <span className="text-theme-muted w-20 shrink-0">{cfg.label}</span>
               <span className="text-theme font-mono">{s.totalTrades}t</span>
-              <span className={`font-mono font-semibold ${s.winRate > 50 ? 'text-green-400' : 'text-red-400'}`}>
+              <span className={`font-mono font-semibold ${s.winRate > 50 ? 'text-bull' : 'text-bear'}`}>
                 {s.winRate}%
               </span>
-              <span className={`font-mono ml-auto ${s.totalPnlPct >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              <span className={`font-mono ml-auto ${s.totalPnlPct >= 0 ? 'text-bull' : 'text-bear'}`}>
                 {s.totalPnlPct >= 0 ? '+' : ''}{s.totalPnlPct}%
               </span>
             </div>
@@ -240,7 +240,7 @@ export function BacktestPanel() {
                 {results.trades.slice(-10).reverse().map((t, i) => (
                   <div key={i} className="flex items-center gap-2 py-1.5 border-b border-theme/30 text-xs">
                     <span className="text-theme-muted font-mono w-16 shrink-0">{t.date}</span>
-                    <span className={`w-10 shrink-0 ${t.type === 'long' ? 'text-green-400' : 'text-red-400'}`}>
+                    <span className={`w-10 shrink-0 ${t.type === 'long' ? 'text-bull' : 'text-bear'}`}>
                       {t.type === 'long' ? 'LONG' : 'SHORT'}
                     </span>
                     {t.dayType && DAY_TYPE_LABELS[t.dayType] && (
@@ -252,7 +252,7 @@ export function BacktestPanel() {
                     )}
                     <span className="flex-1" />
                     <span className={`font-mono font-semibold ${
-                      t.pnlPct > 0 ? 'text-green-400' : t.pnlPct < 0 ? 'text-red-400' : 'text-theme-muted'
+                      t.pnlPct > 0 ? 'text-bull' : t.pnlPct < 0 ? 'text-bear' : 'text-theme-muted'
                     }`}>
                       {t.pnlPct > 0 ? '+' : ''}{t.pnlPct.toFixed(2)}%
                     </span>

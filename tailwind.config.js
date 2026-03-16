@@ -18,9 +18,16 @@ export default {
           48:  '#22c55e',   // green — EMA 48
           200: '#e5e7eb',   // white — EMA 200
         },
-        vwap: '#06b6d4',    // cyan
-        level: '#eab308',   // gold — prev day H/L
-        orb:   '#6366f1',   // indigo — ORB zone
+        vwap:    '#06b6d4',    // cyan
+        level:   '#eab308',    // gold — prev day H/L
+        orb:     '#6366f1',    // indigo — ORB zone
+        // Semantic data colors — bull/bear, status, warnings
+        bull:    '#22c55e',
+        bear:    '#ef4444',
+        warn:    '#eab308',
+        info:    '#60a5fa',
+        neutral: '#6b7280',
+        badge:   '#ef4444',
       },
       fontFamily: {
         mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],

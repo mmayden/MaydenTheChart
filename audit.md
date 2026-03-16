@@ -1,14 +1,14 @@
 # Project Health Audit — Cheechart (Lumpia)
 
 > Reusable top-down assessment template. Run at any milestone for a consistent health snapshot.
-> Last run: 2026-03-15 (Phase 12B complete)
+> Last run: 2026-03-16 (Code Quality Audit complete)
 
 ---
 
 ## 1. Build & CI Health
 - [x] `npm run build` — zero errors, zero warnings
-- [x] `npm run test` — 274/274 tests pass
-- [x] `npx eslint src/` — 0 errors, 7 warnings (all false positives or test-only)
+- [x] `npm run test` — 298/298 tests pass
+- [x] `npx eslint src/` — 0 errors, 0 warnings
 - [x] `npm audit` — 0 vulnerabilities
 - [x] Vite config clean (SW versioning plugin, dev proxy, manual chunks)
 
@@ -92,10 +92,13 @@
 
 ## 10. Documentation Accuracy
 - [x] `CLAUDE.md` file paths match actual file locations
-- [x] `architecture.md` matches current data flow and component map
-- [x] `indicators.md` code signatures match actual function signatures
+- [x] `architecture.md` matches current data flow and component map (rewritten 2026-03-16)
+- [x] `security.md` matches current serverless proxy model (rewritten 2026-03-16)
+- [x] `git.md` reflects actual workflow (updated 2026-03-16)
+- [x] `indicators.md` code signatures match actual function signatures (updated 2026-03-16)
 - [x] `tasks.md` reflects completed work accurately
 - [x] `README.md` matches current project structure and setup
+- [x] `brainstorming.md` build priority section current (updated 2026-03-16)
 
 ---
 

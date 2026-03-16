@@ -49,9 +49,8 @@ export function EMAOverlay({ chart, bars, visible = true }) {
 
       const { series: emaData } = ema(bars, period)
       series.setData(emaData)
-      series.applyOptions({ visible })
     }
-  }, [bars, visible])
+  }, [bars])
 
   // Toggle visibility without re-creating series
   useEffect(() => {

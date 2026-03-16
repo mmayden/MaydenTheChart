@@ -29,8 +29,9 @@ export function Sidebar({ atrGauge }) {
 
       <aside
         className={`
-          flex flex-col shrink-0 border-r border-theme transition-all duration-200 overflow-hidden z-40
+          flex flex-col shrink-0 border-r border-theme overflow-hidden z-40
           fixed md:relative inset-y-0 left-0
+          transition-transform duration-200 md:transition-none
           ${sidebarOpen ? 'w-48 translate-x-0' : 'w-0 -translate-x-full md:w-0 md:translate-x-0'}
         `}
         style={{ backgroundColor: 'var(--bg-surface)' }}

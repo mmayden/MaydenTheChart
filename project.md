@@ -33,7 +33,7 @@ per Concretum Group/SSRN research, 2016–2023).
 
 | Decision | Choice | Reason |
 |---|---|---|
-| Framework | React 18 + Vite | Fast dev, industry standard, dominant in 2026 |
+| Framework | React 18 + Vite 7 | Fast dev, industry standard, dominant in 2026 (upgrades planned in Phase 12C) |
 | Charting lib | lightweight-charts **v5** | v5 has native multi-pane (RSI/MACD subcharts built-in), 16% smaller bundle, enhanced plugin system. Use v5, not v4. |
 | Styling | Tailwind CSS | Dominates 2026 frontend ecosystem |
 | Server state | **TanStack Query v5** | 2026 consensus for API data: caching, loading states, background refetch, deduplication |

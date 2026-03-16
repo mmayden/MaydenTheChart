@@ -47,12 +47,14 @@ function formatTimeET(unixSeconds) {
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function CrosshairLegend({ chart, bars, theme: _theme = 'dark' }) {
-  const legendRef = useRef(null)
-  const barsRef   = useRef(bars)
+  const legendRef  = useRef(null)
+  const barsMapRef = useRef(new Map())
 
-  // Keep bars ref current without triggering effect re-runs
+  // Build time→bar lookup Map when bars change (O(1) per crosshair move)
   useEffect(() => {
-    barsRef.current = bars
+    const m = new Map()
+    if (bars) for (const bar of bars) m.set(bar.time, bar)
+    barsMapRef.current = m
   }, [bars])
 
   useEffect(() => {
@@ -66,7 +68,7 @@ export function CrosshairLegend({ chart, bars, theme: _theme = 'dark' }) {
         return
       }
 
-      const bar = barsRef.current?.find(b => b.time === param.time)
+      const bar = barsMapRef.current.get(param.time)
       if (!bar) {
         el.style.opacity = '0'
         return

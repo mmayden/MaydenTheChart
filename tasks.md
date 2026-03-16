@@ -504,6 +504,33 @@
 
 ---
 
+## ✅ Code Quality Audit — React Patterns + Security + Theme Consistency (2026-03-16)
+
+**298/298 tests passing, build clean, ESLint 0 errors**
+
+### Correctness Fixes
+- ✅ BollingerOverlay: split series creation (once) from visibility toggle (no more teardown/rebuild on show/hide)
+- ✅ EMAOverlay + VWAPOverlay: removed redundant dual visibility effects (data update and visibility are now separate concerns)
+- ✅ SymbolInput: fixed stale closure — reads `selectedSymbol` from store at call time via `useChartStore.getState()`
+- ✅ App.jsx: chart instance polling runs once on mount, not re-triggered on every `dataUpdatedAt` change
+- ✅ SSRF guard: `startsWith()` replaced with `new URL().hostname` exact match in `bars.js` + `snapshot.js`
+
+### Performance Fixes
+- ✅ CommandPalette: pre-computed `flatIndexMap` replaces render-time counter mutation (`flatIdx++`)
+- ✅ CrosshairLegend: `Map` for O(1) bar lookup per mouse move (was O(n) `.find()` on every crosshair event)
+- ✅ Rate limiters: TTL cleanup sweep every 2 minutes + 10K entry cap across all 3 API endpoints (`bars`, `snapshot`, `ws-auth`)
+
+### Theme Consistency (14 files migrated)
+- ✅ Added semantic data color system: CSS variables (`--color-bull/bear/warn/info/neutral/badge`) + Tailwind tokens
+- ✅ Migrated 30+ hardcoded Tailwind color classes (`text-green-400`, `text-red-400`, `bg-red-500`, etc.) to semantic `.text-bull`, `.text-bear`, `.bg-badge` classes
+- ✅ Files updated: StatusBar, TopNav, PriceDisplay, JournalPanel, BacktestPanel, WatchlistPanel, AlertsPanel, ConfluenceBar, SymbolInput, PresetSelector, App.jsx, index.css, tailwind.config.js
+- ✅ Removed dead CSS: `.alerts-panel-enter` / `.alerts-panel-enter-active` (Motion replaced these)
+
+### Sidebar Transition Fix
+- ✅ Desktop sidebar uses `md:transition-none` (instant width snap) — prevents chart/RSI/MACD resize jank during transition
+
+---
+
 ## 🔲 Phase 12C — Dependency Upgrades
 
 > **Goal:** Modernize the stack. All upgrades are incremental version bumps, not rewrites.

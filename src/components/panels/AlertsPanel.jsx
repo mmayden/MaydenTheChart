@@ -190,11 +190,11 @@ export function AlertsPanel() {
                     {alertLabel(alert)}
                   </span>
                   {alert.triggered && (
-                    <span className="text-[10px] text-green-500 shrink-0">hit</span>
+                    <span className="text-[10px] text-bull shrink-0">hit</span>
                   )}
                   <button
                     onClick={() => removeAlert(alert.id)}
-                    className="text-theme-muted hover:text-red-400 text-xs transition-colors shrink-0 leading-none"
+                    className="text-theme-muted hover:text-bear text-xs transition-colors shrink-0 leading-none"
                     title="Remove"
                   >
                     ×

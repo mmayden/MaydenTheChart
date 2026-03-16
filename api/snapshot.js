@@ -14,9 +14,17 @@
 const rateLimitMap = new Map()
 const RATE_LIMIT_WINDOW = 60_000
 const RATE_LIMIT_MAX = 30 // 30 requests per IP per minute
+const RATE_LIMIT_MAX_ENTRIES = 10_000
+let lastCleanup = 0
 
 function isRateLimited(ip) {
   const now = Date.now()
+  if (now - lastCleanup > 120_000 || rateLimitMap.size > RATE_LIMIT_MAX_ENTRIES) {
+    for (const [key, val] of rateLimitMap) {
+      if (now - val.start > RATE_LIMIT_WINDOW) rateLimitMap.delete(key)
+    }
+    lastCleanup = now
+  }
   const entry = rateLimitMap.get(ip)
   if (!entry || now - entry.start > RATE_LIMIT_WINDOW) {
     rateLimitMap.set(ip, { start: now, count: 1 })
@@ -28,7 +36,7 @@ function isRateLimited(ip) {
 }
 
 /** SSRF guard — only allow known Alpaca data hosts. */
-const ALLOWED_DATA_HOSTS = ['https://data.alpaca.markets']
+const ALLOWED_DATA_HOSTS = new Set(['data.alpaca.markets'])
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -63,8 +71,8 @@ export default async function handler(req, res) {
   const secretKey = process.env.ALPACA_SECRET_KEY
   const dataUrl = process.env.ALPACA_DATA_URL || 'https://data.alpaca.markets/v2'
 
-  // SSRF guard — reject misconfigured data URLs
-  if (!ALLOWED_DATA_HOSTS.some(h => dataUrl.startsWith(h))) {
+  // SSRF guard — reject misconfigured data URLs (exact hostname match)
+  if (!ALLOWED_DATA_HOSTS.has(new URL(dataUrl).hostname)) {
     return res.status(500).json({ error: 'Server misconfigured' })
   }
 

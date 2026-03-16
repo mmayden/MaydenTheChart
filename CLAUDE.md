@@ -41,8 +41,8 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - Indicators, backtester, confluence — zero provider coupling (pure math)
 
 ## Security rules
-- All API endpoints must have rate limiting (in-memory per-instance, IP-based)
-- `ALPACA_DATA_URL` must be validated against `ALLOWED_DATA_HOSTS` allowlist (SSRF guard)
+- All API endpoints must have rate limiting (in-memory per-instance, IP-based, TTL cleanup every 2min, 10K entry cap)
+- `ALPACA_DATA_URL` must be validated against `ALLOWED_DATA_HOSTS` via `new URL().hostname` exact match (SSRF guard)
 - All user input from URL params, forms, and localStorage must be regex-validated before use
 - API errors must never leak upstream status codes, URLs, or stack traces to clients
 - ErrorBoundary shows raw error messages only in `import.meta.env.DEV`
@@ -62,13 +62,20 @@ TopNav → Sidebar (left) → Chart (center) → RightPanel (right, one at a tim
 Values: `null | 'alerts' | 'backtest' | 'journal' | 'watchlist'`. Same panel = close,
 different panel = switch. On mobile (<768px), panels become full-screen overlays.
 
-**Color architecture:** All colors flow from CSS custom properties in `src/index.css`
-(lines 60-151). Each theme defines 25+ variables. Components use semantic CSS classes
+**Color architecture:** All colors flow from CSS custom properties in `src/index.css`.
+Each theme defines 25+ variables. Components use semantic CSS classes
 (`.btn-primary`, `.bg-input`, `.border-theme`, `.text-accent`, etc.) or inline
 `var(--name)` references — never hardcoded Tailwind color classes. Each panel button
 has its own `--{id}-color` and `--{id}-active-bg` variables. The settings gear has
 `--settings-color` and `--settings-glow`. Nav button hover animations are CSS-only
 keyframes in `src/index.css` (`.nav-btn-{id}` classes).
+
+**Data color system:** Universal trading/data colors (bull/bear, status, warnings) are
+defined as CSS custom properties (`--color-bull`, `--color-bear`, `--color-warn`,
+`--color-info`, `--color-neutral`, `--color-badge`) in `:root` and also registered as
+Tailwind color tokens in `tailwind.config.js` (`bull`, `bear`, `warn`, `info`, `neutral`,
+`badge`). Components use `.text-bull`, `.bg-bear/20`, `.border-warn/40` etc. — never
+hardcoded `text-green-400` or `text-red-400`.
 
 **Accent color system:** Users can pick from 6 accent presets per theme in Settings.
 Presets defined in `src/constants/accents.js` (single source of truth), consumed by

@@ -38,18 +38,18 @@ export function PriceDisplay({ bars, byDay }) {
   if (price == null) return null
 
   const isUp   = change >= 0
-  const color  = isUp ? 'text-green-400' : 'text-red-400'
+  const color  = isUp ? 'text-bull' : 'text-bear'
   const sign   = isUp ? '+' : ''
 
   return (
     <div className="flex items-baseline gap-3">
-      <span className="text-white font-mono text-2xl font-bold">
+      <span className="text-theme font-mono text-2xl font-bold">
         {price.toFixed(2)}
       </span>
       <span className={`font-mono text-sm ${color}`}>
         {sign}{change.toFixed(2)} ({sign}{changePct.toFixed(2)}%)
       </span>
-      <span className="text-blue-400 font-mono text-xs uppercase tracking-wider">
+      <span className="text-accent font-mono text-xs uppercase tracking-wider">
         {symbol}
       </span>
     </div>

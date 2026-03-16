@@ -184,7 +184,7 @@ export function JournalPanel() {
               <div>
                 <span className="text-theme-muted">Current: </span>
                 <span className={`font-mono font-semibold ${
-                  analytics.streaks.currentType === 'win' ? 'text-green-400' : 'text-red-400'
+                  analytics.streaks.currentType === 'win' ? 'text-bull' : 'text-bear'
                 }`}>
                   {analytics.streaks.current} {analytics.streaks.currentType === 'win' ? 'W' : 'L'}
                 </span>
@@ -192,7 +192,7 @@ export function JournalPanel() {
               <div>
                 <span className="text-theme-muted">Best: </span>
                 <span className={`font-mono font-semibold ${
-                  analytics.streaks.longestType === 'win' ? 'text-green-400' : 'text-red-400'
+                  analytics.streaks.longestType === 'win' ? 'text-bull' : 'text-bear'
                 }`}>
                   {analytics.streaks.longest} {analytics.streaks.longestType === 'win' ? 'W' : 'L'}
                 </span>
@@ -216,7 +216,7 @@ export function JournalPanel() {
                     <span className="truncate flex-1 text-left">{s.setup}</span>
                     <span className="text-theme-muted font-mono">{s.total}t</span>
                     <span className={`font-mono font-semibold w-12 text-right ${
-                      s.winRate >= 50 ? 'text-green-400' : 'text-red-400'
+                      s.winRate >= 50 ? 'text-bull' : 'text-bear'
                     }`}>
                       {s.winRate}%
                     </span>
@@ -234,11 +234,11 @@ export function JournalPanel() {
                 {analytics.ratingCorr.map((r) => (
                   <div key={r.rating} className="flex-1 text-center">
                     <div className={`text-[11px] font-mono font-semibold ${
-                      r.winRate >= 50 ? 'text-green-400' : 'text-red-400'
+                      r.winRate >= 50 ? 'text-bull' : 'text-bear'
                     }`}>
                       {r.winRate}%
                     </div>
-                    <div className="text-[10px] text-yellow-400 font-bold">{r.rating}</div>
+                    <div className="text-[10px] text-warn font-bold">{r.rating}</div>
                     <div className="text-[9px] text-theme-muted">{r.total}t</div>
                   </div>
                 ))}
@@ -284,9 +284,9 @@ export function JournalPanel() {
                   onClick={() => setResult(r)}
                   className={`flex-1 py-1.5 text-[11px] font-semibold rounded transition-colors ${
                     result === r
-                      ? r === 'win' ? 'bg-green-500/20 text-green-400 border border-green-500/40'
-                      : r === 'loss' ? 'bg-red-500/20 text-red-400 border border-red-500/40'
-                      : 'bg-gray-500/20 text-gray-400 border border-gray-500/40'
+                      ? r === 'win' ? 'bg-bull/20 text-bull border border-bull/40'
+                      : r === 'loss' ? 'bg-bear/20 text-bear border border-bear/40'
+                      : 'bg-neutral/20 text-neutral border border-neutral/40'
                       : 'text-theme-muted border border-theme-mid hover:border-theme-mid'
                   }`}
                 >
@@ -306,7 +306,7 @@ export function JournalPanel() {
                   onClick={() => setRating(n)}
                   className={`w-7 h-7 rounded text-xs font-bold transition-colors ${
                     n <= rating
-                      ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/40'
+                      ? 'bg-warn/20 text-warn border border-warn/40'
                       : 'text-theme-muted border border-theme-mid'
                   }`}
                 >
@@ -369,17 +369,17 @@ export function JournalPanel() {
             {filteredEntries.slice(0, 50).map((entry) => (
               <li key={entry.id} className="px-4 py-2.5 flex items-start gap-2">
                 <span className={`shrink-0 mt-1 w-1.5 h-1.5 rounded-full ${
-                  entry.result === 'win' ? 'bg-green-400' : entry.result === 'loss' ? 'bg-red-400' : 'bg-gray-400'
+                  entry.result === 'win' ? 'bg-bull' : entry.result === 'loss' ? 'bg-bear' : 'bg-neutral'
                 }`} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 text-xs">
                     <span className="font-mono font-semibold">{entry.symbol}</span>
                     <span className="text-theme-muted truncate">{entry.setup}</span>
                     {entry.rating && (
-                      <span className="text-yellow-400 text-[10px] font-bold">{entry.rating}/5</span>
+                      <span className="text-warn text-[10px] font-bold">{entry.rating}/5</span>
                     )}
                     <span className={`font-semibold ml-auto shrink-0 ${
-                      entry.result === 'win' ? 'text-green-400' : entry.result === 'loss' ? 'text-red-400' : 'text-gray-400'
+                      entry.result === 'win' ? 'text-bull' : entry.result === 'loss' ? 'text-bear' : 'text-neutral'
                     }`}>
                       {entry.result.toUpperCase()}
                     </span>
@@ -390,7 +390,7 @@ export function JournalPanel() {
                 </div>
                 <button
                   onClick={() => removeEntry(entry.id)}
-                  className="shrink-0 text-theme-muted hover:text-red-400 text-xs transition-colors"
+                  className="shrink-0 text-theme-muted hover:text-bear text-xs transition-colors"
                 >
                   ×
                 </button>
