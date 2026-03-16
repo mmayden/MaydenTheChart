@@ -83,17 +83,17 @@ both the store (`setAccentColor`) and the SettingsModal UI. Overrides 5 CSS vari
 (`--accent`, `--accent-dim`, `--btn-primary`, `--btn-primary-hover`, `--focus-ring`)
 via inline styles on `<html>`. Resets when theme changes. Persisted to `localStorage`.
 
-**Animation system:** Two-tier approach — CSS transitions for layout flow, Motion v12 for content.
-- **Layout transitions (CSS):** Sidebar uses `transition-all`. RightPanel wrapper uses
-  `transition-[transform,width,min-width]`. Both are persistent DOM elements so flex
-  siblings resize smoothly.
+**Animation system:**
+- **RightPanel:** Persistent wrapper with CSS `transition-[transform,width,min-width]`.
+  Border on inner content, not wrapper. Chart area resizes seamlessly.
+- **Sidebar:** Simple `transition-all duration-200` on the `<aside>`. Original pattern.
 - **Content transitions (Motion):** RightPanel uses `AnimatePresence` opacity fade for
   panel switching. CommandPalette and SettingsModal use scale+fade entrance/exit.
 - **Design rule:** Never use Motion's mount/unmount (`AnimatePresence`) for elements that
-  affect flex layout. Layout-affecting transitions must use CSS on persistent DOM elements
-  so the chart area resizes seamlessly. Motion is only for content inside those containers.
+  affect flex layout. Motion is only for content inside persistent containers.
 - All animations respect `prefers-reduced-motion` via `useReducedMotion()` hook
 - CSS-only: nav hover keyframes, skeleton shimmer, settings gear spin+glow
+- **Known issue (BUG-001):** Chart area doesn't expand when sidebar closes. See `bugs.md`.
 
 ## Key file locations
 

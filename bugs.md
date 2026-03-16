@@ -8,23 +8,31 @@
 
 ## Open
 
-### BUG-001: RSI/MACD mini charts don't resize on sidebar toggle
-**Status:** Low priority — partially mitigated by UX change
-**Severity:** Low — RSI/MACD toggles moved to sidebar, tab strip removed
+### BUG-001: Chart area doesn't snap left when sidebar closes
+**Status:** Open — parked. Multiple fix attempts failed. Sidebar reverted to original clean form.
+**Severity:** Medium — functional but the chart/RSI/MACD don't expand to fill sidebar space on close
 **First noticed:** 2026-03-16
-**Introduced:** Unclear — may predate Phase 12B
+**Introduced:** Unclear — may have always been present, noticed after Phase 12B audit
 
 **Symptoms:**
-- When left sidebar opens/closes, RSI and MACD mini chart canvases may not
-  expand/contract to fill available width during transition
-- Main chart and status bar resize correctly
-- Right panel resize works perfectly
+- When left sidebar closes, the chart area (main chart + RSI/MACD + status bar)
+  does not expand leftward to fill the vacated space
+- Right panel close/open works perfectly — chart resizes seamlessly
+- The sidebar itself opens/closes fine visually
 
-**Mitigation:** RSI/MACD toggles moved back to sidebar IndicatorToggle (where they
-belong as indicators). Removed the separate tab button strip. Sidebar reverted to
-original clean form. Charts use `autoSize: true`. No hacks in codebase.
+**What was tried (all failed or reverted):**
+1. `transition-all` restored (was `transition-transform md:transition-none`)
+2. All charts switched to `autoSize: true` (lw-charts v5 built-in)
+3. Sidebar rewritten to mirror RightPanel structure (border on inner, min-w-0, etc.)
+4. `window.dispatchEvent(new Event('resize'))` after transition
+5. Second attempt at RightPanel-mirror pattern
 
-**Tracking doc:** `left-bar-problems.md` — full change history and diagnostic plan
+**Current state:** Sidebar is in its original clean form (pre-audit `dca2cad`).
+Charts use `autoSize: true`. No hacks or workarounds. Needs proper DevTools
+diagnosis to understand why the flex-1 chart column doesn't expand when the
+sidebar shrinks to w-0.
+
+**Tracking doc:** `left-bar-problems.md` — full change history
 
 ---
 

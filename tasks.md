@@ -532,8 +532,10 @@
 - ✅ All charts switched to `autoSize: true` (lw-charts v5 built-in, replaces manual ResizeObserver)
 - ✅ RSI/MACD toggles moved back to sidebar IndicatorToggle (they're indicators, not a separate category)
 - ✅ Removed separate RSI/MACD tab button strip below chart
-- ✅ Added corner labels to RSI/MACD mini charts (RSI purple, MACD blue) for identification
+- ✅ RSI/MACD labels via lw-charts watermark (auto-aligned inside plotting area)
+- ✅ Mini chart price scales `minimumWidth: 60` for right-edge alignment with main chart
 - ✅ Created `bugs.md` tracker and `left-bar-problems.md` audit doc
+- 🔲 **BUG-001:** Chart area doesn't expand when sidebar closes — needs DevTools diagnosis (parked)
 
 ---
 
