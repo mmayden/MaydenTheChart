@@ -90,8 +90,16 @@ export const useChartStore = create((set) => ({
   closePanel:            () => set({ activePanel: null }),
   setSettingsOpen:       (open) => set({ settingsOpen: open }),
   setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
-  setSidebarOpen:        (open) => set({ sidebarOpen: open }),
-  toggleSidebar:         () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
+  setSidebarOpen:        (open) => {
+    set({ sidebarOpen: open })
+    // After the CSS width transition (200ms), fire resize so lightweight-charts
+    // autoSize recalculates canvas dimensions for all chart instances
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 220)
+  },
+  toggleSidebar:         () => {
+    set((s) => ({ sidebarOpen: !s.sidebarOpen }))
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 220)
+  },
 
   // ─── Sound alerts ─────────────────────────────────────────────────────────
   soundAlerts: (() => { try { return localStorage.getItem('lumpia-sound-alerts') !== 'false' } catch { return true } })(),
