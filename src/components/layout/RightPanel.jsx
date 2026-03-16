@@ -4,7 +4,10 @@
  * Renders the active panel content based on useChartStore.activePanel.
  * Only one panel open at a time. On mobile (<768px), becomes full-screen overlay.
  * Panel components are lazy-loaded for code splitting.
- * Animated with Motion (spring physics slide + fade).
+ *
+ * Layout approach: persistent wrapper div always in DOM for smooth width
+ * transitions (chart resizes seamlessly). Content inside uses AnimatePresence
+ * for fade transitions when switching between panels.
  *
  * Panel values: null | 'alerts' | 'backtest' | 'journal' | 'watchlist'
  */
@@ -50,10 +53,6 @@ export function RightPanel() {
   const isOpen = activePanel !== null
   const panel  = activePanel ? PANELS[activePanel] : null
 
-  const springTransition = prefersReduced
-    ? { duration: 0 }
-    : { type: 'spring', stiffness: 400, damping: 35, mass: 0.8 }
-
   return (
     <>
       {/* Backdrop (mobile only) */}
@@ -71,19 +70,33 @@ export function RightPanel() {
         )}
       </AnimatePresence>
 
-      {/* Panel container */}
-      <AnimatePresence mode="wait">
-        {isOpen && panel && (
-          <motion.div
-            key={activePanel}
-            className="fixed top-0 right-0 h-full z-50 w-full md:relative md:z-auto md:top-auto md:right-auto md:h-auto md:w-[340px] md:min-w-[340px]"
-            style={{ backgroundColor: 'var(--bg-surface)' }}
-            initial={{ x: '100%', opacity: 0.5 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: '100%', opacity: 0 }}
-            transition={springTransition}
-          >
-            <div className="flex flex-col h-full border-l border-theme w-full md:w-[340px]">
+      {/* Panel wrapper — always in DOM so width transitions are seamless.
+          On mobile: fixed overlay, slides via translateX.
+          On desktop: relative in flex layout, width transitions smoothly. */}
+      <div
+        className={[
+          'fixed top-0 right-0 h-full z-50',
+          'md:relative md:z-auto md:top-auto md:right-auto md:h-auto',
+          'shrink-0 overflow-hidden',
+          prefersReduced
+            ? ''
+            : 'transition-[transform,width,min-width] duration-300 ease-out',
+          isOpen
+            ? 'translate-x-0 w-full md:w-[340px] md:min-w-[340px]'
+            : 'translate-x-full md:translate-x-0 w-0 md:w-0 md:min-w-0 pointer-events-none',
+        ].join(' ')}
+        style={{ backgroundColor: isOpen ? 'var(--bg-surface)' : 'transparent' }}
+      >
+        <AnimatePresence mode="wait">
+          {isOpen && panel && (
+            <motion.div
+              key={activePanel}
+              className="flex flex-col h-full border-l border-theme w-full md:w-[340px]"
+              initial={prefersReduced ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={prefersReduced ? undefined : { opacity: 0 }}
+              transition={{ duration: prefersReduced ? 0 : 0.15 }}
+            >
               {/* Header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-theme shrink-0">
                 <span className="text-sm font-bold tracking-wide">{panel.title}</span>
@@ -101,10 +114,10 @@ export function RightPanel() {
                   <panel.Component />
                 </Suspense>
               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </>
   )
 }
