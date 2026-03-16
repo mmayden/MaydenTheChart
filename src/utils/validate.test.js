@@ -159,8 +159,6 @@ describe('validateWatchlist', () => {
   })
 
   it('caps at 100 symbols', () => {
-    const big = Array.from({ length: 150 }, (_, i) => `SYM${String(i).padStart(2, '0')}`.slice(0, 5).toUpperCase())
-    // Generate valid symbols
     const valid = Array.from({ length: 150 }, (_, i) => `T${i}`)
       .filter((s) => /^[A-Z]{1,10}$/.test(s))
     const result = validateWatchlist(valid)

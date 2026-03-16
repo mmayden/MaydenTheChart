@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { useAlertsStore } from './useAlertsStore'
 
 beforeEach(() => {
@@ -108,13 +108,11 @@ describe('useAlertsStore', () => {
 
   it('markTriggered with non-existent id leaves alerts unchanged', () => {
     useAlertsStore.getState().addAlert({ type: 'price', price: 100, condition: 'above' })
-    const alertsBefore = useAlertsStore.getState().alerts
-
     useAlertsStore.getState().markTriggered('non-existent-id')
 
-    const alertsAfter = useAlertsStore.getState().alerts
-    expect(alertsAfter).toHaveLength(1)
-    expect(alertsAfter[0].triggered).toBe(false)
+    const { alerts } = useAlertsStore.getState()
+    expect(alerts).toHaveLength(1)
+    expect(alerts[0].triggered).toBe(false)
   })
 
   // ─── Candle streak alerts ──────────────────────────────────────────────────

@@ -5,7 +5,7 @@ import { confluenceScore } from './confluence'
 
 const bullSignal = (strength = 'strong') => ({ value: 1, bias: 'bull', strength })
 const bearSignal = (strength = 'strong') => ({ value: 1, bias: 'bear', strength })
-const neutralSignal = () => ({ value: 1, bias: 'neutral', strength: 'weak' })
+const neutralSignal = () => ({ value: 1, bias: 'neutral', strength: 'weak' }) // eslint-disable-line no-unused-vars -- kept for test readability
 
 const trendBull = { type: 'trend-bull', brokePDH: true, brokePDL: false, label: '', color: '' }
 const trendBear = { type: 'trend-bear', brokePDH: false, brokePDL: true, label: '', color: '' }
