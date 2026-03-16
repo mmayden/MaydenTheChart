@@ -14,6 +14,8 @@ const TOGGLES = [
   { key: 'rvol',      label: 'RVOL'       },
   { key: 'levels',    label: 'Levels'     },
   { key: 'sr',        label: 'S/R'        },
+  { key: 'rsi',       label: 'RSI'        },
+  { key: 'macd',      label: 'MACD'       },
 ]
 
 export function IndicatorToggle() {
