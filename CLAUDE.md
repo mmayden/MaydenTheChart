@@ -29,7 +29,7 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - JavaScript (not TypeScript — tests provide sufficient coverage at current scale)
 - `feed: 'iex'` required on all Alpaca data fetches (free tier)
 - **No react-router-dom** — single-page app, panel-based architecture
-- Motion v12 (formerly Framer Motion) — AnimatePresence + spring physics for panels/modals
+- Motion v12 (formerly Framer Motion) — AnimatePresence for content transitions (panels, modals)
 
 ## Data provider strategy
 - **Current provider:** Alpaca Markets (free tier, IEX feed, 200 calls/min, 7yr history)
@@ -83,10 +83,15 @@ both the store (`setAccentColor`) and the SettingsModal UI. Overrides 5 CSS vari
 (`--accent`, `--accent-dim`, `--btn-primary`, `--btn-primary-hover`, `--focus-ring`)
 via inline styles on `<html>`. Resets when theme changes. Persisted to `localStorage`.
 
-**Animation system:** Motion v12 (`motion/react`) powers panel/modal transitions.
-- RightPanel: spring physics slide-in/out (`AnimatePresence` with per-panel key)
-- CommandPalette: scale+fade entrance/exit (`AnimatePresence` internal)
-- SettingsModal: scale+fade entrance/exit (`AnimatePresence` in App.jsx)
+**Animation system:** Two-tier approach — CSS transitions for layout flow, Motion v12 for content.
+- **Layout transitions (CSS):** Sidebar and RightPanel wrappers are persistent DOM elements
+  with CSS `transition-all` / `transition-[transform,width,min-width]`. This ensures flex
+  siblings (chart, RSI/MACD mini charts) resize smoothly in lockstep via ResizeObserver.
+- **Content transitions (Motion):** RightPanel uses `AnimatePresence` opacity fade for
+  panel switching. CommandPalette and SettingsModal use scale+fade entrance/exit.
+- **Design rule:** Never use Motion's mount/unmount (`AnimatePresence`) for elements that
+  affect flex layout. Layout-affecting transitions must use CSS on persistent DOM elements
+  so the chart area resizes seamlessly. Motion is only for content inside those containers.
 - All animations respect `prefers-reduced-motion` via `useReducedMotion()` hook
 - CSS-only: nav hover keyframes, skeleton shimmer, settings gear spin+glow
 

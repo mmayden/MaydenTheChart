@@ -182,38 +182,52 @@ with separate query keys. Cache aggressively — 4h and 1D data changes slowly.
 
 ---
 
-## Build Priority (Phases 10-12)
+## Build Progress (Phases 10-12)
 
-### Phase 10A — Architecture Consolidation
-Kill router, build right panel system, migrate dashboard components to panels.
+### Phase 10A — Architecture Consolidation ✅
+Killed router, built right panel system, migrated dashboard components to panels.
 
-### Phase 10B — Synthesis Layer ("Damn Factor")
-Confluence score, MTF strip, backtester upgrade (configurable params, equity curve,
+### Phase 10B — Synthesis Layer ("Damn Factor") ✅
+Confluence score, MTF strip, backtester upgrade (3 strategies, equity curve,
 day type breakdown, VWAP Bounce strategy).
 
-### Phase 10C — Panel Content Upgrades
-Watchlist with live prices (Alpaca snapshot), journal analytics (by setup, streaks, ratings).
+### Phase 10C — Panel Content Upgrades ✅
+Watchlist with live prices (Alpaca snapshot), journal analytics, sound alerts, session stats.
 
-### Phase 11 — Polish + Mobile
-Onboarding tooltips, touch targets, swipe gestures, PWA, theme CSS refactor.
+### Phase 11 — Polish + Mobile + Security ✅
+Onboarding tour, touch targets 44px+, swipe gestures, PWA, CSS theme refactor,
+code splitting, chart snapshot, localStorage validation, error sanitization.
 
-### Phase 12+ — Future Differentiators
-Screener, trade replay, chart annotations, snapshot sharing, weekly gap tracking,
+### Phase 12A — Production Hardening ✅
+Cache headers, self-hosted fonts, SW auto-versioning, OG meta, Sentry, reduced-motion.
+
+### Phase 12B — UX Sharpening ✅
+Motion library (content transitions), skeleton loading, accent color customization.
+Layout transition fix: persistent wrapper with CSS transitions for seamless chart resize.
+
+### Phase 12C — Dependency Upgrades (next)
+React 19, Zustand 5, Vite 8, Tailwind 4.
+
+### Phase 12D+ — Future Differentiators
+Data provider abstraction, infinite scroll, screener, trade replay, chart annotations,
 volume profile, alert sets per preset, cloud sync.
 
 ---
 
-## Approved Ideas (Scoped into Build Phases)
+## Shipped Ideas (from brainstorming → implemented)
 
-- **Sound alerts** — optional subtle audio ping on alert triggers (Bloomberg-style). → Phase 10C
-- **Session stats in status bar** — "Today: 2 trades, +0.8%" from journal entries for current day. → Phase 10C
-- **Heat calendar in journal panel** — GitHub-style contribution graph of daily P&L. Green = profit, red = loss. → Phase 10C
-- **Chart snapshot** — Cmd+Shift+S captures chart as PNG with all indicators, copyable. → Phase 11
+- **Sound alerts** — Web Audio API ping (880Hz, optional) ✅ Phase 10C
+- **Session stats in status bar** — "Today: Nt NW NL" from journal ✅ Phase 10C
+- **Chart snapshot** — Cmd+Shift+S captures PNG with watermark ✅ Phase 11B
+- **Accent color customization** — 6 presets per theme ✅ Phase 12B
+- **Panel animations** — CSS layout transitions + Motion content fades ✅ Phase 12B
+- **Skeleton loading states** — shimmer fallbacks ✅ Phase 12B
 
-## Additional Ideas (Not Yet Scoped)
+## Ideas Under Consideration
 
-- **Keyboard-everything** — every single action reachable via command palette
+- **Heat calendar in journal panel** — GitHub-style contribution graph of daily P&L (deferred)
 - **Natural language queries** — "show me when RSI crossed 70 this week" (future AI integration)
+- **Keyboard-everything** — every action via command palette (90% done already)
 
 ---
 
