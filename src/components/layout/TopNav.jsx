@@ -2,11 +2,12 @@
  * TopNav — Shared top navigation bar.
  *
  * Layout:
- *   [☰ mobile] [Logo]  --- spacer ---  [panel toggles] [⌘K search] [⚙ Settings]
+ *   [☰ mobile] [Logo]  --- spacer ---  [panel toggles] [⌘K search] [? Help] [⚙ Settings]
  *
  * Panel toggle icons replace the old Chart/Dashboard navigation tabs.
  */
 
+import { useState, useRef, useEffect } from 'react'
 import Logo from '../ui/Logo'
 import { useChartStore } from '../../store/useChartStore'
 import { useAlertsStore } from '../../store/useAlertsStore'
@@ -53,9 +54,23 @@ export function TopNav() {
   const setSettingsOpen      = useChartStore((s) => s.setSettingsOpen)
   const setCommandPaletteOpen = useChartStore((s) => s.setCommandPaletteOpen)
   const toggleSidebar        = useChartStore((s) => s.toggleSidebar)
+  const startTour            = useChartStore((s) => s.startTour)
 
   const alerts      = useAlertsStore((s) => s.alerts)
   const activeCount = alerts.filter((a) => !a.triggered).length
+
+  const [helpOpen, setHelpOpen] = useState(false)
+  const helpRef = useRef(null)
+
+  // Close help dropdown on outside click
+  useEffect(() => {
+    if (!helpOpen) return
+    function handleClick(e) {
+      if (helpRef.current && !helpRef.current.contains(e.target)) setHelpOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [helpOpen])
 
   return (
     <nav
@@ -135,6 +150,38 @@ export function TopNav() {
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
       </button>
+
+      {/* Help */}
+      <div className="relative" ref={helpRef}>
+        <button
+          onClick={() => setHelpOpen((o) => !o)}
+          className="flex items-center justify-center w-7 h-7 rounded hover:bg-theme-hover transition-colors touch-target nav-icon"
+          title="Help"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+        </button>
+        {helpOpen && (
+          <div
+            className="absolute right-0 mt-1 w-36 rounded-lg border border-theme-mid shadow-xl py-1 z-50"
+            style={{ backgroundColor: 'var(--bg-surface)' }}
+          >
+            <button
+              onClick={() => { setHelpOpen(false); startTour() }}
+              className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-theme hover:bg-theme-hover transition-colors text-left"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <polygon points="10 8 16 12 10 16 10 8" />
+              </svg>
+              Take a tour
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Settings */}
       <button

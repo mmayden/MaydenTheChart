@@ -2,7 +2,7 @@
  * SettingsModal — Full settings panel opened by the gear icon.
  *
  * Tabs:
- *   Appearance  — Color scheme selection (Dark / Lumpia / Terminal)
+ *   Appearance  — Color scheme selection (Default / Lumpia / Terminal)
  *   Shortcuts   — Keyboard shortcut reference
  */
 
@@ -16,7 +16,7 @@ import { ACCENT_PRESETS } from '../../constants/accents'
 const SCHEMES = [
   {
     id: 'dark',
-    name: 'Dark',
+    name: 'Default',
     description: 'Terminal black — easy on the eyes in low light',
     preview: {
       bg:      '#0a0a0a',

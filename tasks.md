@@ -405,10 +405,10 @@
 
 ### UX Polish — Per-Panel Colors + Nav Animations (2026-03-15)
 - ✅ Per-panel icon colors: unique CSS custom property per button across all 3 themes
-  - Dark: alerts `#e5a54b`, watchlist `#5bc0be`, backtest `#a78bfa`, journal `#f87171`, cmd-palette `#a78bfa`
+  - Default: alerts `#e5a54b`, watchlist `#5bc0be`, backtest `#a78bfa`, journal `#f87171`, cmd-palette `#a78bfa`
   - Terminal: alerts `#b8a040`, watchlist `#68c0a8`, backtest `#88a0d0`, journal `#c8a050`, cmd-palette `#9080c0`
   - Lumpia: alerts `#c8a040`, watchlist `#70b8a0`, backtest `#e07050`, journal `#88b870`, cmd-palette `#a88098`
-- ✅ Settings gear unique color per theme: dark `#22d3ee` (cyan), terminal `#58d8b0` (mint), lumpia `#e8c088` (warm gold)
+- ✅ Settings gear unique color per theme: default `#22d3ee` (cyan), terminal `#58d8b0` (mint), lumpia `#e8c088` (warm gold)
 - ✅ Replaced remaining hardcoded Tailwind classes: `bg-blue-600` → `.btn-primary`, `bg-[#0a0a0a]` → `.bg-input`, `accent-blue-500` → `accentColor: var(--accent)`, `border-gray-500` → `.border-theme-mid`
 - ✅ Panel button order: alerts → watchlist → backtest → journal
 - ✅ Nav hover micro-animations (CSS-only keyframes, all pop 1.25-1.4x):
@@ -662,7 +662,7 @@
 - ✅ `src/components/ui/SettingsModal.jsx` — gear icon in header opens centered settings modal
 - ✅ `src/store/useChartStore.js` — `theme` state persisted to localStorage, defaults to `'dark'`
 - ✅ `src/index.css` — CSS custom property theme system (`[data-theme="dark"]` / `[data-theme="lumpia"]` / `[data-theme="terminal"]`)
-- ✅ **Dark theme** — unchanged terminal black (#0a0a0a), blue accents
+- ✅ **Default theme** — unchanged terminal black (#0a0a0a), blue accents
 - ✅ **Lumpia theme** — near-black (#080808) with ember-orange accent (#C85818), warm stone text (#D0C8B8)
 - ✅ **Terminal theme** — deep black (#060806) with sage green text (#a8d8a8), vivid green accent (#50d050)
 - ✅ Preset delete: two-click confirmation with red-tinted pill capsule, cancel button

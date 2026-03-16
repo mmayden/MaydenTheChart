@@ -164,7 +164,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Status bar (WS/polling + session stats): `src/components/ui/StatusBar.jsx`
 - ATR gauge: `src/components/ui/ATRGauge.jsx`
 - Day type banner: `src/components/ui/DayTypeBanner.jsx`
-- Onboarding tour: `src/components/ui/OnboardingTour.jsx`
+- Onboarding tour (first-visit + manual restart via Help menu): `src/components/ui/OnboardingTour.jsx`
 
 ### Utilities
 - Shared timezone utils: `src/utils/timezone.js`

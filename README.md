@@ -146,11 +146,11 @@ npx eslint src/        # Lint check (0 errors)
 
 Three built-in color schemes, each with 6 accent color options:
 
-- **Dark** — Terminal black, blue accents
+- **Default** — Terminal black, blue accents
 - **Lumpia** — Dark espresso, ember-orange accents
 - **Terminal** — Deep black, sage green accents
 
-Switch in Settings (gear icon) or via Command Palette (Cmd+K → "Dark" / "Lumpia" / "Terminal").
+Switch in Settings (gear icon) or via Command Palette (Cmd+K → "Default" / "Lumpia" / "Terminal").
 
 ---
 

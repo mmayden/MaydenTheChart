@@ -13,6 +13,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
+import { useChartStore } from '../../store/useChartStore'
 import { useToast } from '../../store/useToastStore'
 
 const STORAGE_KEY = 'cheechart-onboarding-done'
@@ -49,8 +50,17 @@ export function OnboardingTour() {
   const [visible, setVisible] = useState(false)
   const [rect, setRect] = useState(null)
   const toast = useToast()
+  const tourActive = useChartStore((s) => s.tourActive)
+  const endTour = useChartStore((s) => s.endTour)
 
-  // Check if tour should show
+  // Manual restart via store
+  useEffect(() => {
+    if (!tourActive) return
+    setStep(0)
+    setVisible(true)
+  }, [tourActive])
+
+  // Check if tour should show on first visit
   useEffect(() => {
     if (localStorage.getItem(STORAGE_KEY)) return
 
@@ -92,7 +102,8 @@ export function OnboardingTour() {
   const finish = useCallback(() => {
     localStorage.setItem(STORAGE_KEY, '1')
     setVisible(false)
-  }, [])
+    endTour()
+  }, [endTour])
 
   const next = useCallback(() => {
     if (step >= STEPS.length - 1) {

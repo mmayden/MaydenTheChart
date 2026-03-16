@@ -448,7 +448,7 @@ Component state (useState — local only):
 | `src/components/ui/StatusBar.jsx` | WebSocket/Polling status + last updated time + session stats |
 | `src/components/ui/ErrorBoundary.jsx` | React error boundary with fallback UI |
 | `src/components/ui/Logo.jsx` | Boogaloo font logo with BETA badge |
-| `src/components/ui/OnboardingTour.jsx` | 4-step first-visit tooltip tour (Day Type → ATR → Presets → Cmd+K) |
+| `src/components/ui/OnboardingTour.jsx` | 4-step tooltip tour (Day Type → ATR → Presets → Cmd+K), auto on first visit + manual restart via Help menu |
 
 ### Docs
 | File | Purpose |

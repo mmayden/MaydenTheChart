@@ -118,6 +118,11 @@ export const useChartStore = create((set) => ({
   setSidebarOpen:        (open) => set({ sidebarOpen: open }),
   toggleSidebar:         () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
 
+  // ─── Tour ────────────────────────────────────────────────────────────────
+  tourActive: false,
+  startTour: () => set({ tourActive: true }),
+  endTour:   () => set({ tourActive: false }),
+
   // ─── Sound alerts ─────────────────────────────────────────────────────────
   soundAlerts: (() => { try { return localStorage.getItem('lumpia-sound-alerts') !== 'false' } catch { return true } })(),
   setSoundAlerts: (enabled) => {
