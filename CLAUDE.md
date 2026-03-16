@@ -22,9 +22,9 @@ Every indicator function in `src/utils/indicators.js` must return BOTH:
 ```
 The live chart and the backtester share identical math. Never duplicate indicator logic.
 
-## Stack (locked — upgrades planned in Phase 12C)
-- Vite 7→8 + React 18→19 + lightweight-charts **v5** (NOT v4)
-- TanStack Query v5, Zustand v4→5, Axios, Tailwind CSS 3→4, Vitest v3
+## Stack (locked — Phase 12C upgrades complete)
+- Vite 8 + React 19 + lightweight-charts **v5** (NOT v4)
+- TanStack Query v5, Zustand v5, Axios, Tailwind CSS 4 (`@tailwindcss/postcss`), Vitest v3
 - ESLint 9 + eslint-plugin-react-hooks (flat config, `eslint.config.js`)
 - JavaScript (not TypeScript — tests provide sufficient coverage at current scale)
 - `feed: 'iex'` required on all Alpaca data fetches (free tier)
@@ -73,7 +73,7 @@ keyframes in `src/index.css` (`.nav-btn-{id}` classes).
 **Data color system:** Universal trading/data colors (bull/bear, status, warnings) are
 defined as CSS custom properties (`--color-bull`, `--color-bear`, `--color-warn`,
 `--color-info`, `--color-neutral`, `--color-badge`) in `:root` and also registered as
-Tailwind color tokens in `tailwind.config.js` (`bull`, `bear`, `warn`, `info`, `neutral`,
+Tailwind color tokens in `src/index.css` `@theme` block (`bull`, `bear`, `warn`, `info`, `neutral`,
 `badge`). Components use `.text-bull`, `.bg-bear/20`, `.border-warn/40` etc. — never
 hardcoded `text-green-400` or `text-red-400`.
 
@@ -184,11 +184,14 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 ### Tooling
 - ESLint config (flat): `eslint.config.js`
 - Vite config + SW versioning plugin: `vite.config.js`
+- PostCSS config (`@tailwindcss/postcss`): `postcss.config.js`
+- Tailwind theme tokens: `src/index.css` `@theme` block (no `tailwind.config.js` — TW4)
 
 ### Docs
 - Project spec + architecture: `project.md`
 - Task board: `tasks.md`
 - Indicator math reference: `indicators.md`
+- Security standards: `security.md`
 - Competitive research + vision: `brainstorming.md`
 - Health audit template: `audit.md`
 - Bug tracker: `bugs.md`

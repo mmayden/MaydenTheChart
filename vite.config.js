@@ -35,10 +35,10 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'lightweight-charts': ['lightweight-charts'],
-          'vendor-api': ['axios', '@tanstack/react-query'],
-          'motion': ['motion', 'motion/react'],
+        manualChunks(id) {
+          if (id.includes('node_modules/lightweight-charts')) return 'lightweight-charts'
+          if (id.includes('node_modules/axios') || id.includes('node_modules/@tanstack/react-query')) return 'vendor-api'
+          if (id.includes('node_modules/motion')) return 'motion'
         },
       },
     },

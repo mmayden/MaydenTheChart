@@ -33,11 +33,11 @@ per Concretum Group/SSRN research, 2016–2023).
 
 | Decision | Choice | Reason |
 |---|---|---|
-| Framework | React 18 + Vite 7 | Fast dev, industry standard, dominant in 2026 (upgrades planned in Phase 12C) |
+| Framework | React 19 + Vite 8 | Fast dev, industry standard, dominant in 2026 (Phase 12C complete) |
 | Charting lib | lightweight-charts **v5** | v5 has native multi-pane (RSI/MACD subcharts built-in), 16% smaller bundle, enhanced plugin system. Use v5, not v4. |
-| Styling | Tailwind CSS | Dominates 2026 frontend ecosystem |
+| Styling | Tailwind CSS 4 | Dominates 2026 frontend ecosystem — config in CSS `@theme`, `@tailwindcss/postcss` plugin |
 | Server state | **TanStack Query v5** | 2026 consensus for API data: caching, loading states, background refetch, deduplication |
-| Client/UI state | **Zustand** | 2026 consensus for UI state: timeframe, symbol, indicator toggles. ~1KB, no boilerplate. |
+| Client/UI state | **Zustand v5** | 2026 consensus for UI state: timeframe, symbol, indicator toggles. ~1KB, no boilerplate. |
 | Data source | Alpaca Markets API | Paper trading, real market data, free, WebSocket support |
 | HTTP client | Axios | Clean API, interceptors for auth headers |
 | Deployment | Vercel | Free, instant, Git-connected |
@@ -298,7 +298,7 @@ never touch provider-specific code — they receive normalized `Bar[]` arrays.
 - Permissions-Policy: camera/microphone/geolocation disabled
 
 **Performance targets:**
-- Main bundle: <250KB (currently 226KB + 164KB charts + 81KB vendor, 6 lazy chunks)
+- Main bundle: <320KB (currently 313KB + 161KB charts + 92KB motion + 69KB vendor, 7 lazy chunks — Vite 8/Rolldown)
 - LCP: <2.5s (self-hosted fonts, no external blocking requests)
 - INP: <200ms (canvas-based chart interactions bypass DOM)
 - CLS: <0.1 (fixed layout, no late-loading content)
@@ -457,13 +457,14 @@ Component state (useState — local only):
 | `tasks.md` | Living task board, current sprint status |
 | `indicators.md` | Indicator math reference and code contracts |
 | `brainstorming.md` | Competitive intelligence research + vision document |
+| `security.md` | Security standards, threat model, API endpoint protections |
 | `audit.md` | Health audit reusable template |
 
 ---
 
 ## Current Status
 
-**274/274 tests passing, build clean, ESLint 0 errors. Main bundle 229KB + 164KB lightweight-charts + 125KB motion + 81KB vendor-api (7 lazy chunks).**
+**298/298 tests passing, build clean, ESLint 0 errors, 0 vulnerabilities. Main bundle 313KB + 161KB lightweight-charts + 92KB motion + 69KB vendor-api (7 lazy chunks). Stack: React 19 + Vite 8 + Zustand 5 + Tailwind 4.**
 
 ### Completed
 - [x] Phases 1–4: Core chart, indicators, levels, S/R detection, ATR gauge, day type
@@ -486,7 +487,7 @@ Component state (useState — local only):
 ### Upcoming (Phase 12 — detailed plan finalized 2026-03-15)
 - [x] Phase 12A: Production hardening — cache headers, self-host fonts, SW auto-versioning, OG meta, Sentry, reduced-motion
 - [x] Phase 12B: UX sharpening — Motion library (content transitions), skeleton loading states, accent color customization, layout transition fix
-- [ ] Phase 12C: Dependency upgrades — React 19, Zustand 5, Vite 8, Tailwind 4
+- [x] Phase 12C: Dependency upgrades — React 19, Zustand 5, Vite 8, Tailwind 4
 - [ ] Phase 12D: Data provider abstraction — provider interface, Alpaca adapter, rename hooks to be provider-agnostic
 - [ ] Phase 12E: Infinite scroll — on-demand history loading, IndexedDB cache (Dexie.js), enableConflation
 - [ ] Phase 12F: Future differentiators — screener, trade replay, annotations, gap tracking, cloud sync
@@ -536,3 +537,4 @@ Component state (useState — local only):
 | 2026-03-15 | **Phase 12A complete: Production hardening.** Cache headers (`/assets/*` + `/fonts/*` immutable 1yr, HTML `s-maxage=60`). Self-hosted fonts (Boogaloo 10KB + Inter 800 24KB woff2, removed Google Fonts dependency + CSP origins). SW auto-versioning (Vite plugin injects `cheechart-{hash}` at build time). OG + Twitter Card meta tags. `prefers-reduced-motion` disables all nav animations. Sentry (`@sentry/react`, conditional via `VITE_SENTRY_DSN`). 274/274 tests, build clean. |
 | 2026-03-16 | **Layout transition fix.** Phase 12B's Motion `AnimatePresence` for RightPanel caused close-pause-jump: panel slid out via spring animation but still occupied 340px in flex layout until DOM removal, then chart snapped. Fix: reverted to persistent wrapper div with CSS `transition-[transform,width,min-width]` for seamless chart resize, `AnimatePresence` now only handles content fade between panels. **Design rule documented:** layout-affecting transitions must use CSS on persistent DOM elements; Motion only for content that doesn't affect flex layout. |
 | 2026-03-16 | **RSI/MACD UX cleanup + sidebar revert.** Moved RSI/MACD toggles back to sidebar IndicatorToggle (they're indicators, not a separate UI category). Removed the separate tab button strip below the chart. Mini chart labels use lw-charts built-in watermark (auto-aligned inside plotting area). Mini chart price scales have `minimumWidth: 60` for right-edge alignment. All charts use `autoSize: true`. Sidebar reverted to original clean form (pre-audit `dca2cad`) after 5 failed fix attempts for BUG-001 (chart area not expanding on sidebar close). Created `bugs.md` tracker and `left-bar-problems.md` audit doc. 298/298 tests, build clean. |
+| 2026-03-16 | **Phase 12C complete: Dependency upgrades.** Zustand 4.5.7 → 5.0.12 (drop-in, no middleware in use). Vite 7.3.1 → 8.0.0 + @vitejs/plugin-react 6.0.1 (`manualChunks` converted from object to function for Rolldown). React 18.3.1 → 19.2.4 + react-dom 19.2.4 (already on createRoot). Tailwind 3.4.19 → 4.2.1 via `@tailwindcss/postcss` (`@tailwindcss/vite` not yet Vite 8 compatible), config moved from `tailwind.config.js` to CSS `@theme` block, `@tailwind` directives → `@import "tailwindcss"`, removed `autoprefixer`. ESLint react-hooks v7 fix: `set-state-in-effect` in OnboardingTour (justified disable). 298/298 tests, build clean, ESLint 0 errors, 0 vulnerabilities. |

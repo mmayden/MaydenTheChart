@@ -564,17 +564,16 @@
 
 ---
 
-## 🔲 Phase 12C — Dependency Upgrades
+## ✅ Phase 12C — Dependency Upgrades — COMPLETE
 
-> **Goal:** Modernize the stack. All upgrades are incremental version bumps, not rewrites.
-> Rationale: security patches (React 19), ecosystem compatibility (Zustand 5 drops
-> use-sync-external-store), faster builds (Tailwind 4 Oxide engine), future-proofing.
+**298/298 tests passing, build clean, ESLint 0 errors, 0 vulnerabilities**
 
-- 🔲 Zustand 4 → 5.0.11 — use `createWithEqualityFn` if using shallow, update persist middleware, devtools import path
-- 🔲 React 18 → 19.2.4 — `useEffectEvent` for WebSocket/chart stale closures, React Compiler opt-in, DoS mitigations
-- 🔲 Vite 7 → 8 — version bump, verify build
-- 🔲 Tailwind 3 → 4.2.1 — run `npx @tailwindcss/upgrade`, switch to `@tailwindcss/vite` plugin, configure dark mode as `darkMode: 'selector'` (we use `[data-theme]` attributes), verify class renames, remove `tailwind.config.js` (config moves to CSS `@theme`)
-- 🔲 Verify: 274+ tests passing, build clean, ESLint 0 errors after all upgrades
+- ✅ Zustand 4.5.7 → 5.0.12 — drop-in upgrade, no code changes needed (no middleware in use)
+- ✅ Vite 7.3.1 → 8.0.0 + @vitejs/plugin-react 4.7.0 → 6.0.1 — `manualChunks` converted from object to function (Rolldown replaces Rollup in Vite 8)
+- ✅ React 18.3.1 → 19.2.4 + react-dom 19.2.4 — already using `createRoot`, `forwardRef` still works (deprecated but functional)
+- ✅ Tailwind 3.4.19 → 4.2.1 — `@tailwindcss/postcss` (Vite plugin not yet Vite 8 compatible), config moved from `tailwind.config.js` to CSS `@theme` block in `index.css`, `@tailwind` directives → `@import "tailwindcss"`, removed `autoprefixer` (built into TW4)
+- ✅ ESLint react-hooks v7: fixed `set-state-in-effect` in OnboardingTour (justified eslint-disable)
+- ✅ Deleted `tailwind.config.js` (config now in CSS)
 
 ---
 

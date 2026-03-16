@@ -1,6 +1,28 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-terminal-bg:      #0a0a0a;
+  --color-terminal-surface: #111111;
+  --color-terminal-border:  #1f2937;
+  --color-terminal-muted:   #374151;
+
+  --color-ema-9:   #3b82f6;
+  --color-ema-48:  #22c55e;
+  --color-ema-200: #e5e7eb;
+
+  --color-vwap:    #06b6d4;
+  --color-level:   #eab308;
+  --color-orb:     #6366f1;
+
+  --color-bull:    #22c55e;
+  --color-bear:    #ef4444;
+  --color-warn:    #eab308;
+  --color-info:    #60a5fa;
+  --color-neutral: #6b7280;
+  --color-badge:   #ef4444;
+
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+}
 
 /* ── Self-hosted fonts ─────────────────────────────────────────────────── */
 

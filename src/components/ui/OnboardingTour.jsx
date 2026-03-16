@@ -53,10 +53,11 @@ export function OnboardingTour() {
   const tourActive = useChartStore((s) => s.tourActive)
   const endTour = useChartStore((s) => s.endTour)
 
-  // Manual restart via store
+  // Manual restart via store — resets local state when tourActive goes true.
+  // This is "adjusting state when a prop changes" (React docs), not a cascading render.
   useEffect(() => {
     if (!tourActive) return
-    setStep(0)
+    setStep(0) // eslint-disable-line react-hooks/set-state-in-effect -- intentional reset when store flag changes
     setVisible(true)
   }, [tourActive])
 
