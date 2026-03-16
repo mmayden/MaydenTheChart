@@ -10,17 +10,16 @@
  */
 
 import { useQueries } from '@tanstack/react-query'
-import { fetchBars } from '../services/alpaca'
+import { fetchBars } from '../services/dataProvider'
 import { useChartStore } from '../store/useChartStore'
 import { ema } from '../utils/indicators'
-import { normalizeBar } from '../utils/normalizeBar'
 
 const MTF_TIMEFRAMES = [
-  { key: '5Min',  label: '5m',  alpaca: '5Min',  lookbackMs: 5 * 24 * 60 * 60 * 1000,  limit: 500 },
-  { key: '15Min', label: '15m', alpaca: '15Min', lookbackMs: 10 * 24 * 60 * 60 * 1000, limit: 500 },
-  { key: '1Hour', label: '1h',  alpaca: '1Hour', lookbackMs: 30 * 24 * 60 * 60 * 1000, limit: 500 },
-  { key: '4Hour', label: '4h',  alpaca: '4Hour', lookbackMs: 90 * 24 * 60 * 60 * 1000, limit: 500 },
-  { key: '1Day',  label: '1D',  alpaca: '1Day',  lookbackMs: 365 * 24 * 60 * 60 * 1000, limit: 300 },
+  { key: '5Min',  label: '5m',  lookbackMs: 5 * 24 * 60 * 60 * 1000,  limit: 500 },
+  { key: '15Min', label: '15m', lookbackMs: 10 * 24 * 60 * 60 * 1000, limit: 500 },
+  { key: '1Hour', label: '1h',  lookbackMs: 30 * 24 * 60 * 60 * 1000, limit: 500 },
+  { key: '4Hour', label: '4h',  lookbackMs: 90 * 24 * 60 * 60 * 1000, limit: 500 },
+  { key: '1Day',  label: '1D',  lookbackMs: 365 * 24 * 60 * 60 * 1000, limit: 300 },
 ]
 
 /**
@@ -61,10 +60,8 @@ export function useMTFSignals() {
       queryFn: async () => {
         const now = new Date()
         const start = new Date(now.getTime() - tf.lookbackMs)
-        const raw = await fetchBars(symbol, tf.alpaca, start.toISOString(), now.toISOString(), tf.limit)
-        return raw
-          .sort((a, b) => new Date(a.t) - new Date(b.t))
-          .map(normalizeBar)
+        // fetchBars handles provider timeframe translation + normalization
+        return fetchBars(symbol, tf.key, start.toISOString(), now.toISOString(), tf.limit)
       },
       staleTime: 2 * 60 * 1000,     // 2 min — MTF alignment changes slowly
       refetchInterval: 2 * 60 * 1000,

@@ -8,7 +8,7 @@
 
 import { useState, useMemo } from 'react'
 import { useChartStore } from '../../store/useChartStore'
-import { useAlpacaBars } from '../../hooks/useAlpacaBars'
+import { useBars } from '../../hooks/useBars'
 import {
   backtestORB,
   backtestEMACross,
@@ -133,7 +133,7 @@ export function BacktestPanel() {
   const [volumeFilter, setVolumeFilter] = useState(false)
   const [requireTrend, setRequireTrend] = useState(false)
   const [showBreakdown, setShowBreakdown] = useState(false)
-  const { data: bars } = useAlpacaBars()
+  const { data: bars } = useBars()
 
   const results = useMemo(() => {
     if (!bars?.length) return null

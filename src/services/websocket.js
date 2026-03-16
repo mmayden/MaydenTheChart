@@ -1,16 +1,16 @@
 /**
- * Alpaca WebSocket connection manager.
+ * WebSocket connection manager — provider-agnostic shell.
  *
- * Connects to wss://stream.data.alpaca.markets/v2/iex, authenticates,
- * subscribes to minute bars, and calls back with normalized bar data.
+ * Handles connection lifecycle, reconnection with exponential backoff + jitter,
+ * and credential fetching. Provider-specific protocol (auth messages, bar parsing,
+ * subscription format) is delegated to the provider adapter.
  *
- * Handles reconnection with exponential backoff + jitter.
+ * Currently uses the Alpaca adapter (src/services/providers/alpaca.js).
  */
 
 import axios from 'axios'
-import { normalizeBar } from '../utils/normalizeBar'
+import { getWSUrl, handleWSMessages } from './providers/alpaca'
 
-const WS_URL = 'wss://stream.data.alpaca.markets/v2/iex'
 const MAX_RETRIES = 10
 const BASE_DELAY_MS = 1000
 const MAX_DELAY_MS = 30000
@@ -27,7 +27,7 @@ async function fetchCredentials() {
 }
 
 /**
- * Create and manage an Alpaca WebSocket connection.
+ * Create and manage a WebSocket connection for live market data.
  *
  * @param {Object} options
  * @param {(bar: Object) => void} options.onBar        — called with each normalized bar
@@ -35,7 +35,7 @@ async function fetchCredentials() {
  * @param {() => string} [options.getSymbol]            — returns the current symbol to subscribe to (default: 'QQQ')
  * @returns {{ connect: Function, disconnect: Function }}
  */
-export function createAlpacaSocket({ onBar, onStatus, getSymbol }) {
+export function createSocket({ onBar, onStatus, getSymbol }) {
   let ws = null
   let retryCount = 0
   let retryTimer = null
@@ -59,7 +59,7 @@ export function createAlpacaSocket({ onBar, onStatus, getSymbol }) {
           return
         }
 
-        ws = new WebSocket(WS_URL)
+        ws = new WebSocket(getWSUrl())
 
         ws.onmessage = (event) => {
           let messages
@@ -72,39 +72,16 @@ export function createAlpacaSocket({ onBar, onStatus, getSymbol }) {
 
           if (!Array.isArray(messages)) return
 
-          for (const msg of messages) {
-            // Welcome message — send auth
-            if (msg.T === 'success' && msg.msg === 'connected') {
-              ws.send(JSON.stringify({ action: 'auth', key, secret }))
-            }
-
-            // Auth success — subscribe to bars
-            if (msg.T === 'success' && msg.msg === 'authenticated') {
-              retryCount = 0 // reset on successful auth
-              onStatus('authenticated')
-              const symbol = typeof getSymbol === 'function' ? getSymbol() : 'QQQ'
-              ws.send(JSON.stringify({
-                action: 'subscribe',
-                bars: [symbol],
-              }))
-            }
-
-            // Subscription confirmation
-            if (msg.T === 'subscription') {
-              onStatus('subscribed')
-            }
-
-            // Bar data
-            if (msg.T === 'b') {
-              onBar(normalizeBar(msg))
-            }
-
-            // Auth error
-            if (msg.T === 'error') {
-              DEBUG && console.error('[WS] Alpaca error:', msg.msg, msg.code)
-              onStatus('error')
-            }
-          }
+          // Delegate protocol handling to provider adapter
+          handleWSMessages(messages, {
+            ws,
+            key,
+            secret,
+            getSymbol,
+            onBar,
+            onStatus,
+            onAuthSuccess: () => { retryCount = 0 },
+          })
         }
 
         ws.onclose = () => {
@@ -167,3 +144,6 @@ export function createAlpacaSocket({ onBar, onStatus, getSymbol }) {
 
   return { connect, disconnect }
 }
+
+// Backward compat — old name still works during migration
+export { createSocket as createAlpacaSocket }

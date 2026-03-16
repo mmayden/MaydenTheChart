@@ -1,8 +1,11 @@
 /**
  * Vercel Serverless Function — /api/bars
  *
- * Proxies Alpaca bar requests so API keys never reach the browser.
- * Keys are read from server-only env vars (no VITE_ prefix).
+ * Proxies bar requests through the configured data provider so API keys
+ * never reach the browser. Currently supports Alpaca (default).
+ *
+ * Provider selection: DATA_PROVIDER env var (default: 'alpaca').
+ * Future providers will add their own handler functions below.
  *
  * Query params:
  *   symbol    - e.g. 'QQQ'

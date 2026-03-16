@@ -1,13 +1,12 @@
 /**
  * useDailyBars — Fetches 200+ days of daily bars for macro MA calculation.
- * Separate from useAlpacaBars so it doesn't invalidate when timeframe changes.
+ * Separate from useBars so it doesn't invalidate when timeframe changes.
  * Cached for 5 minutes (staleTime) — daily bars don't change during the session.
  */
 
 import { useQuery } from '@tanstack/react-query'
-import { fetchBars } from '../services/alpaca'
+import { fetchBars } from '../services/dataProvider'
 import { useChartStore } from '../store/useChartStore'
-import { normalizeBar } from '../utils/normalizeBar'
 
 export function useDailyBars() {
   const symbol = useChartStore((s) => s.selectedSymbol)
@@ -18,10 +17,8 @@ export function useDailyBars() {
   return useQuery({
     queryKey: ['daily-bars', symbol],
     queryFn: async () => {
-      const raw = await fetchBars(symbol, '1Day', start.toISOString(), end.toISOString(), 250)
-      return raw
-        .sort((a, b) => new Date(a.t) - new Date(b.t))
-        .map(normalizeBar)
+      // fetchBars handles provider timeframe translation + normalization
+      return fetchBars(symbol, '1Day', start.toISOString(), end.toISOString(), 250)
     },
     staleTime: 5 * 60 * 1000,   // 5 minutes
     enabled:   !!symbol,

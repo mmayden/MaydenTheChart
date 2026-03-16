@@ -1,8 +1,10 @@
 /**
  * Vercel Serverless Function — /api/snapshot
  *
- * Proxies Alpaca snapshot requests for watchlist live prices.
- * Returns latest trade + quote for multiple symbols in one call.
+ * Proxies snapshot requests through the configured data provider for
+ * watchlist live prices. Currently supports Alpaca (default).
+ *
+ * Provider selection: DATA_PROVIDER env var (default: 'alpaca').
  *
  * Query params:
  *   symbols - comma-separated list, e.g. 'QQQ,SPY,AAPL'

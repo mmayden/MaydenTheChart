@@ -136,10 +136,17 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Trade journal store: `src/store/useJournalStore.js`
 - Toast store: `src/store/useToastStore.js`
 
+### Data Layer (provider-abstracted)
+- Provider interface: `src/services/dataProvider.js` — `fetchBars()`, `fetchSnapshot()`, `getProviderName()`
+- Alpaca adapter: `src/services/providers/alpaca.js` — normalization, timeframe mapping, WS protocol
+- WebSocket manager: `src/services/websocket.js` — connection lifecycle, reconnect (provider-agnostic shell)
+- Bar normalizer: `src/utils/normalizeBar.js` — Alpaca `{t,o,h,l,c,v}` → `{time,open,high,low,close,volume}`
+
 ### Hooks
+- Historical bars: `src/hooks/useBars.js` (TanStack Query, provider-agnostic)
+- WebSocket live feed: `src/hooks/useLiveFeed.js` — market-hours gating, bar aggregation, cache injection
 - Keyboard shortcuts (1-6, [/], Cmd+K, Cmd+Shift+S, panel toggles): `src/hooks/useKeyboardShortcuts.js`
 - Viewport persistence: `src/hooks/useViewportPersistence.js`
-- WebSocket live feed: `src/hooks/useAlpacaSocket.js` + `src/services/websocket.js`
 - Alert checker: `src/hooks/useAlertChecker.js`
 - Daily bars hook: `src/hooks/useDailyBars.js`
 - MTF signals: `src/hooks/useMTFSignals.js`
@@ -168,11 +175,12 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 
 ### Utilities
 - Shared timezone utils: `src/utils/timezone.js`
-- Bar normalizer: `src/utils/normalizeBar.js`
 - localStorage schema validation: `src/utils/validate.js`
 - Chart snapshot capture + export: `src/utils/snapshot.js`
 
 ### Services
+- Data provider: `src/services/dataProvider.js` — provider-abstracted data fetching
+- Alpaca provider adapter: `src/services/providers/alpaca.js`
 - Sentry error tracking (conditional): `src/services/sentry.js`
 
 ### PWA

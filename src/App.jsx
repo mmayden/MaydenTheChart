@@ -14,9 +14,9 @@
  */
 
 import { useRef, useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react'
-import { useAlpacaBars } from './hooks/useAlpacaBars'
+import { useBars } from './hooks/useBars'
 import { useDailyBars } from './hooks/useDailyBars'
-import { useAlpacaSocket } from './hooks/useAlpacaSocket'
+import { useLiveFeed } from './hooks/useLiveFeed'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import { useAlertChecker } from './hooks/useAlertChecker'
 import { useSwipeGesture } from './hooks/useSwipeGesture'
@@ -71,7 +71,7 @@ export default function App() {
   const showSr            = useChartStore((s) => s.indicators.sr)
   const showBollinger     = useChartStore((s) => s.indicators.bollinger)
 
-  const { data: bars, isLoading, isError, error, dataUpdatedAt, refetch } = useAlpacaBars()
+  const { data: bars, isLoading, isError, error, dataUpdatedAt, refetch } = useBars()
   const { data: dailyBars } = useDailyBars()
 
   // Sync URL params with store
@@ -84,7 +84,7 @@ export default function App() {
   }, [])
 
   // Live WebSocket + keyboard shortcuts + alert checker
-  useAlpacaSocket()
+  useLiveFeed()
   useKeyboardShortcuts()
   useAlertChecker(bars, selectedTimeframe)
 

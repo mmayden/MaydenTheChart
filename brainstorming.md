@@ -205,11 +205,15 @@ Cache headers, self-hosted fonts, SW auto-versioning, OG meta, Sentry, reduced-m
 Motion library (content transitions), skeleton loading, accent color customization.
 Layout transition fix: persistent wrapper with CSS transitions for seamless chart resize.
 
-### Phase 12C — Dependency Upgrades (next)
+### Phase 12C — Dependency Upgrades ✅
 React 19, Zustand 5, Vite 8, Tailwind 4.
 
-### Phase 12D+ — Future Differentiators
-Data provider abstraction, infinite scroll, screener, trade replay, chart annotations,
+### Phase 12D — Data Provider Abstraction ✅
+Provider interface (`dataProvider.js`), Alpaca adapter (`providers/alpaca.js`),
+hooks renamed (`useBars`, `useLiveFeed`), TIMEFRAME_CONFIG decoupled.
+
+### Phase 12E+ — Future Differentiators
+Infinite scroll, screener, trade replay, chart annotations,
 volume profile, alert sets per preset, cloud sync.
 
 ---

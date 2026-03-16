@@ -203,20 +203,34 @@ Set `limit` high enough and specify a tight date range.
 ## TanStack Query Integration Pattern
 
 ```js
-// src/hooks/useAlpacaBars.js
-import { useQuery } from '@tanstack/react-query'
-import { fetchBars } from '../services/alpaca'
+// src/hooks/useBars.js — provider-agnostic hook
+import { useQuery, keepPreviousData } from '@tanstack/react-query'
+import { fetchBars } from '../services/dataProvider'
 import { useChartStore } from '../store/useChartStore'
+import { TIMEFRAME_CONFIG } from '../constants/chart'
 
-export function useAlpacaBars() {
-  const { timeframe, symbol } = useChartStore()
+export function useBars() {
+  const symbol    = useChartStore((s) => s.selectedSymbol)
+  const timeframe = useChartStore((s) => s.selectedTimeframe)
+  const config    = TIMEFRAME_CONFIG[timeframe]
+  const todayKey  = new Date().toISOString().slice(0, 10)
 
   return useQuery({
-    queryKey: ['bars', symbol, timeframe],
-    queryFn: () => fetchBars(symbol, timeframe),
-    staleTime: 30_000,       // 30 seconds
-    refetchInterval: 60_000, // refetch every 60s during market hours
-    retry: 1,
+    queryKey: ['bars', symbol, timeframe, todayKey],
+    queryFn: async () => {
+      const now   = new Date()
+      const start = new Date(now.getTime() - config.lookbackMs)
+      // fetchBars handles provider timeframe translation + normalization
+      return fetchBars(symbol, timeframe, start.toISOString(), now.toISOString(), config.limit)
+    },
+    enabled:         !!symbol && !!timeframe,
+    placeholderData: keepPreviousData,
+    refetchInterval: config.intraday ? 60_000 : 5 * 60_000,
   })
 }
 ```
+
+> **Note:** `fetchBars()` in `dataProvider.js` delegates to the active provider adapter
+> (currently Alpaca). The adapter handles timeframe string translation (e.g. internal
+> `'5Min'` → Alpaca API `'5Min'`) and bar normalization (`{t,o,h,l,c,v}` → `{time,open,high,low,close,volume}`).
+> To swap providers, create a new adapter in `src/services/providers/` and wire it in `dataProvider.js`.

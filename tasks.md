@@ -577,17 +577,19 @@
 
 ---
 
-## 🔲 Phase 12D — Data Provider Abstraction
+## ✅ Phase 12D — Data Provider Abstraction — COMPLETE
 
-> **Goal:** Decouple the app from Alpaca so data sources can be swapped via config.
-> Keep Alpaca as the only implementation for now.
+**298/298 tests passing, build clean, ESLint 0 errors**
 
-- 🔲 Create `src/services/dataProvider.js` — provider interface: `fetchBars()`, `subscribe()`, `fetchSnapshot()`
-- 🔲 Create `src/services/providers/alpaca.js` — extract existing Alpaca logic into adapter
-- 🔲 Rename hooks: `useAlpacaBars` → `useBars`, `useAlpacaSocket` → `useLiveFeed`
-- 🔲 Abstract WebSocket layer: extract Alpaca-specific protocol into adapter, generic reconnect + aggregation stays in shared layer
-- 🔲 Make serverless proxies provider-aware (env var selects provider, URL builder adapts)
-- 🔲 Update `TIMEFRAME_CONFIG` to use adapter pattern for provider-specific timeframe strings
+- ✅ `src/services/dataProvider.js` — provider interface: `fetchBars()`, `fetchSnapshot()`, `getProviderName()`
+- ✅ `src/services/providers/alpaca.js` — Alpaca adapter: bar normalization, timeframe mapping, WS protocol handling
+- ✅ `src/services/websocket.js` — refactored to provider-agnostic shell (delegates protocol to adapter)
+- ✅ Renamed hooks: `useAlpacaBars` → `useBars`, `useAlpacaSocket` → `useLiveFeed` (old files kept as re-export wrappers)
+- ✅ `src/services/alpaca.js` → re-export wrapper pointing to `dataProvider.js`
+- ✅ `TIMEFRAME_CONFIG` — removed `alpacaTimeframe` field; provider adapter handles translation via `getProviderTimeframe()`
+- ✅ All consumers updated: App.jsx, BacktestPanel, useMTFSignals, useDailyBars, useWatchlistQuotes, SymbolInput
+- ✅ Serverless proxies documented for provider-awareness (`DATA_PROVIDER` env var plumbing)
+- ✅ CLAUDE.md updated with new data layer section
 
 ---
 

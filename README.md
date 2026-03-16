@@ -30,15 +30,15 @@ This is not a generic charting tool. Every feature encodes a specific trading ed
 
 | Layer | Tool |
 |---|---|
-| Framework | React 18 + Vite 7 |
+| Framework | React 19 + Vite 8 |
 | Charting | lightweight-charts **v5** (native multi-pane) |
 | Server state | TanStack Query v5 |
-| Client state | Zustand v4 |
+| Client state | Zustand v5 |
 | Animations | Motion v12 (spring physics panels, scale+fade modals) |
-| Styling | Tailwind CSS 3 + CSS custom properties (3 themes) |
-| Data | Alpaca Markets API (free tier, IEX feed) |
+| Styling | Tailwind CSS 4 + CSS custom properties (3 themes) |
+| Data | Provider-abstracted (Alpaca Markets default, swappable via adapter) |
 | HTTP | Axios |
-| Testing | Vitest v3 (274 tests) |
+| Testing | Vitest v3 (298 tests) |
 | Linting | ESLint 9 (flat config) |
 | Deployment | Vercel (serverless API proxies) |
 | Error tracking | Sentry (optional) |
@@ -50,8 +50,8 @@ This is not a generic charting tool. Every feature encodes a specific trading ed
 
 ```
 MaydenTheChart/
-├── api/                         # Vercel serverless functions
-│   ├── bars.js                  #   Alpaca bars proxy (rate-limited, validated)
+├── api/                         # Vercel serverless functions (provider-routed)
+│   ├── bars.js                  #   Historical bars proxy (rate-limited, validated)
 │   ├── snapshot.js              #   Multi-symbol snapshot proxy
 │   └── ws-auth.js               #   WebSocket credential proxy
 ├── public/
@@ -70,8 +70,8 @@ MaydenTheChart/
 │   │   ├── accents.js           #   Per-theme accent color presets (6 per theme)
 │   │   ├── chart.js             #   Colors, timeframes, symbols, EMA periods
 │   │   └── presets.js           #   Default chart presets (Clean, Full, Scalp, Swing)
-│   ├── hooks/                   #   useAlpacaBars, useAlpacaSocket, useKeyboardShortcuts, ...
-│   ├── services/                #   alpaca.js, websocket.js, queryClient.js, sentry.js
+│   ├── hooks/                   #   useBars, useLiveFeed, useKeyboardShortcuts, ...
+│   ├── services/                #   dataProvider.js, providers/alpaca.js, websocket.js, queryClient.js
 │   ├── store/                   #   useChartStore, usePresetsStore, useAlertsStore, useJournalStore, useToastStore
 │   ├── utils/                   #   indicators.js, levels.js, confluence.js, backtest.js, ...
 │   ├── App.jsx                  #   Single-page root layout
@@ -134,7 +134,7 @@ VITE_SENTRY_DSN=                        # Optional — Sentry error tracking
 ## Testing
 
 ```bash
-npm run test           # Run all 274 tests
+npm run test           # Run all 298 tests
 npx vitest --watch     # Watch mode
 npm run build          # Production build (zero errors/warnings)
 npx eslint src/        # Lint check (0 errors)

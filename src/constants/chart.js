@@ -76,65 +76,62 @@ export const ALERT_SOUND_DURATION = 0.3   // seconds
 
 // ─── Timeframe config ─────────────────────────────────────────────────────────
 // lookbackMs: how far back to fetch data for this timeframe
-// alpacaTimeframe: the string Alpaca's API expects
 // limit: max bars to request
 // intraday: whether VWAP/ORB/levels are shown
 // showVWAP: hide VWAP on higher timeframes per trading system rules
+//
+// Note: provider-specific timeframe strings (e.g. '5Min' for Alpaca) are
+// handled by the provider adapter in src/services/providers/. The internal
+// keys here ('5Min', '1Hour', etc.) are the canonical identifiers.
 
 export const TIMEFRAME_CONFIG = {
   '1Min': {
-    label:           '1m',
-    alpacaTimeframe: '1Min',
-    lookbackMs:      2 * 24 * 60 * 60 * 1000,   // 2 days
-    limit:           1000,
-    intraday:        true,
-    showVWAP:        true,
-    showORB:         true,
+    label:      '1m',
+    lookbackMs: 2 * 24 * 60 * 60 * 1000,   // 2 days
+    limit:      1000,
+    intraday:   true,
+    showVWAP:   true,
+    showORB:    true,
   },
   '5Min': {
-    label:           '5m',
-    alpacaTimeframe: '5Min',
-    lookbackMs:      5 * 24 * 60 * 60 * 1000,   // 5 days
-    limit:           1000,
-    intraday:        true,
-    showVWAP:        true,
-    showORB:         true,
+    label:      '5m',
+    lookbackMs: 5 * 24 * 60 * 60 * 1000,   // 5 days
+    limit:      1000,
+    intraday:   true,
+    showVWAP:   true,
+    showORB:    true,
   },
   '15Min': {
-    label:           '15m',
-    alpacaTimeframe: '15Min',
-    lookbackMs:      10 * 24 * 60 * 60 * 1000,  // 10 days
-    limit:           1000,
-    intraday:        true,
-    showVWAP:        true,
-    showORB:         true,
+    label:      '15m',
+    lookbackMs: 10 * 24 * 60 * 60 * 1000,  // 10 days
+    limit:      1000,
+    intraday:   true,
+    showVWAP:   true,
+    showORB:    true,
   },
   '1Hour': {
-    label:           '1h',
-    alpacaTimeframe: '1Hour',
-    lookbackMs:      30 * 24 * 60 * 60 * 1000,  // 30 days
-    limit:           720,
-    intraday:        false,
-    showVWAP:        false,
-    showORB:         false,
+    label:      '1h',
+    lookbackMs: 30 * 24 * 60 * 60 * 1000,  // 30 days
+    limit:      720,
+    intraday:   false,
+    showVWAP:   false,
+    showORB:    false,
   },
   '4Hour': {
-    label:           '4h',
-    alpacaTimeframe: '4Hour',
-    lookbackMs:      90 * 24 * 60 * 60 * 1000,  // 90 days
-    limit:           540,
-    intraday:        false,
-    showVWAP:        false,
-    showORB:         false,
+    label:      '4h',
+    lookbackMs: 90 * 24 * 60 * 60 * 1000,  // 90 days
+    limit:      540,
+    intraday:   false,
+    showVWAP:   false,
+    showORB:    false,
   },
   '1Day': {
-    label:           '1D',
-    alpacaTimeframe: '1Day',
-    lookbackMs:      365 * 24 * 60 * 60 * 1000, // 1 year
-    limit:           365,
-    intraday:        false,
-    showVWAP:        false,
-    showORB:         false,
+    label:      '1D',
+    lookbackMs: 365 * 24 * 60 * 60 * 1000, // 1 year
+    limit:      365,
+    intraday:   false,
+    showVWAP:   false,
+    showORB:    false,
   },
 }
 

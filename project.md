@@ -341,16 +341,18 @@ Component state (useState — local only):
 
 ## File Ownership Map
 
-### Core Data Layer
+### Core Data Layer (provider-abstracted)
 | File | Purpose |
 |---|---|
-| `src/services/alpaca.js` | Axios client, auth headers, base URLs |
+| `src/services/dataProvider.js` | Provider interface — `fetchBars()`, `fetchSnapshot()`, `getProviderName()` |
+| `src/services/providers/alpaca.js` | Alpaca adapter — bar normalization, timeframe mapping, WS protocol |
+| `src/services/alpaca.js` | Re-export wrapper (backward compat → `dataProvider.js`) |
 | `src/services/queryClient.js` | TanStack Query client config + default options |
-| `src/services/websocket.js` | Alpaca WebSocket connection manager — auth, subscribe, reconnect with exponential backoff |
+| `src/services/websocket.js` | Provider-agnostic WebSocket manager — connection lifecycle, reconnect with exponential backoff |
 | `src/services/sentry.js` | Sentry error tracking — conditional init via `VITE_SENTRY_DSN` env var |
-| `api/bars.js` | Vercel serverless proxy — Alpaca API (keys server-only, pagination) |
-| `api/ws-auth.js` | Vercel serverless function — returns Alpaca WS credentials, protected by bearer token |
-| `api/snapshot.js` | Vercel serverless proxy — Alpaca snapshots for watchlist live prices |
+| `api/bars.js` | Vercel serverless proxy — provider-routed (currently Alpaca, keys server-only, pagination) |
+| `api/ws-auth.js` | Vercel serverless function — returns WS credentials, protected by bearer token |
+| `api/snapshot.js` | Vercel serverless proxy — provider-routed snapshots for watchlist live prices |
 | `public/manifest.json` | PWA manifest (standalone display, icons, theme) |
 | `src/sw.js` | Service worker source — build-time processed by Vite plugin, auto-versioned CACHE_NAME |
 | `public/fonts/boogaloo-regular.woff2` | Self-hosted Boogaloo font (logo) |
@@ -368,8 +370,8 @@ Component state (useState — local only):
 ### Hooks
 | File | Purpose |
 |---|---|
-| `src/hooks/useAlpacaBars.js` | TanStack Query hook for historical bars |
-| `src/hooks/useAlpacaSocket.js` | React hook — WS market-hours gating, 1-min bar aggregation, TanStack cache injection |
+| `src/hooks/useBars.js` | TanStack Query hook for historical bars (provider-agnostic) |
+| `src/hooks/useLiveFeed.js` | React hook — WS market-hours gating, 1-min bar aggregation, TanStack cache injection |
 | `src/hooks/useDailyBars.js` | TanStack Query hook for daily bars (ATR gauge) |
 | `src/hooks/useKeyboardShortcuts.js` | Global keyboard shortcuts (1-6 timeframes, [/] presets, Cmd+K, panel toggles) |
 | `src/hooks/useViewportPersistence.js` | Preserves chart zoom/scroll across live data updates |
@@ -488,7 +490,7 @@ Component state (useState — local only):
 - [x] Phase 12A: Production hardening — cache headers, self-host fonts, SW auto-versioning, OG meta, Sentry, reduced-motion
 - [x] Phase 12B: UX sharpening — Motion library (content transitions), skeleton loading states, accent color customization, layout transition fix
 - [x] Phase 12C: Dependency upgrades — React 19, Zustand 5, Vite 8, Tailwind 4
-- [ ] Phase 12D: Data provider abstraction — provider interface, Alpaca adapter, rename hooks to be provider-agnostic
+- [x] Phase 12D: Data provider abstraction — provider interface, Alpaca adapter, hooks renamed (useBars, useLiveFeed), TIMEFRAME_CONFIG decoupled
 - [ ] Phase 12E: Infinite scroll — on-demand history loading, IndexedDB cache (Dexie.js), enableConflation
 - [ ] Phase 12F: Future differentiators — screener, trade replay, annotations, gap tracking, cloud sync
 
@@ -538,3 +540,4 @@ Component state (useState — local only):
 | 2026-03-16 | **Layout transition fix.** Phase 12B's Motion `AnimatePresence` for RightPanel caused close-pause-jump: panel slid out via spring animation but still occupied 340px in flex layout until DOM removal, then chart snapped. Fix: reverted to persistent wrapper div with CSS `transition-[transform,width,min-width]` for seamless chart resize, `AnimatePresence` now only handles content fade between panels. **Design rule documented:** layout-affecting transitions must use CSS on persistent DOM elements; Motion only for content that doesn't affect flex layout. |
 | 2026-03-16 | **RSI/MACD UX cleanup + sidebar revert.** Moved RSI/MACD toggles back to sidebar IndicatorToggle (they're indicators, not a separate UI category). Removed the separate tab button strip below the chart. Mini chart labels use lw-charts built-in watermark (auto-aligned inside plotting area). Mini chart price scales have `minimumWidth: 60` for right-edge alignment. All charts use `autoSize: true`. Sidebar reverted to original clean form (pre-audit `dca2cad`) after 5 failed fix attempts for BUG-001 (chart area not expanding on sidebar close). Created `bugs.md` tracker and `left-bar-problems.md` audit doc. 298/298 tests, build clean. |
 | 2026-03-16 | **Phase 12C complete: Dependency upgrades.** Zustand 4.5.7 → 5.0.12 (drop-in, no middleware in use). Vite 7.3.1 → 8.0.0 + @vitejs/plugin-react 6.0.1 (`manualChunks` converted from object to function for Rolldown). React 18.3.1 → 19.2.4 + react-dom 19.2.4 (already on createRoot). Tailwind 3.4.19 → 4.2.1 via `@tailwindcss/postcss` (`@tailwindcss/vite` not yet Vite 8 compatible), config moved from `tailwind.config.js` to CSS `@theme` block, `@tailwind` directives → `@import "tailwindcss"`, removed `autoprefixer`. ESLint react-hooks v7 fix: `set-state-in-effect` in OnboardingTour (justified disable). 298/298 tests, build clean, ESLint 0 errors, 0 vulnerabilities. |
+| 2026-03-16 | **Phase 12D complete: Data provider abstraction.** Created `src/services/dataProvider.js` (provider interface: `fetchBars()`, `fetchSnapshot()`, `getProviderName()`), `src/services/providers/alpaca.js` (Alpaca adapter: bar normalization, timeframe mapping, WS protocol). Refactored `websocket.js` to provider-agnostic shell — delegates protocol handling to adapter. Renamed hooks: `useAlpacaBars` → `useBars`, `useAlpacaSocket` → `useLiveFeed` (old files kept as re-export wrappers for backward compat). Removed `alpacaTimeframe` from `TIMEFRAME_CONFIG` — provider adapter handles translation. Updated all 6 consumers (App.jsx, BacktestPanel, useMTFSignals, useDailyBars, useWatchlistQuotes, SymbolInput). Serverless proxies documented for `DATA_PROVIDER` env var routing. 298/298 tests, build clean, ESLint 0 errors. |

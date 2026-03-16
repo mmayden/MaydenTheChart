@@ -1,9 +1,9 @@
 /**
- * SymbolInput — Editable ticker input with autocomplete and Alpaca validation.
+ * SymbolInput — Editable ticker input with autocomplete and validation.
  *
  * Click the symbol to edit. As you type, a dropdown shows matching suggestions
  * sorted by usage frequency (most-selected first). Press Enter or click a
- * suggestion to submit. Validates against Alpaca — if data comes back, the
+ * suggestion to submit. Validates by fetching bars — if data comes back, the
  * symbol is valid. If not, shows a brief error and reverts.
  *
  * Usage frequency is tracked in localStorage so frequently-used symbols
@@ -13,7 +13,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { useChartStore } from '../../store/useChartStore'
 import { useToast } from '../../store/useToastStore'
-import { fetchBars } from '../../services/alpaca'
+import { fetchBars } from '../../services/dataProvider'
 import { SYMBOL_SUGGESTIONS } from '../../constants/chart'
 import { validateSymbolUsage } from '../../utils/validate'
 

@@ -1,6 +1,6 @@
 # Architecture — Lumpia (Cheechart)
 
-> Current as of layout fix (2026-03-16). Update this file whenever architecture changes.
+> Current as of Phase 12D data provider abstraction (2026-03-16). Update this file whenever architecture changes.
 
 ---
 
@@ -44,7 +44,7 @@ become full-screen overlays. Chart fills the viewport.
 ## Data Flow
 
 ```
-Alpaca REST API (data.alpaca.markets)
+Data Provider (currently Alpaca REST — data.alpaca.markets)
       │
       ▼
 api/bars.js (Vercel serverless)     ← rate-limited, SSRF-guarded, paginated
@@ -52,10 +52,11 @@ api/snapshot.js                     ← multi-symbol quotes for watchlist
 api/ws-auth.js                     ← returns WS credentials (bearer token)
       │
       ▼
-services/alpaca.js                  ← axios client, calls /api/bars proxy
+services/dataProvider.js            ← provider interface: fetchBars(), fetchSnapshot()
+services/providers/alpaca.js        ← Alpaca adapter: normalization, timeframe mapping, WS protocol
       │
       ▼
-hooks/useAlpacaBars.js              ← TanStack Query: caching, loading, refetch
+hooks/useBars.js                    ← TanStack Query: caching, loading, refetch
 hooks/useDailyBars.js               ← daily bars for ATR gauge
 hooks/useMTFSignals.js              ← parallel fetch across 5m/15m/1h/4h/1D
       │
@@ -65,13 +66,14 @@ hooks/useMTFSignals.js              ← parallel fetch across 5m/15m/1h/4h/1D
       ├──► utils/confluence.js      ← weighted synthesis of all signals → score/bias
       └──► utils/backtest.js        ← ORB, EMA-cross, VWAP Bounce strategies
 
-Alpaca WebSocket (wss://stream.data.alpaca.markets/v2/iex)
+WebSocket (provider-agnostic shell, currently Alpaca wss://stream.data.alpaca.markets/v2/iex)
       │
       ▼
 services/websocket.js               ← connection lifecycle, auth via ws-auth proxy,
       │                                exponential backoff reconnect (max 10, 1s-30s)
+      │                                delegates protocol to providers/alpaca.js
       ▼
-hooks/useAlpacaSocket.js            ← market-hours gating (9:30-4 ET, weekdays),
+hooks/useLiveFeed.js                ← market-hours gating (9:30-4 ET, weekdays),
       │                                1-min bar aggregation into selected timeframe,
       ▼                                injects into TanStack Query cache
 App.jsx
@@ -260,14 +262,15 @@ API keys never reach the browser bundle (no VITE_ prefix).
 ## Build & Bundle
 
 ```
-Vite 7 → dist/
+Vite 8 → dist/
   ├── index.html
   ├── sw.js (auto-versioned CACHE_NAME via Vite plugin)
   ├── assets/
-  │   ├── index-[hash].js        (229KB main bundle)
-  │   ├── lw-charts-[hash].js    (164KB lightweight-charts)
-  │   ├── motion-[hash].js       (125KB motion library)
-  │   ├── vendor-api-[hash].js   (81KB axios + tanstack + zustand)
+  │   ├── index-[hash].js        (~312KB main bundle)
+  │   ├── lw-charts-[hash].js    (161KB lightweight-charts)
+  │   ├── motion-[hash].js       (92KB motion library)
+  │   ├── vendor-api-[hash].js   (69KB axios + tanstack + zustand)
+  │   ├── dataProvider-[hash].js (1KB provider abstraction)
   │   └── 6 lazy chunks          (panels, settings, command palette)
   └── fonts/
       ├── boogaloo-regular.woff2 (10KB)

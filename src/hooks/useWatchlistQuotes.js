@@ -1,14 +1,14 @@
 /**
  * useWatchlistQuotes — Fetches live snapshot prices for watchlist symbols.
  *
- * Uses the /api/snapshot serverless proxy (Alpaca snapshots endpoint).
+ * Uses the data provider's fetchSnapshot() method.
  * Auto-refreshes every 30 seconds. Enabled only when watchlist panel is open.
  *
  * Returns: { quotes: { [symbol]: { price, change, changePercent } }, isLoading }
  */
 
 import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
+import { fetchSnapshot } from '../services/dataProvider'
 import { useChartStore } from '../store/useChartStore'
 
 /**
@@ -21,12 +21,7 @@ export function useWatchlistQuotes(symbols) {
 
   const { data, isLoading } = useQuery({
     queryKey: ['watchlist-quotes', symbols.join(',')],
-    queryFn: async () => {
-      const { data: resp } = await axios.get('/api/snapshot', {
-        params: { symbols: symbols.join(',') },
-      })
-      return resp.snapshots ?? {}
-    },
+    queryFn: () => fetchSnapshot(symbols),
     enabled,
     refetchInterval: enabled ? 30 * 1000 : false,
     staleTime: 15 * 1000,
