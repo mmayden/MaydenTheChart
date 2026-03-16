@@ -18,6 +18,10 @@ export function RSIMiniChart({ bars }) {
     const chart = createChart(containerRef.current, {
       ...MINI_CHART_OPTS,
       autoSize: true,
+      layout: {
+        ...MINI_CHART_OPTS.layout,
+        watermark: { text: 'RSI', color: 'rgba(167, 139, 250, 0.5)', visible: true, fontSize: 11, fontFamily: "'JetBrains Mono', monospace", fontStyle: 'bold', horzAlign: 'left', vertAlign: 'top' },
+      },
     })
 
     const line = chart.addSeries(LineSeries, {

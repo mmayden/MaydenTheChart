@@ -18,7 +18,7 @@ export const MINI_CHART_OPTS = {
     vertLine: { color: CROSSHAIR_COLOR, labelBackgroundColor: GRID_COLOR },
     horzLine: { color: CROSSHAIR_COLOR, labelBackgroundColor: GRID_COLOR },
   },
-  rightPriceScale: { borderColor: GRID_COLOR },
+  rightPriceScale: { borderColor: GRID_COLOR, minimumWidth: 60 },
   timeScale:       { borderColor: GRID_COLOR, timeVisible: true, secondsVisible: false, visible: false },
   handleScroll:    false,
   handleScale:     false,
