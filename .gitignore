@@ -19,6 +19,22 @@ dist/
 .DS_Store
 Thumbs.db
 
+# internal docs / brainstorming (not shipped)
+marketing.md
+growth.md
+brainstorming.md
+audit.md
+audit-*.md
+feature-ideas.md
+left-bar-problems.md
+bugs.md
+alpaca-api.md
+architecture.md
+git.md
+qqq-specific-features.txt
+temp-file.md
+temp-*.md
+
 # logs
 npm-debug.log*
 yarn-debug.log*

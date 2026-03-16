@@ -7,10 +7,18 @@
 
 ## What We're Building
 
-A professional day trading chart terminal supporting any US equity symbol, using real Alpaca
-paper trading data. The goal is a tool that encodes a rules-based trading system — validated
-against academic research and professional trader consensus — into a visual interface that
-makes high-probability setups obvious and low-probability conditions clearly flagged.
+A free, opinionated day trading chart terminal supporting any US equity symbol, using real
+Alpaca paper trading data. The goal is a tool that encodes a rules-based trading system —
+validated against academic research and professional trader consensus — into a visual
+interface that makes high-probability setups obvious and low-probability conditions flagged.
+
+**Target audience:** Beginner-to-intermediate day traders who want structure. People
+overwhelmed by TradingView's complexity, or limited by its free tier (1 indicator/chart).
+Cheechart gives 8 indicators, confluence scoring, one-click backtesting, and a trade
+journal — no signup, no ads, no paywall. Free forever, donation-supported.
+
+**Growth strategy:** Shareable chart screenshots with confluence score watermarks drive
+organic discovery. See `growth.md` for full traction plan.
 
 Originally built around QQQ (Nasdaq 100 ETF), now multi-symbol with autocomplete for ~80
 popular tickers. The system is purpose-built around a specific, documented, rules-based

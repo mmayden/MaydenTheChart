@@ -221,10 +221,8 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Task board: `tasks.md`
 - Indicator math reference: `indicators.md`
 - Security standards: `security.md`
-- Competitive research + vision: `brainstorming.md`
-- Health audit template: `audit.md`
-- Bug tracker: `bugs.md`
-- Sidebar layout bug audit: `left-bar-problems.md`
+- Growth & traction strategy: `growth.md` (gitignored — local only)
+- Internal docs (gitignored): `brainstorming.md`, `audit.md`, `bugs.md`, `left-bar-problems.md`, etc.
 
 ## Developer workflow
 - **Pre-commit:** `husky` + `lint-staged` runs `eslint --max-warnings=0` on staged `src/` and `api/` files

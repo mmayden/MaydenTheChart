@@ -652,6 +652,48 @@
 
 ---
 
+## 🔲 Phase 13A — Traction Readiness (Shareability)
+
+> Make the tool shareable and give a good first impression. See `growth.md` for strategy context.
+
+- 🔲 Enhanced chart snapshots — include confluence score + day type in watermark overlay (`NVDA 5m · Confluence 8.5 Bull · cheechart.space`)
+- 🔲 First-visit welcome banner — dismissible, one-time: "Free charting — unlimited indicators, no signup, no ads." localStorage gate.
+- 🔲 Ko-fi donate link — small heart icon in StatusBar, links to Ko-fi page
+- 🔲 OG image — replace app icon with actual chart screenshot for social link previews
+
+---
+
+## 🔲 Phase 13B — First Impression Polish
+
+> Fix issues that make screenshots/first visits look unprofessional.
+
+- 🔲 Fix 9 hardcoded color violations — replace hex values with CSS variable references (see audit in `temp files`)
+  - `AlertsPanel.jsx` — alertDotColor() + streak indicator
+  - `MACDMiniChart.jsx` — MACD/signal line + histogram colors
+  - `RSIMiniChart.jsx` — RSI line + reference level colors
+  - `SROverlay.jsx` — support/resistance rgba colors
+  - `ErrorBoundary.jsx` — fallback UI colors
+  - `CandlestickChart.jsx` — CANDLE_COLORS object
+  - `ToastContainer.jsx` — BORDER_COLORS map
+  - `PresetSelector.jsx` — delete button color
+  - `IndicatorTabView.jsx` — mini-chart label colors
+- 🔲 Confluence bar visual emphasis — make it more prominent (bigger score, gradient/glow when strong)
+- 🔲 Accessibility — `:focus-visible` outline in index.css, `role="dialog"` + `aria-modal` on CommandPalette/SettingsModal, `aria-label` on panel toggle buttons
+
+---
+
+## 🔲 Phase 13C — Discoverability
+
+> After the Reddit/HN launch post — make it findable.
+
+- 🔲 `public/robots.txt` — allow all crawlers
+- 🔲 `public/sitemap.xml` — single-page sitemap
+- 🔲 Canonical URL meta tag in `index.html`
+- 🔲 Real PWA icons — replace placeholder 1x1 PNGs with branded 192/512 icons
+- 🔲 Meta description targeting "free charting tool" / "TradingView alternative"
+
+---
+
 ## 🔲 Phase 12F — Future Differentiators
 
 - 🔲 Screener — scan watchlist for active setups
