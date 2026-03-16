@@ -10,7 +10,7 @@
  * Props:
  *   chart      — lightweight-charts IChartApi instance
  *   bars       — array of { time, open, high, low, close, volume } bar objects
- *   theme      — 'dark' | 'lumpia'
+ *   theme      — 'dark' | 'lumpia' | 'terminal'
  */
 
 import { useEffect, useRef } from 'react'

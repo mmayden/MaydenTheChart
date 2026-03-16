@@ -36,9 +36,9 @@ function _readURLTimeframe() {
 
 export const useChartStore = create((set) => ({
   // ─── Theme ─────────────────────────────────────────────────────────────────
-  theme: (() => { try { return localStorage.getItem('lumpia-theme') ?? 'dark' } catch { return 'dark' } })(),
+  theme: (() => { try { return localStorage.getItem('cheechart-theme') ?? localStorage.getItem('lumpia-theme') ?? 'dark' } catch { return 'dark' } })(),
   setTheme: (theme) => {
-    try { localStorage.setItem('lumpia-theme', theme) } catch { /* storage unavailable */ }
+    try { localStorage.setItem('cheechart-theme', theme); localStorage.removeItem('lumpia-theme') } catch { /* storage unavailable */ }
     // Clear accent overrides — each theme has its own default accent
     try {
       const root = document.documentElement
@@ -48,14 +48,14 @@ export const useChartStore = create((set) => ({
       root.style.removeProperty('--btn-primary-hover')
       root.style.removeProperty('--focus-ring')
     } catch { /* no DOM in test env */ }
-    try { localStorage.removeItem('lumpia-accent') } catch { /* storage unavailable */ }
+    try { localStorage.removeItem('cheechart-accent'); localStorage.removeItem('lumpia-accent') } catch { /* storage unavailable */ }
     set({ theme, accentId: null })
   },
 
   // ─── Accent color ─────────────────────────────────────────────────────────
-  accentId: (() => { try { return localStorage.getItem('lumpia-accent') ?? null } catch { return null } })(),
+  accentId: (() => { try { return localStorage.getItem('cheechart-accent') ?? localStorage.getItem('lumpia-accent') ?? null } catch { return null } })(),
   setAccentColor: (id, currentTheme) => {
-    try { localStorage.setItem('lumpia-accent', id) } catch { /* storage unavailable */ }
+    try { localStorage.setItem('cheechart-accent', id); localStorage.removeItem('lumpia-accent') } catch { /* storage unavailable */ }
     const colors = ACCENT_LOOKUP[currentTheme]?.[id]
     if (colors) {
       try {
@@ -124,9 +124,9 @@ export const useChartStore = create((set) => ({
   endTour:   () => set({ tourActive: false }),
 
   // ─── Sound alerts ─────────────────────────────────────────────────────────
-  soundAlerts: (() => { try { return localStorage.getItem('lumpia-sound-alerts') !== 'false' } catch { return true } })(),
+  soundAlerts: (() => { try { return (localStorage.getItem('cheechart-sound-alerts') ?? localStorage.getItem('lumpia-sound-alerts')) !== 'false' } catch { return true } })(),
   setSoundAlerts: (enabled) => {
-    try { localStorage.setItem('lumpia-sound-alerts', String(enabled)) } catch { /* storage unavailable */ }
+    try { localStorage.setItem('cheechart-sound-alerts', String(enabled)); localStorage.removeItem('lumpia-sound-alerts') } catch { /* storage unavailable */ }
     set({ soundAlerts: enabled })
   },
 

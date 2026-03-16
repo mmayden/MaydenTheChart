@@ -52,5 +52,3 @@ export function useBars() {
   })
 }
 
-// Backward compat export during migration
-export { useBars as useAlpacaBars }

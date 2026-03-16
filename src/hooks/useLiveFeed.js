@@ -141,5 +141,3 @@ export function useLiveFeed() {
   return { wsStatus, isMarketOpen }
 }
 
-// Backward compat export during migration
-export { useLiveFeed as useAlpacaSocket }
