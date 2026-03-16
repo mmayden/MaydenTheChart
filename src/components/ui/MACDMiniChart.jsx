@@ -67,6 +67,30 @@ export function MACDMiniChart({ bars, mainChart }) {
     return () => { mainChart.unsubscribeCrosshairMove(handler) }
   }, [mainChart])
 
+  // Sync visible time range from main chart → this mini chart
+  useEffect(() => {
+    if (!mainChart || !chartRef.current) return
+    const miniChart = chartRef.current
+
+    const handler = (range) => {
+      if (range) {
+        miniChart.timeScale().setVisibleLogicalRange(range)
+      }
+    }
+
+    mainChart.timeScale().subscribeVisibleLogicalRangeChange(handler)
+
+    // Apply current range immediately so mini-chart aligns on mount
+    const currentRange = mainChart.timeScale().getVisibleLogicalRange()
+    if (currentRange) {
+      miniChart.timeScale().setVisibleLogicalRange(currentRange)
+    }
+
+    return () => {
+      mainChart.timeScale().unsubscribeVisibleLogicalRangeChange(handler)
+    }
+  }, [mainChart])
+
   useEffect(() => {
     const { hist, macdLine, signalLine } = seriesRef.current
     if (!bars?.length || !hist) return
@@ -75,8 +99,12 @@ export function MACDMiniChart({ bars, mainChart }) {
     hist.setData(result.histogram.map((p) => ({ time: p.time, value: p.value, color: p.value >= 0 ? '#22c55e' : '#ef4444' })))
     macdLine.setData(result.macd)
     signalLine.setData(result.signalLine)
-    chartRef.current?.timeScale().fitContent()
-  }, [bars])
+    // If main chart is connected, it drives the time range via sync.
+    // Only fitContent when there's no main chart to sync from.
+    if (!mainChart) {
+      chartRef.current?.timeScale().fitContent()
+    }
+  }, [bars, mainChart])
 
   return <div ref={containerRef} className="w-full h-full" />
 }
