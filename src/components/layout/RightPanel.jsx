@@ -4,11 +4,13 @@
  * Renders the active panel content based on useChartStore.activePanel.
  * Only one panel open at a time. On mobile (<768px), becomes full-screen overlay.
  * Panel components are lazy-loaded for code splitting.
+ * Animated with Motion (spring physics slide + fade).
  *
  * Panel values: null | 'alerts' | 'backtest' | 'journal' | 'watchlist'
  */
 
 import { lazy, Suspense } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react' // eslint-disable-line no-unused-vars -- motion used as JSX namespace
 import { useChartStore } from '../../store/useChartStore'
 
 // Lazy-load panel components — only loaded when the user first opens them
@@ -26,11 +28,16 @@ const PANELS = {
 
 function PanelSkeleton() {
   return (
-    <div className="flex items-center justify-center h-32">
-      <div
-        className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"
-        style={{ borderColor: 'var(--accent)', borderTopColor: 'transparent' }}
-      />
+    <div className="flex flex-col gap-3 p-4">
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded skeleton-shimmer shrink-0" />
+          <div className="flex-1 flex flex-col gap-1.5">
+            <div className="h-3 rounded skeleton-shimmer" style={{ width: `${70 + (i % 3) * 10}%` }} />
+            <div className="h-2.5 rounded skeleton-shimmer" style={{ width: `${40 + (i % 4) * 12}%` }} />
+          </div>
+        </div>
+      ))}
     </div>
   )
 }
@@ -38,55 +45,66 @@ function PanelSkeleton() {
 export function RightPanel() {
   const activePanel = useChartStore((s) => s.activePanel)
   const closePanel  = useChartStore((s) => s.closePanel)
+  const prefersReduced = useReducedMotion()
 
   const isOpen = activePanel !== null
   const panel  = activePanel ? PANELS[activePanel] : null
 
+  const springTransition = prefersReduced
+    ? { duration: 0 }
+    : { type: 'spring', stiffness: 400, damping: 35, mass: 0.8 }
+
   return (
     <>
-      {/* Backdrop (mobile full-screen, desktop subtle) */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/30 z-[45] md:hidden"
-          onClick={closePanel}
-        />
-      )}
+      {/* Backdrop (mobile only) */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            key="panel-backdrop"
+            className="fixed inset-0 bg-black/30 z-[45] md:hidden"
+            onClick={closePanel}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: prefersReduced ? 0 : 0.2 }}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Panel container */}
-      <div
-        className={`
-          fixed top-0 right-0 h-full z-50
-          md:relative md:z-auto md:top-auto md:right-auto md:h-auto
-          transition-all duration-300 ease-out
-          ${isOpen
-            ? 'translate-x-0 w-full md:w-[340px] md:min-w-[340px]'
-            : 'translate-x-full md:translate-x-0 w-0 md:w-0 md:min-w-0'
-          }
-        `}
-        style={{ backgroundColor: isOpen ? 'var(--bg-surface)' : 'transparent' }}
-      >
+      <AnimatePresence mode="wait">
         {isOpen && panel && (
-          <div className="flex flex-col h-full border-l border-theme w-full md:w-[340px]">
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-theme shrink-0">
-              <span className="text-sm font-bold tracking-wide">{panel.title}</span>
-              <button
-                onClick={closePanel}
-                className="text-theme-muted hover:text-theme transition-colors text-lg leading-none touch-target"
-              >
-                ×
-              </button>
-            </div>
+          <motion.div
+            key={activePanel}
+            className="fixed top-0 right-0 h-full z-50 w-full md:relative md:z-auto md:top-auto md:right-auto md:h-auto md:w-[340px] md:min-w-[340px]"
+            style={{ backgroundColor: 'var(--bg-surface)' }}
+            initial={{ x: '100%', opacity: 0.5 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: '100%', opacity: 0 }}
+            transition={springTransition}
+          >
+            <div className="flex flex-col h-full border-l border-theme w-full md:w-[340px]">
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-theme shrink-0">
+                <span className="text-sm font-bold tracking-wide">{panel.title}</span>
+                <button
+                  onClick={closePanel}
+                  className="text-theme-muted hover:text-theme transition-colors text-lg leading-none touch-target"
+                >
+                  ×
+                </button>
+              </div>
 
-            {/* Panel content (lazy-loaded with Suspense) */}
-            <div className="flex-1 min-h-0 overflow-hidden">
-              <Suspense fallback={<PanelSkeleton />}>
-                <panel.Component />
-              </Suspense>
+              {/* Panel content (lazy-loaded with Suspense) */}
+              <div className="flex-1 min-h-0 overflow-hidden">
+                <Suspense fallback={<PanelSkeleton />}>
+                  <panel.Component />
+                </Suspense>
+              </div>
             </div>
-          </div>
+          </motion.div>
         )}
-      </div>
+      </AnimatePresence>
     </>
   )
 }

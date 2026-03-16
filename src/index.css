@@ -253,6 +253,52 @@ body,
   overflow: hidden;
 }
 
+/* ── Skeleton shimmer loading states ──────────────────────────────────── */
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--border) 25%,
+    var(--hover-bg) 50%,
+    var(--border) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Chart area skeleton */
+.chart-skeleton {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  padding: 24px;
+  height: 100%;
+}
+
+.chart-skeleton-bar {
+  width: 6px;
+  border-radius: 2px;
+  background: linear-gradient(
+    180deg,
+    var(--border) 25%,
+    var(--hover-bg) 50%,
+    var(--border) 75%
+  );
+  background-size: 100% 200%;
+  animation: shimmer-v 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer-v {
+  0%   { background-position: 0 200%; }
+  100% { background-position: 0 -200%; }
+}
+
 /* ── Nav button hover micro-animations ─────────────────────────────────── */
 
 /* Shared: all nav icons pop bigger on hover */
@@ -385,5 +431,11 @@ body,
   /* Disable button transitions */
   .btn-primary {
     transition: none;
+  }
+
+  /* Disable skeleton shimmer */
+  .skeleton-shimmer,
+  .chart-skeleton-bar {
+    animation: none;
   }
 }

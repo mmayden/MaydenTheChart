@@ -29,7 +29,7 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - JavaScript (not TypeScript — tests provide sufficient coverage at current scale)
 - `feed: 'iex'` required on all Alpaca data fetches (free tier)
 - **No react-router-dom** — single-page app, panel-based architecture
-- Motion (formerly Framer Motion) for panel/modal animations (Phase 12B)
+- Motion v12 (formerly Framer Motion) — AnimatePresence + spring physics for panels/modals
 
 ## Data provider strategy
 - **Current provider:** Alpaca Markets (free tier, IEX feed, 200 calls/min, 7yr history)
@@ -70,6 +70,19 @@ has its own `--{id}-color` and `--{id}-active-bg` variables. The settings gear h
 `--settings-color` and `--settings-glow`. Nav button hover animations are CSS-only
 keyframes in `src/index.css` (`.nav-btn-{id}` classes).
 
+**Accent color system:** Users can pick from 6 accent presets per theme in Settings.
+Presets defined in `src/constants/accents.js` (single source of truth), consumed by
+both the store (`setAccentColor`) and the SettingsModal UI. Overrides 5 CSS variables
+(`--accent`, `--accent-dim`, `--btn-primary`, `--btn-primary-hover`, `--focus-ring`)
+via inline styles on `<html>`. Resets when theme changes. Persisted to `localStorage`.
+
+**Animation system:** Motion v12 (`motion/react`) powers panel/modal transitions.
+- RightPanel: spring physics slide-in/out (`AnimatePresence` with per-panel key)
+- CommandPalette: scale+fade entrance/exit (`AnimatePresence` internal)
+- SettingsModal: scale+fade entrance/exit (`AnimatePresence` in App.jsx)
+- All animations respect `prefers-reduced-motion` via `useReducedMotion()` hook
+- CSS-only: nav hover keyframes, skeleton shimmer, settings gear spin+glow
+
 ## Key file locations
 
 ### App Shell
@@ -99,7 +112,7 @@ keyframes in `src/index.css` (`.nav-btn-{id}` classes).
 - MTF signals hook: `src/hooks/useMTFSignals.js` — fetches bars across 5m/15m/1h/4h/1D
 
 ### Stores
-- Primary UI state: `src/store/useChartStore.js` (timeframe, symbol, indicators, activePanel, theme)
+- Primary UI state: `src/store/useChartStore.js` (timeframe, symbol, indicators, activePanel, theme, accentId)
 - Preset store: `src/store/usePresetsStore.js`
 - Alert store: `src/store/useAlertsStore.js`
 - Trade journal store: `src/store/useJournalStore.js`
@@ -124,8 +137,9 @@ keyframes in `src/index.css` (`.nav-btn-{id}` classes).
 ### UI Components
 - Preset selector UI: `src/components/ui/PresetSelector.jsx`
 - Default preset definitions: `src/constants/presets.js`
+- Accent color presets (per-theme): `src/constants/accents.js`
 - Command palette (Cmd+K): `src/components/ui/CommandPalette.jsx`
-- Settings modal (themes + shortcuts + sound alerts): `src/components/ui/SettingsModal.jsx`
+- Settings modal (themes + accent colors + shortcuts + sound alerts): `src/components/ui/SettingsModal.jsx`
 - Error boundary: `src/components/ui/ErrorBoundary.jsx`
 - Logo: `src/components/ui/Logo.jsx`
 - Toast notifications: `src/components/ui/ToastContainer.jsx`

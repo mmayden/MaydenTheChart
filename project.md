@@ -463,7 +463,7 @@ Component state (useState — local only):
 
 ## Current Status
 
-**274/274 tests passing, build clean, ESLint 0 errors. Main bundle 226KB + 164KB lightweight-charts + 81KB vendor-api (6 lazy chunks).**
+**274/274 tests passing, build clean, ESLint 0 errors. Main bundle 229KB + 164KB lightweight-charts + 125KB motion + 81KB vendor-api (7 lazy chunks).**
 
 ### Completed
 - [x] Phases 1–4: Core chart, indicators, levels, S/R detection, ATR gauge, day type
@@ -485,7 +485,7 @@ Component state (useState — local only):
 
 ### Upcoming (Phase 12 — detailed plan finalized 2026-03-15)
 - [x] Phase 12A: Production hardening — cache headers, self-host fonts, SW auto-versioning, OG meta, Sentry, reduced-motion
-- [ ] Phase 12B: UX sharpening — Motion library (panel/modal animations), skeleton loading states, accent color customization
+- [x] Phase 12B: UX sharpening — Motion library (panel/modal animations), skeleton loading states, accent color customization
 - [ ] Phase 12C: Dependency upgrades — React 19, Zustand 5, Vite 8, Tailwind 4
 - [ ] Phase 12D: Data provider abstraction — provider interface, Alpaca adapter, rename hooks to be provider-agnostic
 - [ ] Phase 12E: Infinite scroll — on-demand history loading, IndexedDB cache (Dexie.js), enableConflation

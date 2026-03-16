@@ -14,14 +14,14 @@ function serviceWorkerVersion() {
     name: 'sw-version',
     apply: 'build',
     closeBundle() {
-      const swSource = readFileSync(resolve(__dirname, 'src/sw.js'), 'utf-8')
+      const swSource = readFileSync(resolve(import.meta.dirname, 'src/sw.js'), 'utf-8')
       // Hash based on the SW source + current timestamp for uniqueness per deploy
       const hash = createHash('md5')
         .update(swSource + Date.now())
         .digest('hex')
         .slice(0, 8)
       const swOut = swSource.replace('__BUILD_HASH__', `cheechart-${hash}`)
-      writeFileSync(resolve(__dirname, 'dist/sw.js'), swOut)
+      writeFileSync(resolve(import.meta.dirname, 'dist/sw.js'), swOut)
     },
   }
 }
@@ -38,6 +38,7 @@ export default defineConfig({
         manualChunks: {
           'lightweight-charts': ['lightweight-charts'],
           'vendor-api': ['axios', '@tanstack/react-query'],
+          'motion': ['motion', 'motion/react'],
         },
       },
     },

@@ -47,6 +47,20 @@ export default [
     },
   },
   {
+    files: ['vite.config.js', 'eslint.config.js'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        ...globals.node,
+      },
+    },
+    rules: {
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      'no-console': 'off',
+    },
+  },
+  {
     ignores: ['dist/', 'public/sw.js'],
   },
 ]

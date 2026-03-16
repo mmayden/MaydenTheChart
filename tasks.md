@@ -489,18 +489,18 @@
 
 ---
 
-## 🔲 Phase 12B — UX Sharpening
+## ✅ Phase 12B — UX Sharpening — COMPLETE
 
-> **Goal:** Cutting-edge micro-interactions and loading states. Make the app feel alive.
+**274/274 tests passing, build clean, ESLint 0 errors**
 
-- 🔲 Add Motion library (formerly Framer Motion) — ~15KB with LazyMotion
-- 🔲 Panel slide-in/out with spring physics (replace CSS transition-all)
-- 🔲 Command palette scale+fade entrance animation (AnimatePresence for exit)
-- 🔲 Settings modal entrance/exit animation
-- 🔲 Skeleton loading states: replace spinners with content-shaped skeletons + shimmer pulse
-  - Chart area: pulsing rectangle skeleton
-  - Panel content: skeleton rows matching watchlist/journal/backtest layout
-- 🔲 Accent color customization in Settings (5-6 preset accent colors per theme, stored in localStorage, updates `--accent` CSS variable)
+- ✅ Added Motion v12 library (`motion` package, 125KB lazy chunk)
+- ✅ Panel slide-in/out with spring physics (`AnimatePresence` + `motion.div`, stiffness 400, damping 35)
+- ✅ Command palette scale+fade entrance/exit animation (`AnimatePresence` internal)
+- ✅ Settings modal scale+fade entrance animation (`motion.div` backdrop + card)
+- ✅ Skeleton loading states: `.skeleton-shimmer` CSS + `PanelSkeleton` component (Suspense fallback in RightPanel)
+- ✅ Accent color customization: 6 presets per theme in `src/constants/accents.js`, Settings UI with color dots, localStorage persistence, overrides 5 CSS variables
+- ✅ All animations respect `prefers-reduced-motion` via `useReducedMotion()` hook
+- ✅ ESLint config updated: root config files get node globals, `motion` namespace JSX usage suppressed
 
 ---
 

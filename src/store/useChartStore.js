@@ -7,13 +7,42 @@
 
 import { create } from 'zustand'
 import { DEFAULT_SYMBOL, DEFAULT_TIMEFRAME } from '../constants/chart'
+import { ACCENT_LOOKUP } from '../constants/accents'
 
 export const useChartStore = create((set) => ({
   // ─── Theme ─────────────────────────────────────────────────────────────────
   theme: (() => { try { return localStorage.getItem('lumpia-theme') ?? 'dark' } catch { return 'dark' } })(),
   setTheme: (theme) => {
     try { localStorage.setItem('lumpia-theme', theme) } catch { /* storage unavailable */ }
-    set({ theme })
+    // Clear accent overrides — each theme has its own default accent
+    try {
+      const root = document.documentElement
+      root.style.removeProperty('--accent')
+      root.style.removeProperty('--accent-dim')
+      root.style.removeProperty('--btn-primary')
+      root.style.removeProperty('--btn-primary-hover')
+      root.style.removeProperty('--focus-ring')
+    } catch { /* no DOM in test env */ }
+    try { localStorage.removeItem('lumpia-accent') } catch { /* storage unavailable */ }
+    set({ theme, accentId: null })
+  },
+
+  // ─── Accent color ─────────────────────────────────────────────────────────
+  accentId: (() => { try { return localStorage.getItem('lumpia-accent') ?? null } catch { return null } })(),
+  setAccentColor: (id, currentTheme) => {
+    try { localStorage.setItem('lumpia-accent', id) } catch { /* storage unavailable */ }
+    const colors = ACCENT_LOOKUP[currentTheme]?.[id]
+    if (colors) {
+      try {
+        const root = document.documentElement
+        root.style.setProperty('--accent', colors.accent)
+        root.style.setProperty('--accent-dim', colors.dim)
+        root.style.setProperty('--btn-primary', colors.btn)
+        root.style.setProperty('--btn-primary-hover', colors.btnHover)
+        root.style.setProperty('--focus-ring', colors.ring)
+      } catch { /* no DOM in test env */ }
+    }
+    set({ accentId: id })
   },
 
   // ─── Selection ─────────────────────────────────────────────────────────────

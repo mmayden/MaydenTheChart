@@ -1,23 +1,28 @@
-# Lumpia
+# Cheechart (Lumpia)
 
-A professional-grade day trading chart tool for QQQ, built around a specific, validated
-trading system. Purpose-built around
-the Previous High/Low framework and validated by academic ORB research.
+A professional day trading chart terminal built around a rules-based trading system.
+Multi-symbol support, real-time data via Alpaca, and signal synthesis that makes
+high-probability setups obvious at a glance.
+
+**Live:** [cheechart.space](https://cheechart.space)
 
 ---
 
 ## What Makes This Different
 
-This is not a generic charting tool. Every feature is intentional:
+This is not a generic charting tool. Every feature encodes a specific trading edge:
 
-- **Previous Day High/Low lines** auto-drawn every morning — the single most important level
-- **15-minute ORB zone** — shaded breakout zone with academic backing (33% annualized alpha on QQQ)
-- **VWAP + 1σ/2σ bands** — institutional-grade intraday levels, not just the line
-- **EMA 9/48/200** in the exact colors — the directional signal stack
+- **Confluence score** — weighted synthesis of 6 indicator signals into a single "should I trade?" readout
+- **Multi-timeframe strip** — EMA alignment across 5m/15m/1h/4h/1D at a glance
+- **Day type classification** — live Trend / Range / Chop detection from prev H/L framework
 - **ATR daily range meter** — prevents chasing exhausted moves
-- **Day type banner** — live Trend / Range / Chop classification
-- **RVOL highlights** — volume confirmation on breakout bars
-- **Macro health bar** — QQQ vs. 50MA/200MA context strip
+- **ORB zone** — 15-minute opening range with academic backing (33% annualized alpha, SSRN 2023)
+- **VWAP + 1/2 sigma bands** — institutional-grade intraday levels
+- **EMA 9/48/200 stack** — directional signal with exact colors
+- **Command palette** — Cmd+K for everything (symbols, timeframes, indicators, presets)
+- **Backtester** — 3 strategies using the same indicator math as the live chart
+- **Trade journal** — log entries with setup type, rating, win/loss analytics
+- **Saved presets** — one-click chart configurations (Clean, Full, Scalp, Swing + custom)
 
 ---
 
@@ -25,70 +30,59 @@ This is not a generic charting tool. Every feature is intentional:
 
 | Layer | Tool |
 |---|---|
-| Framework | React 18 + Vite |
+| Framework | React 18 + Vite 7 |
 | Charting | lightweight-charts **v5** (native multi-pane) |
 | Server state | TanStack Query v5 |
-| Client state | Zustand |
-| Styling | Tailwind CSS |
-| Data | Alpaca Markets API (paper trading) |
+| Client state | Zustand v4 |
+| Animations | Motion v12 (spring physics panels, scale+fade modals) |
+| Styling | Tailwind CSS 3 + CSS custom properties (3 themes) |
+| Data | Alpaca Markets API (free tier, IEX feed) |
 | HTTP | Axios |
-| Deployment | Vercel |
+| Testing | Vitest v3 (274 tests) |
+| Linting | ESLint 9 (flat config) |
+| Deployment | Vercel (serverless API proxies) |
+| Error tracking | Sentry (optional) |
+| PWA | Service worker + manifest |
 
 ---
 
 ## Project Structure
 
 ```
-lumpia/
-├── .roo/
-│   ├── project.md          # Master spec & all decisions
-│   ├── tasks.md            # Phase-by-phase task board
-│   ├── git.md              # Git conventions
-│   ├── indicators.md       # Math + logic for every indicator
-│   └── security.md         # API key and security rules
-├── docs/
-│   ├── alpaca-api.md       # All Alpaca endpoints, params, quirks
-│   └── architecture.md     # Data flow, component map, color system
+MaydenTheChart/
+├── api/                         # Vercel serverless functions
+│   ├── bars.js                  #   Alpaca bars proxy (rate-limited, validated)
+│   ├── snapshot.js              #   Multi-symbol snapshot proxy
+│   └── ws-auth.js               #   WebSocket credential proxy
+├── public/
+│   ├── fonts/                   #   Self-hosted Boogaloo + Inter woff2
+│   ├── icons/                   #   PWA icons (192 + 512)
+│   ├── manifest.json            #   PWA manifest
+│   └── ...
 ├── src/
-│   ├── store/
-│   │   └── useChartStore.js
-│   ├── services/
-│   │   ├── alpaca.js
-│   │   ├── queryClient.js
-│   │   └── websocket.js
-│   ├── hooks/
-│   │   ├── useAlpacaBars.js
-│   │   └── useAlpacaSocket.js
-│   ├── utils/
-│   │   ├── indicators.js
-│   │   ├── levels.js
-│   │   ├── supportResistance.js
-│   │   └── validateEnv.js
 │   ├── components/
-│   │   ├── chart/
-│   │   │   ├── CandlestickChart.jsx
-│   │   │   ├── ChartContainer.jsx
-│   │   │   ├── TimeframeSelector.jsx
-│   │   │   └── PriceDisplay.jsx
-│   │   ├── indicators/
-│   │   │   ├── EMAOverlay.jsx
-│   │   │   ├── VWAPOverlay.jsx
-│   │   │   ├── LevelOverlay.jsx
-│   │   │   ├── RSIChart.jsx
-│   │   │   └── MACDChart.jsx
-│   │   └── ui/
-│   │       ├── ATRGauge.jsx
-│   │       ├── DayTypeBanner.jsx
-│   │       ├── MacroStatusBar.jsx
-│   │       ├── IndicatorToggle.jsx
-│   │       └── StatusBar.jsx
+│   │   ├── chart/               #   CandlestickChart, PriceDisplay, SymbolInput, TimeframeSelector
+│   │   ├── indicators/          #   EMAOverlay, VWAPOverlay, LevelOverlay, SROverlay, BollingerOverlay
+│   │   ├── layout/              #   TopNav, Sidebar, RightPanel
+│   │   ├── panels/              #   AlertsPanel, BacktestPanel, JournalPanel, WatchlistPanel
+│   │   └── ui/                  #   CommandPalette, SettingsModal, ConfluenceBar, MTFStrip, ...
 │   ├── constants/
-│   │   └── chart.js
-│   ├── App.jsx
-│   └── main.jsx
-├── .env                    # Real keys — NEVER commit
-├── .env.example            # Template — safe to commit
-├── .gitignore
+│   │   ├── accents.js           #   Per-theme accent color presets (6 per theme)
+│   │   ├── chart.js             #   Colors, timeframes, symbols, EMA periods
+│   │   └── presets.js           #   Default chart presets (Clean, Full, Scalp, Swing)
+│   ├── hooks/                   #   useAlpacaBars, useAlpacaSocket, useKeyboardShortcuts, ...
+│   ├── services/                #   alpaca.js, websocket.js, queryClient.js, sentry.js
+│   ├── store/                   #   useChartStore, usePresetsStore, useAlertsStore, useJournalStore, useToastStore
+│   ├── utils/                   #   indicators.js, levels.js, confluence.js, backtest.js, ...
+│   ├── App.jsx                  #   Single-page root layout
+│   ├── main.jsx                 #   Entry point + SW registration
+│   ├── index.css                #   Theme variables + semantic utilities
+│   └── sw.js                    #   Service worker source (build-time versioned)
+├── .env                         #   Real keys — NEVER commit
+├── .env.example                 #   Template — safe to commit
+├── eslint.config.js             #   ESLint 9 flat config
+├── vite.config.js               #   Vite + SW versioning plugin
+├── vercel.json                  #   Deployment config + security headers
 └── package.json
 ```
 
@@ -98,87 +92,106 @@ lumpia/
 
 ### Prerequisites
 - Node.js 18+
-- npm 9+
-- Alpaca paper trading account (free at alpaca.markets)
+- Alpaca paper trading account (free at [alpaca.markets](https://alpaca.markets))
 
 ### Setup
 
 ```bash
-# 1. Clone the repo
-git clone https://github.com/yourusername/lumpia.git
-cd lumpia
-
-# 2. Install dependencies
+# Clone and install
+git clone <repo-url>
+cd MaydenTheChart
 npm install
 
-# 3. Set up environment variables
+# Configure environment
 cp .env.example .env
-# Edit .env and add your Alpaca paper trading keys
+# Edit .env with your Alpaca paper trading keys
 
-# 4. Verify security — .env must NOT appear in git status
-git status
-
-# 5. Run audit — zero critical/high before starting
-npm audit
-
-# 6. Start dev server
-npm run dev
+# Run locally (needs two terminals)
+npx vercel dev          # Terminal 1: serverless API functions on :3000
+npm run dev             # Terminal 2: Vite dev server on :5173
 ```
 
-App runs at `http://localhost:5173`
+### Environment Variables
+
+**Server-only** (Vercel dashboard + `.env`):
+```bash
+ALPACA_API_KEY=your_paper_key
+ALPACA_SECRET_KEY=your_paper_secret
+ALPACA_DATA_URL=https://data.alpaca.markets
+WS_AUTH_TOKEN=your_ws_auth_token
+```
+
+**Client** (`.env`):
+```bash
+VITE_WS_AUTH_TOKEN=your_ws_auth_token
+VITE_SENTRY_DSN=                        # Optional — Sentry error tracking
+```
+
+> API keys are server-only (no `VITE_` prefix). They never reach the browser bundle.
 
 ---
 
-## Environment Variables
+## Testing
 
 ```bash
-VITE_ALPACA_API_KEY=your_paper_key_here
-VITE_ALPACA_SECRET_KEY=your_paper_secret_here
-VITE_ALPACA_BASE_URL=https://paper-api.alpaca.markets
-VITE_ALPACA_DATA_URL=https://data.alpaca.markets
+npm run test           # Run all 274 tests
+npx vitest --watch     # Watch mode
+npm run build          # Production build (zero errors/warnings)
+npx eslint src/        # Lint check (0 errors)
 ```
-
-> Never commit `.env`. It is gitignored. Use `.env.example` as the template.
-> These are paper trading keys — no real money is at risk.
 
 ---
 
-## Git Workflow
+## Themes
 
-See `.roo/git.md` for full conventions.
+Three built-in color schemes, each with 6 accent color options:
 
-```
-main        — production only, never commit directly
-develop     — integration branch
-feature/*   — all new work happens here
-```
+- **Dark** — Terminal black, blue accents
+- **Lumpia** — Dark espresso, ember-orange accents
+- **Terminal** — Deep black, sage green accents
 
-Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/):
-`feat:`, `fix:`, `docs:`, `chore:`, `refactor:`
+Switch in Settings (gear icon) or via Command Palette (Cmd+K → "Dark" / "Lumpia" / "Terminal").
+
+---
+
+## Keyboard Shortcuts
+
+| Key | Action |
+|---|---|
+| `Cmd+K` | Command palette |
+| `1`–`6` | Switch timeframe (1m/5m/15m/1h/4h/1D) |
+| `[` / `]` | Cycle presets |
+| `A` / `B` / `J` / `W` | Toggle Alerts / Backtest / Journal / Watchlist panel |
+| `Cmd+Shift+S` | Chart snapshot (copy/download) |
+| `Esc` | Close panel / modal |
 
 ---
 
 ## Documentation
 
-| File | What's in it |
+| File | Contents |
 |---|---|
-| `.roo/project.md` | Full project spec, trading system, all decisions |
-| `.roo/tasks.md` | Phase-by-phase task checklist |
-| `.roo/indicators.md` | Math + trading logic for every indicator |
-| `.roo/security.md` | API key security rules |
-| `docs/alpaca-api.md` | Every endpoint, param, and quirk |
-| `docs/architecture.md` | Data flow, component responsibilities, colors |
+| `CLAUDE.md` | AI session context — architecture, file map, contracts |
+| `project.md` | Full project spec, trading system, decisions |
+| `tasks.md` | Phase-by-phase task board |
+| `indicators.md` | Math + trading logic for every indicator |
+| `architecture.md` | Data flow, component map, patterns |
+| `brainstorming.md` | Competitive research + product vision |
+| `audit.md` | Health audit template + findings |
+| `security.md` | Security model + threat mitigations |
+| `alpaca-api.md` | Alpaca API endpoints, params, quirks |
+| `git.md` | Git conventions + commit format |
 
 ---
 
 ## Deployment
 
-```bash
-# Test production build locally
-npm run build && npm run preview
+Deployed on Vercel with auto-deploy from git push.
 
-# Deploy to Vercel
-vercel --prod
+```bash
+npm run build && npm run preview   # Test production build locally
+vercel --prod                      # Manual deploy
 ```
 
 Add env vars in Vercel dashboard: Project Settings → Environment Variables.
+Custom domain: `cheechart.space` (CNAME → `cname.vercel-dns.com`).

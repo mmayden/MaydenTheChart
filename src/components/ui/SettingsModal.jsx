@@ -7,7 +7,9 @@
  */
 
 import { useState, useEffect } from 'react'
+import { motion, useReducedMotion } from 'motion/react' // eslint-disable-line no-unused-vars -- motion used as JSX namespace (motion.div)
 import { useChartStore } from '../../store/useChartStore'
+import { ACCENT_PRESETS } from '../../constants/accents'
 
 // ── Theme schemes ───────────────────────────────────────────────────────────
 
@@ -158,9 +160,14 @@ const TABS = [
 export function SettingsModal({ onClose }) {
   const theme          = useChartStore((s) => s.theme)
   const setTheme       = useChartStore((s) => s.setTheme)
+  const accentId       = useChartStore((s) => s.accentId)
+  const setAccentColor = useChartStore((s) => s.setAccentColor)
   const soundAlerts    = useChartStore((s) => s.soundAlerts)
   const setSoundAlerts = useChartStore((s) => s.setSoundAlerts)
   const [activeTab, setActiveTab] = useState('appearance')
+  const prefersReduced = useReducedMotion()
+
+  const motionDuration = prefersReduced ? 0 : 0.2
 
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose() }
@@ -168,9 +175,11 @@ export function SettingsModal({ onClose }) {
     return () => window.removeEventListener('keydown', handler)
   }, [onClose])
 
+  const accentPresets = ACCENT_PRESETS[theme] ?? ACCENT_PRESETS.dark
+
   return (
     /* Backdrop */
-    <div
+    <motion.div
       onClick={onClose}
       style={{
         position: 'fixed', inset: 0, zIndex: 1000,
@@ -178,9 +187,13 @@ export function SettingsModal({ onClose }) {
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         backdropFilter: 'blur(3px)',
       }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: motionDuration }}
     >
       {/* Modal card */}
-      <div
+      <motion.div
         onClick={(e) => e.stopPropagation()}
         data-theme={theme}
         style={{
@@ -195,6 +208,10 @@ export function SettingsModal({ onClose }) {
           boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
           fontFamily: 'monospace',
         }}
+        initial={{ scale: 0.95, opacity: 0, y: 12 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.95, opacity: 0, y: 12 }}
+        transition={{ duration: motionDuration, ease: [0.4, 0, 0.2, 1] }}
       >
         {/* Header */}
         <div style={{
@@ -261,6 +278,33 @@ export function SettingsModal({ onClose }) {
                     onSelect={setTheme}
                   />
                 ))}
+              </div>
+
+              {/* Accent color picker */}
+              <div style={{ marginTop: 24 }}>
+                <div style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 10 }}>
+                  Accent Color
+                </div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {accentPresets.map((preset) => {
+                    const isActive = accentId === preset.id || (!accentId && preset.id === accentPresets[0].id)
+                    return (
+                      <button
+                        key={preset.id}
+                        onClick={() => setAccentColor(preset.id, theme)}
+                        title={preset.id}
+                        style={{
+                          width: 32, height: 32, borderRadius: '50%',
+                          background: preset.color, border: 'none', cursor: 'pointer',
+                          outline: isActive ? `2px solid ${preset.color}` : '2px solid transparent',
+                          outlineOffset: 3,
+                          transition: 'outline-color 0.15s, transform 0.15s',
+                          transform: isActive ? 'scale(1.15)' : 'scale(1)',
+                        }}
+                      />
+                    )
+                  })}
+                </div>
               </div>
 
               {/* Sound alerts toggle */}
@@ -332,7 +376,7 @@ export function SettingsModal({ onClose }) {
           )}
 
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }

@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect, useRef, useMemo } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react' // eslint-disable-line no-unused-vars -- motion used as JSX namespace
 import { useChartStore } from '../../store/useChartStore'
 import { usePresetsStore } from '../../store/usePresetsStore'
 import { SYMBOL_SUGGESTIONS, TIMEFRAME_CONFIG, TIMEFRAME_ORDER } from '../../constants/chart'
@@ -85,6 +86,7 @@ function buildCommands() {
 export function CommandPalette() {
   const open    = useChartStore((s) => s.commandPaletteOpen)
   const setOpen = useChartStore((s) => s.setCommandPaletteOpen)
+  const prefersReduced = useReducedMotion()
 
   const [query, setQuery]           = useState('')
   const [selectedIdx, setSelectedIdx] = useState(0)
@@ -153,88 +155,104 @@ export function CommandPalette() {
   // Reset index when query changes
   useEffect(() => { setSelectedIdx(0) }, [query])
 
-  if (!open) return null
-
   // Group by category
-  const grouped = {}
-  filtered.forEach((cmd) => {
-    if (!grouped[cmd.category]) grouped[cmd.category] = []
-    grouped[cmd.category].push(cmd)
-  })
+  const grouped = useMemo(() => {
+    const g = {}
+    filtered.forEach((cmd) => {
+      if (!g[cmd.category]) g[cmd.category] = []
+      g[cmd.category].push(cmd)
+    })
+    return g
+  }, [filtered])
+
+  const motionDuration = prefersReduced ? 0 : 0.2
 
   let flatIdx = -1
 
   return (
-    <div
-      className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh]"
-      onClick={() => setOpen(false)}
-    >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          key="command-palette"
+          className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh]"
+          onClick={() => setOpen(false)}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: motionDuration }}
+        >
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
-      {/* Palette */}
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-lg rounded-xl border border-theme-mid shadow-2xl overflow-hidden"
-        style={{ backgroundColor: 'var(--bg-base)' }}
-      >
-        {/* Search input */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-theme">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-theme-muted shrink-0">
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <input
-            ref={inputRef}
-            type="text"
-            placeholder="Search commands, symbols, indicators..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="flex-1 bg-transparent text-sm text-theme placeholder-theme-muted focus:outline-none font-mono"
-          />
-          <kbd className="text-[10px] text-theme-muted bg-theme-border px-1.5 py-0.5 rounded font-mono">ESC</kbd>
-        </div>
+          {/* Palette */}
+          <motion.div
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-lg rounded-xl border border-theme-mid shadow-2xl overflow-hidden"
+            style={{ backgroundColor: 'var(--bg-base)' }}
+            initial={{ scale: 0.95, opacity: 0, y: -8 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.95, opacity: 0, y: -8 }}
+            transition={{ duration: motionDuration, ease: [0.4, 0, 0.2, 1] }}
+          >
+            {/* Search input */}
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-theme">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-theme-muted shrink-0">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                ref={inputRef}
+                type="text"
+                placeholder="Search commands, symbols, indicators..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="flex-1 bg-transparent text-sm text-theme placeholder-theme-muted focus:outline-none font-mono"
+              />
+              <kbd className="text-[10px] text-theme-muted bg-theme-border px-1.5 py-0.5 rounded font-mono">ESC</kbd>
+            </div>
 
-        {/* Results */}
-        <div ref={listRef} className="max-h-72 overflow-y-auto py-1">
-          {filtered.length === 0 ? (
-            <p className="text-center text-theme-muted text-xs py-6">No results found</p>
-          ) : (
-            Object.entries(grouped).map(([category, cmds]) => (
-              <div key={category}>
-                <div className="px-4 pt-2 pb-1 text-[10px] tracking-widest text-theme-muted uppercase font-semibold">
-                  {category}
-                </div>
-                {cmds.map((cmd) => {
-                  flatIdx++
-                  const idx = flatIdx
-                  return (
-                    <button
-                      key={cmd.id}
-                      onClick={() => { cmd.action(); setOpen(false) }}
-                      onMouseEnter={() => setSelectedIdx(idx)}
-                      className={`w-full flex items-center gap-3 px-4 py-2 text-left text-sm transition-colors ${
-                        idx === selectedIdx
-                          ? 'bg-accent-dim text-accent'
-                          : 'text-theme hover:bg-theme-hover'
-                      }`}
-                    >
-                      <span className="font-mono text-xs">{cmd.label}</span>
-                    </button>
-                  )
-                })}
-              </div>
-            ))
-          )}
-        </div>
+            {/* Results */}
+            <div ref={listRef} className="max-h-72 overflow-y-auto py-1">
+              {filtered.length === 0 ? (
+                <p className="text-center text-theme-muted text-xs py-6">No results found</p>
+              ) : (
+                Object.entries(grouped).map(([category, cmds]) => (
+                  <div key={category}>
+                    <div className="px-4 pt-2 pb-1 text-[10px] tracking-widest text-theme-muted uppercase font-semibold">
+                      {category}
+                    </div>
+                    {cmds.map((cmd) => {
+                      flatIdx++
+                      const idx = flatIdx
+                      return (
+                        <button
+                          key={cmd.id}
+                          onClick={() => { cmd.action(); setOpen(false) }}
+                          onMouseEnter={() => setSelectedIdx(idx)}
+                          className={`w-full flex items-center gap-3 px-4 py-2 text-left text-sm transition-colors ${
+                            idx === selectedIdx
+                              ? 'bg-accent-dim text-accent'
+                              : 'text-theme hover:bg-theme-hover'
+                          }`}
+                        >
+                          <span className="font-mono text-xs">{cmd.label}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                ))
+              )}
+            </div>
 
-        {/* Footer */}
-        <div className="flex items-center gap-4 px-4 py-2 border-t border-theme text-[10px] text-theme-muted">
-          <span><kbd className="bg-theme-border px-1 rounded">↑↓</kbd> navigate</span>
-          <span><kbd className="bg-theme-border px-1 rounded">↵</kbd> select</span>
-          <span><kbd className="bg-theme-border px-1 rounded">esc</kbd> close</span>
-        </div>
-      </div>
-    </div>
+            {/* Footer */}
+            <div className="flex items-center gap-4 px-4 py-2 border-t border-theme text-[10px] text-theme-muted">
+              <span><kbd className="bg-theme-border px-1 rounded">↑↓</kbd> navigate</span>
+              <span><kbd className="bg-theme-border px-1 rounded">↵</kbd> select</span>
+              <span><kbd className="bg-theme-border px-1 rounded">esc</kbd> close</span>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }

@@ -1,4 +1,28 @@
-# Architecture — Lumpia
+# Architecture — Cheechart (Lumpia)
+
+> Current as of Phase 12B (2026-03-15). 274 tests passing, ESLint 0 errors.
+
+---
+
+## High-Level Layout
+
+Single-page app. Chart is always visible. Tools live in slide-out right panels.
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│  TopNav: Logo │ panel toggles │ ⌘K │ ⚙                              │
+├────────┬─────────────────────────────────────────────┬───────────────┤
+│ Side   │  Sub-header: Price │ Confluence │ MTF │ Day │  RightPanel   │
+│ bar    │  ─────────────────────────────────────────  │  (one at a    │
+│        │  Chart (candlestick + overlays)             │   time)       │
+│ symbol │  ─────────────────────────────────────────  │  alerts │     │
+│ TF     │  Indicator tabs (RSI / MACD mini charts)    │  backtest │   │
+│ indic. │  ─────────────────────────────────────────  │  journal │    │
+│ preset │  Status bar (WS status + session stats)     │  watchlist    │
+└────────┴─────────────────────────────────────────────┴───────────────┘
+```
+
+No router. URL state sync via query params only (`?s=QQQ&tf=5m&p=full&panel=backtest`).
 
 ---
 
@@ -8,270 +32,215 @@
 Alpaca REST API
       │
       ▼
-services/alpaca.js          ← axios client, auth headers, error handling
+api/bars.js (Vercel serverless)  ← rate-limited, input-validated, SSRF-guarded
+api/snapshot.js                  ← multi-symbol snapshots for watchlist
+api/ws-auth.js                   ← credential proxy for WebSocket auth
       │
       ▼
-hooks/useAlpacaBars.js      ← TanStack Query: caching, loading, error, refetch
+src/services/alpaca.js           ← axios client, calls /api/bars proxy
+src/services/queryClient.js      ← TanStack Query client config
       │
-      ├──► utils/indicators.js    ← pure math: EMA, VWAP+bands, ATR, RSI, MACD
-      ├──► utils/levels.js        ← prev H/L, ORB zone, open of day
-      └──► utils/supportResistance.js
+      ▼
+src/hooks/useAlpacaBars.js       ← TanStack Query: caching, loading, error, refetch
+src/hooks/useDailyBars.js        ← daily bars for ATR(14) calculation
+src/hooks/useMTFSignals.js       ← parallel fetch across 5m/15m/1h/4h/1D
+src/hooks/useWatchlistQuotes.js  ← snapshot polling for watchlist panel
+      │
+      ├──► src/utils/indicators.js       ← pure math: EMA, VWAP+bands, ATR, RSI, MACD, Bollinger, RVOL
+      ├──► src/utils/levels.js           ← prev H/L, ORB zone, open of day, day type
+      ├──► src/utils/supportResistance.js ← pivot-based S/R detection + clustering
+      ├──► src/utils/confluence.js        ← weighted signal synthesis (6 inputs → score)
+      └──► src/utils/backtest.js         ← ORB breakout, EMA-cross, VWAP bounce strategies
 
-Zustand Store (useChartStore)
-  selectedTimeframe ─────────────────────────────────► useAlpacaBars (queryKey)
-  selectedSymbol    ─────────────────────────────────► useAlpacaBars (queryKey)
-  indicator toggles ─────────────────────────────────► conditional rendering
+Zustand Stores
+  useChartStore     ── timeframe, symbol, indicators, activePanel, theme, accentId, wsStatus
+  usePresetsStore   ── saved chart presets (indicator + timeframe combos), localStorage
+  useAlertsStore    ── price level + candle streak alerts
+  useJournalStore   ── trade journal entries, stats, localStorage
+  useToastStore     ── toast notification queue
 
       ▼
-App.jsx                     ← root layout, providers
+App.jsx (single-page root)
+      │
+      ├──► components/layout/
+      │         ├── TopNav.jsx         ← logo, panel toggles, ⌘K, settings gear
+      │         ├── Sidebar.jsx        ← symbol input, TF selector, indicator toggles, presets, ATR gauge
+      │         └── RightPanel.jsx     ← animated slide-out panel shell (spring physics)
       │
       ├──► components/chart/
-      │         ├── CandlestickChart.jsx    ← lw-charts v5 main pane
-      │         ├── TimeframeSelector.jsx   ← reads/writes Zustand timeframe
-      │         └── PriceDisplay.jsx        ← live price + % change
+      │         ├── CandlestickChart.jsx  ← lw-charts v5 main pane + volume histogram
+      │         ├── PriceDisplay.jsx      ← live price + % change + daily range
+      │         ├── SymbolInput.jsx       ← click-to-edit ticker with autocomplete
+      │         └── TimeframeSelector.jsx ← 1m/5m/15m/1h/4h/1D buttons
       │
       ├──► components/indicators/
-      │         ├── EMAOverlay.jsx          ← EMA 9/48/200 line series
-      │         ├── VWAPOverlay.jsx         ← VWAP + 1σ/2σ bands
-      │         ├── LevelOverlay.jsx        ← prev H/L, ORB zone, ODC line
-      │         ├── RSIChart.jsx            ← v5 pane (attached to main chart)
-      │         └── MACDChart.jsx           ← v5 pane (attached below RSI)
+      │         ├── EMAOverlay.jsx       ← EMA 9/48/200 line series
+      │         ├── VWAPOverlay.jsx      ← VWAP + 1σ/2σ bands
+      │         ├── LevelOverlay.jsx     ← prev H/L, ORB zone, ODC line
+      │         ├── SROverlay.jsx        ← S/R lines + swing markers
+      │         └── BollingerOverlay.jsx ← Bollinger Bands (middle + upper/lower)
+      │
+      ├──► components/panels/ (lazy-loaded)
+      │         ├── AlertsPanel.jsx     ← price level + candle streak alerts
+      │         ├── BacktestPanel.jsx   ← ORB/EMA-cross/VWAP-bounce with equity curve
+      │         ├── JournalPanel.jsx    ← trade log + analytics (by setup, streaks, ratings)
+      │         └── WatchlistPanel.jsx  ← symbol list with live prices
       │
       └──► components/ui/
-                ├── ATRGauge.jsx            ← daily range meter
-                ├── DayTypeBanner.jsx       ← Trend/Range/Chop live status
-                ├── MacroStatusBar.jsx      ← 50MA/200MA alignment
-                ├── IndicatorToggle.jsx     ← show/hide controls
-                └── StatusBar.jsx          ← market open/closed, last update
+                ├── CommandPalette.jsx    ← ⌘K search (symbols, TF, indicators, presets, panels)
+                ├── SettingsModal.jsx     ← themes, accent colors, shortcuts, sound alerts
+                ├── ConfluenceBar.jsx     ← traffic-light setup quality readout
+                ├── MTFStrip.jsx          ← multi-timeframe EMA alignment dots
+                ├── IndicatorTabView.jsx  ← RSI/MACD toggle + mini charts
+                ├── RSIMiniChart.jsx      ← RSI sub-chart (lw-charts v5 pane)
+                ├── MACDMiniChart.jsx     ← MACD sub-chart (lw-charts v5 pane)
+                ├── CrosshairLegend.jsx   ← OHLCV overlay on crosshair hover
+                ├── StatusBar.jsx         ← WS status + session stats
+                ├── ATRGauge.jsx          ← daily range fuel gauge
+                ├── DayTypeBanner.jsx     ← Trend/Range/Chop live status
+                ├── PresetSelector.jsx    ← 2×2 defaults + custom presets
+                ├── IndicatorToggle.jsx   ← sidebar indicator on/off switches
+                ├── ToastContainer.jsx    ← fixed bottom-right toast stack
+                ├── OnboardingTour.jsx    ← 4-step tooltip tour
+                ├── ErrorBoundary.jsx     ← React error boundary with fallback UI
+                └── Logo.jsx             ← Boogaloo font logo
 
 Alpaca WebSocket
       │
       ▼
-services/websocket.js       ← connection lifecycle, auth, reconnect
+src/services/websocket.js          ← connection lifecycle, auth, exponential backoff reconnect
       │
       ▼
-hooks/useAlpacaSocket.js    ← subscribe to QQQ, update chart ref
+src/hooks/useAlpacaSocket.js       ← market-hours gating, bar aggregation, TanStack cache injection
       │
       ▼
-CandlestickChart.jsx        ← series.update() with incoming bar
+CandlestickChart.jsx               ← series.update() with incoming bar
 ```
 
 ---
 
-## lightweight-charts v5 — Key Differences from v4
+## Key Architecture Patterns
 
-**Multi-pane is now native in v5** — this is the primary reason we chose v5.
+### State Management Boundaries
+
+| State Type | Tool | Location |
+|---|---|---|
+| Server/async data | TanStack Query v5 | `useAlpacaBars`, `useDailyBars`, `useMTFSignals`, `useWatchlistQuotes` |
+| UI state | Zustand | `useChartStore` (TF, symbol, indicators, panel, theme) |
+| Domain state | Zustand | `usePresetsStore`, `useAlertsStore`, `useJournalStore` |
+| Ephemeral UI | useState | Component-local (form inputs, hover states, tab selection) |
+| Notifications | Zustand | `useToastStore` |
+
+### Right Panel System
+
+`activePanel` in `useChartStore` controls which panel is shown.
+Values: `null | 'alerts' | 'backtest' | 'journal' | 'watchlist'`.
+Same panel toggle = close, different panel = switch.
+On mobile (<768px), panels become full-screen overlays with backdrop.
+Panels are lazy-loaded via `React.lazy()` — only loaded when first opened.
+
+### Color Architecture
+
+All colors flow from CSS custom properties in `src/index.css` (3 theme definitions).
+Components use semantic CSS classes (`.btn-primary`, `.bg-input`, `.border-theme`, `.text-accent`)
+or inline `var(--name)` references — never hardcoded Tailwind color classes.
+
+**Accent color system:** 6 presets per theme defined in `src/constants/accents.js`.
+Overrides 5 CSS variables via inline styles on `<html>`. Persisted to `localStorage`.
+
+### Animation System
+
+Motion v12 (`motion/react`) powers panel/modal transitions:
+- RightPanel: spring physics slide-in/out (stiffness 400, damping 35)
+- CommandPalette: scale+fade entrance/exit
+- SettingsModal: scale+fade entrance/exit
+- All respect `prefers-reduced-motion` via `useReducedMotion()` hook
+- CSS-only: nav hover keyframes, skeleton shimmer, settings gear spin+glow
+
+### Indicator Contract
+
+Every indicator function returns `{ series, signal }`:
+```js
+{
+  series: [{ time, value }],   // ready for lightweight-charts series.setData()
+  signal: {
+    value:    number,
+    bias:     'bull' | 'bear' | 'neutral',
+    strength: 'strong' | 'moderate' | 'weak'
+  }
+}
+```
+Documented deviations: `vwapWithBands()` (5 band series), `macd()` (3 chart series).
+
+### Code Splitting
+
+Lazy-loaded chunks (only loaded on demand):
+- 4 right panels (AlertsPanel, BacktestPanel, JournalPanel, WatchlistPanel)
+- SettingsModal
+- CommandPalette
+
+Manual Vite chunks:
+- `lightweight-charts` (164KB)
+- `vendor-api` (axios + TanStack Query, 81KB)
+- `motion` (125KB)
+
+### Security Layers
+
+1. **Serverless proxies** — API keys never reach browser (`api/bars.js`, `api/snapshot.js`, `api/ws-auth.js`)
+2. **Rate limiting** — per-IP in-memory limits on all 3 endpoints
+3. **SSRF guard** — `ALPACA_DATA_URL` validated against host allowlist
+4. **Input validation** — symbol regex, timeframe allowlist, date format, limit bounds
+5. **CSP headers** — configured in `vercel.json`
+6. **Error sanitization** — API errors never leak upstream details to client
+
+---
+
+## lightweight-charts v5 Integration
+
+Multi-pane is native in v5 — the primary reason we chose v5 over v4.
+Crosshair automatically syncs across all panes (no manual sync needed).
 
 ```js
-// v5 pattern: create main chart, attach panes to it
-import { createChart } from 'lightweight-charts'
-
 const chart = createChart(container, options)
-
-// Main price pane (auto-created)
 const candleSeries = chart.addCandlestickSeries()
 
-// RSI pane — attached to same chart instance
-const rsiPane = chart.addPane()  // or chart.addLineSeries({ pane: 1 })
-const rsiSeries = chart.addLineSeries({ pane: 1 })
-
-// MACD pane — second sub-pane
-const macdSeries = chart.addLineSeries({ pane: 2 })
+// RSI/MACD as separate chart instances in IndicatorTabView
+// (user toggles between them via tab strip)
 ```
 
-Crosshair automatically syncs across all panes in the same chart instance.
-No manual sync needed — this is one of v5's biggest improvements over v4.
+`CandlestickChart.jsx` uses `forwardRef` + `useImperativeHandle` to expose
+`chart()` and `candleSeries()` accessors to parent (`App.jsx`), which passes
+them to overlay components for series attachment.
 
 ---
 
-## Component Responsibilities
+## Production Infrastructure
 
-### `App.jsx`
-- Wraps everything in `QueryClientProvider` (TanStack) and any context providers
-- Root layout: header, main chart area, bottom panels
-- Does NOT own chart rendering directly — delegates to components
+| Asset | Cache-Control |
+|---|---|
+| `/assets/*` (JS/CSS) | `public, max-age=31536000, immutable` (content-hashed) |
+| `/fonts/*` | `public, max-age=31536000, immutable` |
+| `/` (HTML) | `public, s-maxage=60, stale-while-revalidate=300` |
+| API endpoints | per-endpoint (bars 30s, snapshot 15s, ws-auth no-store) |
 
-### `CandlestickChart.jsx`
-- Creates and owns the lightweight-charts v5 `IChartApi` instance
-- Manages chart cleanup on unmount (`return () => chart.remove()`)
-- Exposes chart ref so overlay components can attach series to it
-- Handles responsive resizing via `ResizeObserver`
-
-### `useAlpacaBars.js` (TanStack Query)
-- Accepts `symbol` and `timeframe` from Zustand store as queryKey parts
-- Returns `{ data, isLoading, isError, error, refetch }`
-- Caches for 30s, background refetches every 60s during market hours
-
-### `useChartStore.js` (Zustand)
-```js
-import { create } from 'zustand'
-
-export const useChartStore = create((set) => ({
-  timeframe: '5Min',
-  symbol: 'QQQ',
-  indicators: {
-    ema: true,
-    vwap: true,
-    levels: true,  // prev H/L, ORB, ODC
-    rsi: true,
-    macd: true,
-  },
-  setTimeframe: (tf) => set({ timeframe: tf }),
-  setSymbol: (sym) => set({ symbol: sym }),
-  toggleIndicator: (key) => set((state) => ({
-    indicators: { ...state.indicators, [key]: !state.indicators[key] }
-  })),
-}))
-```
+- Fonts self-hosted in `public/fonts/` (Boogaloo 10KB + Inter 800 24KB)
+- Service worker cache auto-versioned at build time (Vite plugin in `vite.config.js`)
+- Error tracking via Sentry free tier (conditional on `VITE_SENTRY_DSN` env var)
+- PWA manifest + icons in `public/`
 
 ---
 
-## lightweight-charts v5 Integration Pattern
-
-```jsx
-import { createChart } from 'lightweight-charts'
-import { useEffect, useRef } from 'react'
-
-function CandlestickChart({ bars }) {
-  const containerRef = useRef(null)
-  const chartRef = useRef(null)
-  const seriesRef = useRef(null)
-
-  // Create chart once on mount
-  useEffect(() => {
-    if (!containerRef.current) return
-
-    chartRef.current = createChart(containerRef.current, {
-      layout: {
-        background: { color: '#0a0a0a' },
-        textColor: '#d1d5db',
-      },
-      grid: {
-        vertLines: { color: '#1f2937' },
-        horzLines: { color: '#1f2937' },
-      },
-      crosshair: { mode: 1 },
-      rightPriceScale: { borderColor: '#374151' },
-      timeScale: { borderColor: '#374151', timeVisible: true },
-    })
-
-    seriesRef.current = chartRef.current.addCandlestickSeries({
-      upColor: '#22c55e',
-      downColor: '#ef4444',
-      borderVisible: false,
-      wickUpColor: '#22c55e',
-      wickDownColor: '#ef4444',
-    })
-
-    // Cleanup on unmount — CRITICAL to prevent memory leaks
-    return () => {
-      chartRef.current.remove()
-      chartRef.current = null
-    }
-  }, [])
-
-  // Update data when bars change
-  useEffect(() => {
-    if (!seriesRef.current || !bars?.length) return
-    seriesRef.current.setData(bars)
-    chartRef.current.timeScale().fitContent()
-  }, [bars])
-
-  return <div ref={containerRef} style={{ width: '100%', height: '500px' }} />
-}
-```
-
----
-
-## Color System
-
-All colors defined in `src/constants/chart.js`. The exact EMA colors are non-negotiable.
-
-```js
-export const COLORS = {
-  // UI
-  background: '#0a0a0a',
-  surface: '#111111',
-  border: '#1f2937',
-  text: '#d1d5db',
-  textMuted: '#6b7280',
-
-  // Candles
-  bullish: '#22c55e',
-  bearish: '#ef4444',
-
-  // EMA stack — do not change these colors
-  ema9:   '#3b82f6',   // blue
-  ema48:  '#22c55e',   // green
-  ema200: '#e5e7eb',   // white
-
-  // VWAP system
-  vwap:        '#06b6d4',   // cyan
-  vwapBand1:   '#0891b2',   // darker cyan
-  vwapBand2:   '#0e7490',   // even darker
-
-  // Levels
-  prevHigh:    '#fbbf24',   // gold/amber
-  prevLow:     '#fbbf24',   // gold/amber
-  orbZone:     '#1e3a5f',   // dark blue (semi-transparent)
-  openOfDay:   '#94a3b8',   // light gray
-
-  // S/R
-  support:     '#22c55e',
-  resistance:  '#ef4444',
-
-  // Subcharts
-  rsi:         '#a78bfa',   // violet
-  macdLine:    '#3b82f6',   // blue
-  macdSignal:  '#f97316',   // orange
-  macdHistPos: '#22c55e',
-  macdHistNeg: '#ef4444',
-}
-```
-
----
-
-## Styling Approach
-
-Dark terminal theme throughout. Tailwind utility classes for layout and spacing.
-Chart colors defined in `constants/chart.js` and passed to lightweight-charts config.
-
-Key layout structure:
-```
-┌─────────────────────────────────────────────────┐
-│ MacroStatusBar (fixed top strip)                │
-├──────────────────────────┬──────────────────────┤
-│                          │ ATR Gauge            │
-│   Main Chart             │ Day Type Banner      │
-│   (candlestick +         │ Price Display        │
-│    all overlays)         │ Indicator Toggles    │
-│                          │                      │
-├──────────────────────────┴──────────────────────┤
-│ RSI Pane                                        │
-├─────────────────────────────────────────────────┤
-│ MACD Pane                                       │
-├─────────────────────────────────────────────────┤
-│ TimeframeSelector | StatusBar                   │
-└─────────────────────────────────────────────────┘
-```
-
----
-
-## Vercel Deployment
-
-```json
-// vercel.json
-{
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "framework": "vite"
-}
-```
-
-Add env vars in Vercel dashboard under Project Settings → Environment Variables.
-Reference variable names in vercel.json, never actual values.
+## Deployment (Vercel)
 
 ```bash
-# Test production build locally before deploying
+# Test production build locally
 npm run build && npm run preview
+
+# Deploy (auto-deploys from git push)
+vercel --prod
 ```
+
+Env vars configured in Vercel dashboard (Project Settings → Environment Variables):
+- `ALPACA_API_KEY`, `ALPACA_SECRET_KEY`, `ALPACA_DATA_URL` (server-only, no VITE_ prefix)
+- `WS_AUTH_TOKEN`, `VITE_WS_AUTH_TOKEN` (WebSocket auth)
+- `VITE_SENTRY_DSN` (optional, error tracking)
