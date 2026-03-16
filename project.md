@@ -258,9 +258,10 @@ The nuclear options — each one could be a product on its own.
 
 **Current:** Alpaca Markets free tier (IEX feed, 200 calls/min, 7yr history, WebSocket for 30 symbols).
 
-**Architecture decision (2026-03-15):** Abstract the data layer behind a provider interface
-so the app is provider-agnostic. The chart, indicators, backtester, and confluence engine
-never touch provider-specific code — they receive normalized `Bar[]` arrays.
+**Architecture (Phase 12D complete):** Data layer is abstracted behind a provider interface.
+The chart, indicators, backtester, and confluence engine never touch provider-specific code
+— they receive normalized `Bar[]` arrays. To add a new provider: create an adapter in
+`src/services/providers/`, register it in `dataProvider.js`, update serverless proxies.
 
 | Provider | Free Tier | Best For | When to consider |
 |---|---|---|---|
@@ -269,19 +270,23 @@ never touch provider-specific code — they receive normalized `Bar[]` arrays.
 | **Polygon/Massive** (~$29-199/mo) | 5 calls/min free | SIP data (gold standard quality) | When data must match TradingView |
 | **Twelve Data** | 800/day, real-time US | Deep history (back to 1980) | Daily bars supplement |
 
-**Provider interface (3 methods):**
+**Provider interface (3 methods in `src/services/dataProvider.js`):**
 ```js
-{
-  fetchBars(symbol, timeframe, start, end) → Bar[],
-  subscribe(symbol, onBar) → unsubscribe(),
-  fetchSnapshot(symbols) → Snapshot[]
-}
+fetchBars(symbol, timeframe, start, end, limit) → Bar[]
+fetchSnapshot(symbols) → { [symbol]: { price, change, changePercent } }
+createSocket({ onBar, onStatus, getSymbol }) → { connect, disconnect }
 ```
 
-**Coupling audit (2026-03-15):**
-- `src/services/alpaca.js` (27 lines) — thin HTTP wrapper, easy to swap
-- `src/services/websocket.js` (170 lines) — Alpaca-specific protocol, needs adapter
-- `api/bars.js`, `api/snapshot.js`, `api/ws-auth.js` — HTTP proxies, easy to make provider-aware
+**Provider adapter (`src/services/providers/alpaca.js`):**
+- `normalizeBars(rawBars)` — Alpaca `{t,o,h,l,c,v}` → `{time,open,high,low,close,volume}`
+- `getProviderTimeframe(internalTF)` — maps internal keys to Alpaca API strings
+- `getWsProtocol()` — Alpaca WS auth/subscribe/unsubscribe message formats
+
+**Coupling audit (verified 2026-03-16):**
+- `src/services/dataProvider.js` — provider interface, all hooks call this
+- `src/services/providers/alpaca.js` — Alpaca adapter (normalization, timeframe mapping, WS protocol)
+- `src/services/websocket.js` — provider-agnostic shell, delegates protocol to adapter
+- `api/bars.js`, `api/snapshot.js`, `api/ws-auth.js` — HTTP proxies (documented for `DATA_PROVIDER` env var routing)
 - Indicators, backtest, confluence, levels, S/R — **zero** provider dependency
 
 ## Production Infrastructure
@@ -298,7 +303,7 @@ never touch provider-specific code — they receive normalized `Bar[]` arrays.
 - Permissions-Policy: camera/microphone/geolocation disabled
 
 **Performance targets:**
-- Main bundle: <320KB (currently 313KB + 161KB charts + 92KB motion + 69KB vendor, 7 lazy chunks — Vite 8/Rolldown)
+- Main bundle: <320KB (currently 314KB + 161KB charts + 92KB motion + 69KB vendor, 7 lazy chunks — Vite 8/Rolldown)
 - LCP: <2.5s (self-hosted fonts, no external blocking requests)
 - INP: <200ms (canvas-based chart interactions bypass DOM)
 - CLS: <0.1 (fixed layout, no late-loading content)
@@ -371,6 +376,7 @@ Component state (useState — local only):
 | File | Purpose |
 |---|---|
 | `src/hooks/useBars.js` | TanStack Query hook for historical bars (provider-agnostic) |
+| `src/hooks/useInfiniteHistory.js` | Infinite scroll-back — fetches older bars on scroll, prepends to TanStack cache |
 | `src/hooks/useLiveFeed.js` | React hook — WS market-hours gating, 1-min bar aggregation, TanStack cache injection |
 | `src/hooks/useDailyBars.js` | TanStack Query hook for daily bars (ATR gauge) |
 | `src/hooks/useKeyboardShortcuts.js` | Global keyboard shortcuts (1-6 timeframes, [/] presets, Cmd+K, panel toggles) |
@@ -466,7 +472,7 @@ Component state (useState — local only):
 
 ## Current Status
 
-**298/298 tests passing, build clean, ESLint 0 errors, 0 vulnerabilities. Main bundle 313KB + 161KB lightweight-charts + 92KB motion + 69KB vendor-api (7 lazy chunks). Stack: React 19 + Vite 8 + Zustand 5 + Tailwind 4.**
+**298/298 tests passing, build clean, ESLint 0 errors, 0 vulnerabilities. Main bundle 314KB + 161KB lightweight-charts + 92KB motion + 69KB vendor-api (7 lazy chunks). Stack: React 19 + Vite 8 + Zustand 5 + Tailwind 4.**
 
 ### Completed
 - [x] Phases 1–4: Core chart, indicators, levels, S/R detection, ATR gauge, day type
@@ -491,7 +497,7 @@ Component state (useState — local only):
 - [x] Phase 12B: UX sharpening — Motion library (content transitions), skeleton loading states, accent color customization, layout transition fix
 - [x] Phase 12C: Dependency upgrades — React 19, Zustand 5, Vite 8, Tailwind 4
 - [x] Phase 12D: Data provider abstraction — provider interface, Alpaca adapter, hooks renamed (useBars, useLiveFeed), TIMEFRAME_CONFIG decoupled
-- [ ] Phase 12E: Infinite scroll — on-demand history loading, IndexedDB cache (Dexie.js), enableConflation
+- [x] Phase 12E: Infinite scroll — useInfiniteHistory hook, scroll-back fetch with viewport save/restore, per-timeframe pageSize/maxBars caps, loading indicator
 - [ ] Phase 12F: Future differentiators — screener, trade replay, annotations, gap tracking, cloud sync
 
 ---
@@ -541,3 +547,4 @@ Component state (useState — local only):
 | 2026-03-16 | **RSI/MACD UX cleanup + sidebar revert.** Moved RSI/MACD toggles back to sidebar IndicatorToggle (they're indicators, not a separate UI category). Removed the separate tab button strip below the chart. Mini chart labels use lw-charts built-in watermark (auto-aligned inside plotting area). Mini chart price scales have `minimumWidth: 60` for right-edge alignment. All charts use `autoSize: true`. Sidebar reverted to original clean form (pre-audit `dca2cad`) after 5 failed fix attempts for BUG-001 (chart area not expanding on sidebar close). Created `bugs.md` tracker and `left-bar-problems.md` audit doc. 298/298 tests, build clean. |
 | 2026-03-16 | **Phase 12C complete: Dependency upgrades.** Zustand 4.5.7 → 5.0.12 (drop-in, no middleware in use). Vite 7.3.1 → 8.0.0 + @vitejs/plugin-react 6.0.1 (`manualChunks` converted from object to function for Rolldown). React 18.3.1 → 19.2.4 + react-dom 19.2.4 (already on createRoot). Tailwind 3.4.19 → 4.2.1 via `@tailwindcss/postcss` (`@tailwindcss/vite` not yet Vite 8 compatible), config moved from `tailwind.config.js` to CSS `@theme` block, `@tailwind` directives → `@import "tailwindcss"`, removed `autoprefixer`. ESLint react-hooks v7 fix: `set-state-in-effect` in OnboardingTour (justified disable). 298/298 tests, build clean, ESLint 0 errors, 0 vulnerabilities. |
 | 2026-03-16 | **Phase 12D complete: Data provider abstraction.** Created `src/services/dataProvider.js` (provider interface: `fetchBars()`, `fetchSnapshot()`, `getProviderName()`), `src/services/providers/alpaca.js` (Alpaca adapter: bar normalization, timeframe mapping, WS protocol). Refactored `websocket.js` to provider-agnostic shell — delegates protocol handling to adapter. Renamed hooks: `useAlpacaBars` → `useBars`, `useAlpacaSocket` → `useLiveFeed` (old files kept as re-export wrappers for backward compat). Removed `alpacaTimeframe` from `TIMEFRAME_CONFIG` — provider adapter handles translation. Updated all 6 consumers (App.jsx, BacktestPanel, useMTFSignals, useDailyBars, useWatchlistQuotes, SymbolInput). Serverless proxies documented for `DATA_PROVIDER` env var routing. 298/298 tests, build clean, ESLint 0 errors. |
+| 2026-03-16 | **Phase 12E complete: Infinite scroll.** `src/hooks/useInfiniteHistory.js` — subscribes to `subscribeVisibleLogicalRangeChange`, triggers fetch when user scrolls within 50 bars of left edge. Debounced 200ms + 500ms cooldown. Fetches older page via `fetchBars()`, deduplicates, prepends to TanStack Query cache. `CandlestickChart.jsx` — detects prepend (bars grew at front, same tail), saves `getVisibleRange()` before `setData()`, restores after to prevent viewport jump. Skips `fitContent()` on prepend. Added `allowShiftVisibleRangeOnWhitespaceReplacement` to timeScale. `TIMEFRAME_CONFIG` — added `pageSize` (bars per scroll-back fetch) and `maxBars` (memory cap) per timeframe. Loading pill at chart left edge during fetch. IndexedDB/Dexie.js deferred. 298/298 tests, build clean, ESLint 0 errors. |

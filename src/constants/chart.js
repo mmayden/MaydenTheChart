@@ -75,8 +75,10 @@ export const ALERT_SOUND_FREQ     = 880   // A5 note
 export const ALERT_SOUND_DURATION = 0.3   // seconds
 
 // ─── Timeframe config ─────────────────────────────────────────────────────────
-// lookbackMs: how far back to fetch data for this timeframe
-// limit: max bars to request
+// lookbackMs: how far back to fetch data on initial load
+// limit: max bars per initial request
+// pageSize: bars to fetch per scroll-back page (infinite scroll)
+// maxBars: hard cap on total bars in memory (prevents OOM)
 // intraday: whether VWAP/ORB/levels are shown
 // showVWAP: hide VWAP on higher timeframes per trading system rules
 //
@@ -89,6 +91,8 @@ export const TIMEFRAME_CONFIG = {
     label:      '1m',
     lookbackMs: 2 * 24 * 60 * 60 * 1000,   // 2 days
     limit:      1000,
+    pageSize:   390,     // ~1 trading day
+    maxBars:    50000,
     intraday:   true,
     showVWAP:   true,
     showORB:    true,
@@ -96,6 +100,8 @@ export const TIMEFRAME_CONFIG = {
   '5Min': {
     label:      '5m',
     lookbackMs: 5 * 24 * 60 * 60 * 1000,   // 5 days
+    pageSize:   390,     // ~2 trading days
+    maxBars:    100000,
     limit:      1000,
     intraday:   true,
     showVWAP:   true,
@@ -105,6 +111,8 @@ export const TIMEFRAME_CONFIG = {
     label:      '15m',
     lookbackMs: 10 * 24 * 60 * 60 * 1000,  // 10 days
     limit:      1000,
+    pageSize:   260,     // ~5 trading days
+    maxBars:    100000,
     intraday:   true,
     showVWAP:   true,
     showORB:    true,
@@ -113,6 +121,8 @@ export const TIMEFRAME_CONFIG = {
     label:      '1h',
     lookbackMs: 30 * 24 * 60 * 60 * 1000,  // 30 days
     limit:      720,
+    pageSize:   150,
+    maxBars:    100000,
     intraday:   false,
     showVWAP:   false,
     showORB:    false,
@@ -121,6 +131,8 @@ export const TIMEFRAME_CONFIG = {
     label:      '4h',
     lookbackMs: 90 * 24 * 60 * 60 * 1000,  // 90 days
     limit:      540,
+    pageSize:   180,
+    maxBars:    100000,
     intraday:   false,
     showVWAP:   false,
     showORB:    false,
@@ -129,6 +141,8 @@ export const TIMEFRAME_CONFIG = {
     label:      '1D',
     lookbackMs: 365 * 24 * 60 * 60 * 1000, // 1 year
     limit:      365,
+    pageSize:   252,     // ~1 year
+    maxBars:    0,       // unlimited
     intraday:   false,
     showVWAP:   false,
     showORB:    false,

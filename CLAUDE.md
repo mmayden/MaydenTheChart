@@ -33,12 +33,15 @@ The live chart and the backtester share identical math. Never duplicate indicato
 
 ## Data provider strategy
 - **Current provider:** Alpaca Markets (free tier, IEX feed, 200 calls/min, 7yr history)
-- **Architecture:** Data layer will be abstracted behind a provider interface (Phase 12D)
-  so providers can be swapped without touching chart/indicator code
-- **Provider interface:** `fetchBars()`, `subscribe()`, `fetchSnapshot()` — 3 methods
+- **Architecture:** Data layer is abstracted behind a provider interface (Phase 12D complete)
+  — providers can be swapped without touching chart/indicator code
+- **Provider interface:** `fetchBars()`, `fetchSnapshot()`, `createSocket()` — 3 methods
+  in `src/services/dataProvider.js`, with Alpaca adapter in `src/services/providers/alpaca.js`
 - **Future options evaluated:** FMP ($19/mo best value), Polygon/Massive (best SIP data),
   Twelve Data (real-time free but WS costs $191+/mo), Finnhub (shallow intraday history)
 - Indicators, backtester, confluence — zero provider coupling (pure math)
+- **Infinite scroll:** `useInfiniteHistory` hook fetches older bars on-demand as user
+  scrolls left. Per-timeframe `pageSize` and `maxBars` caps in `TIMEFRAME_CONFIG`
 
 ## Security rules
 - All API endpoints must have rate limiting (in-memory per-instance, IP-based, TTL cleanup every 2min, 10K entry cap)
@@ -100,6 +103,11 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
   visible time range (`subscribeVisibleLogicalRangeChange` → `setVisibleLogicalRange`).
   Scroll/zoom on the main chart drives all three panes as one unit.
   Mini-charts have `handleScroll/handleScale: false` (no independent interaction).
+- **Infinite scroll:** `useInfiniteHistory` hook subscribes to `subscribeVisibleLogicalRangeChange`.
+  When fewer than 50 bars are visible before the left edge, fetches an older page via provider.
+  Bars are prepended to TanStack Query cache. CandlestickChart detects prepend and saves/restores
+  visible time range to prevent viewport jump. Per-timeframe `pageSize` and `maxBars` caps in
+  `TIMEFRAME_CONFIG`. "Loading..." pill appears at chart left edge during fetch.
 
 ## Key file locations
 
@@ -144,6 +152,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 
 ### Hooks
 - Historical bars: `src/hooks/useBars.js` (TanStack Query, provider-agnostic)
+- Infinite scroll-back: `src/hooks/useInfiniteHistory.js` — fetch older bars on scroll, prepend to cache
 - WebSocket live feed: `src/hooks/useLiveFeed.js` — market-hours gating, bar aggregation, cache injection
 - Keyboard shortcuts (1-6, [/], Cmd+K, Cmd+Shift+S, panel toggles): `src/hooks/useKeyboardShortcuts.js`
 - Viewport persistence: `src/hooks/useViewportPersistence.js`

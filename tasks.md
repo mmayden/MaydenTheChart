@@ -593,24 +593,26 @@
 
 ---
 
-## 🔲 Phase 12E — Infinite Scroll
+## ✅ Phase 12E — Infinite Scroll — COMPLETE
 
-> **Goal:** TradingView/Webull-style endless chart history. Scroll left to load older data on demand.
-> Uses lightweight-charts v5 `subscribeVisibleLogicalRangeChange` + `barsInLogicalRange` API.
+**298/298 tests passing, build clean, ESLint 0 errors**
 
-- 🔲 Create `src/hooks/useInfiniteHistory.js` — core scroll-back logic
-  - Subscribe to `subscribeVisibleLogicalRangeChange` on chart timeScale
-  - When `barsBefore < 50`, calculate older date range and fetch via provider
-  - Deduplicate by timestamp, prepend to existing bars array
-  - Save/restore scroll position to prevent viewport jump after `setData()`
-  - Debounce scroll trigger (200ms), gate with `isFetching` flag
-- 🔲 Enable `enableConflation: true` on chart timeScale options (optimizes rendering for large datasets)
-- 🔲 Add per-timeframe page sizes to `TIMEFRAME_CONFIG`: 1m=390 bars/page, 5m=390, 15m=260, 1h=150, 4h=180, 1D=252
-- 🔲 IndexedDB cache via Dexie.js — cache fetched bar ranges per symbol+timeframe, instant on revisit
-- 🔲 Max bars cap per timeframe: 50K for 1m, 100K for 5m+, unlimited for 1D
-- 🔲 "Loading more..." indicator at left edge of chart while fetching
-- 🔲 Update `useViewportPersistence.js` — don't `fitContent()` after scroll-back loads
-- 🔲 Update all overlay components to handle growing bars array (no architecture change needed — `bars` prop is already single source of truth)
+> TradingView/Webull-style endless chart history. Scroll left to load older data on demand.
+
+- ✅ `src/hooks/useInfiniteHistory.js` — core scroll-back logic
+  - Subscribes to `subscribeVisibleLogicalRangeChange` on chart timeScale
+  - When `barsBefore < 50`, calculates older date range and fetches via provider
+  - Deduplicates by timestamp, prepends to TanStack Query cache
+  - Saves/restores visible time range to prevent viewport jump after `setData()`
+  - Debounced scroll trigger (200ms), gated with `isFetching` ref + 500ms cooldown
+  - Resets on symbol/timeframe change
+- ✅ `allowShiftVisibleRangeOnWhitespaceReplacement: true` on chart timeScale
+- ✅ Per-timeframe `pageSize` + `maxBars` in `TIMEFRAME_CONFIG`: 1m=390/50K, 5m=390/100K, 15m=260/100K, 1h=150/100K, 4h=180/100K, 1D=252/unlimited
+- ✅ Max bars cap enforced — fetching stops when cap reached
+- ✅ "Loading…" pill indicator at left edge of chart during fetch
+- ✅ `CandlestickChart.jsx` — detects prepend (bars grew at front), saves/restores `getVisibleRange()`, skips `fitContent()` on prepend
+- ✅ All overlay components already handle growing bars array (bars prop is single source of truth)
+- 🔲 IndexedDB cache via Dexie.js deferred (nice-to-have, not required for core functionality)
 
 ---
 

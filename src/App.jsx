@@ -17,6 +17,7 @@ import { useRef, useState, useEffect, useMemo, useCallback, lazy, Suspense } fro
 import { useBars } from './hooks/useBars'
 import { useDailyBars } from './hooks/useDailyBars'
 import { useLiveFeed } from './hooks/useLiveFeed'
+import { useInfiniteHistory } from './hooks/useInfiniteHistory'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import { useAlertChecker } from './hooks/useAlertChecker'
 import { useSwipeGesture } from './hooks/useSwipeGesture'
@@ -83,8 +84,9 @@ export default function App() {
     if (activePresetId) applyPreset(activePresetId)
   }, [])
 
-  // Live WebSocket + keyboard shortcuts + alert checker
+  // Live WebSocket + keyboard shortcuts + alert checker + infinite scroll
   useLiveFeed()
+  const { isLoadingHistory } = useInfiniteHistory(chart, bars)
   useKeyboardShortcuts()
   useAlertChecker(bars, selectedTimeframe)
 
@@ -252,6 +254,14 @@ export default function App() {
                     Check your .env has valid Alpaca paper trading keys.
                   </span>
                 </div>
+              </div>
+            )}
+
+            {isLoadingHistory && (
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2 px-3 py-1.5 rounded-full text-xs text-theme-muted font-mono pointer-events-none"
+                style={{ backgroundColor: 'color-mix(in srgb, var(--bg-base) 85%, transparent)' }}>
+                <div className="w-3 h-3 border border-accent border-t-transparent rounded-full animate-spin" />
+                Loading…
               </div>
             )}
 

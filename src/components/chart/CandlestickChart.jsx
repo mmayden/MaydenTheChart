@@ -81,6 +81,7 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
         borderColor:    GRID_COLOR,
         timeVisible:    true,
         secondsVisible: false,
+        allowShiftVisibleRangeOnWhitespaceReplacement: true,
         // Axis tick marks in ET — TickMarkType: 0=Year 1=Month 2=Day 3=Time
         tickMarkFormatter: (unixSecs, tickMarkType) => {
           const d  = new Date(unixSecs * 1000)
@@ -221,15 +222,30 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
       }
     }
 
+    // Detect scroll-back prepend: bars grew at the front, same data at the end
+    const isPrepend = prev && prev.length > 0 && bars.length > prev.length
+      && prev[prev.length - 1].time === last.time
+      && bars[0].time < prev[0].time
+
     // Fall back to full setData() for initial load, symbol change, timeframe change, etc.
     if (!didUpdate) {
+      // Save visible time range before setData() if this is a scroll-back prepend
+      const savedRange = isPrepend
+        ? chartRef.current.timeScale().getVisibleRange()
+        : null
+
       candleRef.current.setData(bars)
       const volumeData = bars.map(makeVolBar)
       volumeRef.current.setData(volumeData)
+
+      // Restore viewport position after scroll-back prepend
+      if (savedRange) {
+        chartRef.current.timeScale().setVisibleRange(savedRange)
+      }
     }
 
     prevBarsRef.current = bars
-    if (shouldFit) chartRef.current.timeScale().fitContent()
+    if (shouldFit && !isPrepend) chartRef.current.timeScale().fitContent()
   }, [bars, shouldFit, showRvol])
 
   // Expose chart instance to parent for overlays

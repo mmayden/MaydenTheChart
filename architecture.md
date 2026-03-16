@@ -1,6 +1,6 @@
 # Architecture — Lumpia (Cheechart)
 
-> Current as of Phase 12D data provider abstraction (2026-03-16). Update this file whenever architecture changes.
+> Current as of Phase 12E infinite scroll (2026-03-16). Update this file whenever architecture changes.
 
 ---
 
@@ -57,6 +57,7 @@ services/providers/alpaca.js        ← Alpaca adapter: normalization, timeframe
       │
       ▼
 hooks/useBars.js                    ← TanStack Query: caching, loading, refetch
+hooks/useInfiniteHistory.js         ← scroll-back: fetch older bars, prepend to cache
 hooks/useDailyBars.js               ← daily bars for ATR gauge
 hooks/useMTFSignals.js              ← parallel fetch across 5m/15m/1h/4h/1D
       │
@@ -76,6 +77,15 @@ services/websocket.js               ← connection lifecycle, auth via ws-auth p
 hooks/useLiveFeed.js                ← market-hours gating (9:30-4 ET, weekdays),
       │                                1-min bar aggregation into selected timeframe,
       ▼                                injects into TanStack Query cache
+
+Infinite scroll (on-demand history loading):
+hooks/useInfiniteHistory.js         ← subscribes to chart timeScale visible range
+      │                                when user scrolls near left edge (barsBefore < 50),
+      │                                fetches older page via fetchBars(), deduplicates,
+      ▼                                prepends to TanStack Query cache
+CandlestickChart.jsx                ← detects prepend, saves/restores visible range
+                                       to prevent viewport jump after setData()
+
 App.jsx
       │
       ├──► components/layout/TopNav.jsx         ← Logo, panel toggles, Cmd+K, settings
@@ -128,6 +138,7 @@ App.jsx
 ```
 Server state (TanStack Query v5):
   - Historical bars (per symbol + timeframe, queryKey includes todayKey)
+  - Infinite scroll prepends older bars to same cache key via setQueryData()
   - Daily bars (for ATR gauge)
   - MTF signals (5 parallel queries across timeframes)
   - Watchlist snapshots (30s auto-refresh when panel open)
@@ -266,7 +277,7 @@ Vite 8 → dist/
   ├── index.html
   ├── sw.js (auto-versioned CACHE_NAME via Vite plugin)
   ├── assets/
-  │   ├── index-[hash].js        (~312KB main bundle)
+  │   ├── index-[hash].js        (~314KB main bundle)
   │   ├── lw-charts-[hash].js    (161KB lightweight-charts)
   │   ├── motion-[hash].js       (92KB motion library)
   │   ├── vendor-api-[hash].js   (69KB axios + tanstack + zustand)
@@ -306,6 +317,9 @@ const volumeSeries = chart.addHistogramSeries({ priceScaleId: 'volume' })
 // Each has a corner label (RSI purple, MACD blue) for identification
 ```
 
+**TimeScale options:** `timeVisible`, `allowShiftVisibleRangeOnWhitespaceReplacement`
+(prevents scroll jump when bars are prepended via infinite scroll).
+
 Crosshair data is read via `subscribeCrosshairMove` and rendered in
 `CrosshairLegend.jsx` using direct DOM manipulation (ref-based, zero React re-renders).
 
@@ -326,3 +340,14 @@ not the entire store. Prevents unnecessary re-renders.
 **Code splitting:** 6 components loaded via `React.lazy()` — the 4 right panels,
 SettingsModal, and CommandPalette. RightPanel wraps them in `Suspense` with
 a skeleton fallback.
+
+**Infinite scroll pattern:** `useInfiniteHistory` subscribes to the chart's
+`subscribeVisibleLogicalRangeChange`. When fewer than 50 logical bars are before
+the left edge, it fetches an older page of bars via `fetchBars()` (debounced 200ms,
+gated with `isFetching` ref + 500ms cooldown). Older bars are deduplicated by
+timestamp and prepended to the TanStack Query cache via `setQueryData()`.
+`CandlestickChart` detects the prepend (bars grew at front, same tail), saves
+the visible time range before `setData()`, and restores it after — preventing
+viewport jump. Per-timeframe `pageSize` and `maxBars` caps in `TIMEFRAME_CONFIG`
+prevent API spam and OOM. WebSocket live feed (appending newest bars) and infinite
+scroll (prepending oldest bars) coexist without conflict on the same cache key.
