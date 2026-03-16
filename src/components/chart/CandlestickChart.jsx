@@ -141,6 +141,19 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
     }
   }, [])
 
+  // Force chart resize on layout change (sidebar toggle).
+  // autoSize uses ResizeObserver which can miss the final size during CSS transitions.
+  useEffect(() => {
+    function handleLayoutResize() {
+      const chart = chartRef.current
+      const container = containerRef.current
+      if (!chart || !container) return
+      chart.resize(container.clientWidth, container.clientHeight, true)
+    }
+    window.addEventListener('cheechart:layout-resize', handleLayoutResize)
+    return () => window.removeEventListener('cheechart:layout-resize', handleLayoutResize)
+  }, [])
+
   // Re-apply candle colors when theme changes
   useEffect(() => {
     if (!candleRef.current) return

@@ -1,30 +1,28 @@
-# Git Conventions — Cheechart (Lumpia)
+# Git Conventions — Lumpia (Cheechart)
 
-> Follow these conventions for all commits.
-> Last updated: 2026-03-15
+> Current as of Phase 12B (2026-03-15).
 
 ---
 
-## Current Workflow
+## Branch Strategy
 
-All work is currently on `main`. Feature branches and develop branch
-will be introduced when the project is shared or has collaborators.
+All work is committed directly to `main`. The project is solo-dev and
+moves fast — feature branches add overhead without value at this stage.
 
-```bash
-# Typical workflow
-git add <specific-files>
-git commit -m "feat(scope): description"
-git push origin main
 ```
+main ← all commits go here
+```
+
+**When to revisit:** If collaborators join or the project is open-sourced,
+introduce `develop` + `feature/*` branches with PR-based merges.
 
 ---
 
 ## Commit Message Format
 
-Follow **Conventional Commits**: `type(scope): description`
+Follow **Conventional Commits** spec: `type(scope): description`
 
 ### Types
-
 | Type | When to use |
 |---|---|
 | `feat` | New feature or component |
@@ -35,19 +33,14 @@ Follow **Conventional Commits**: `type(scope): description`
 | `chore` | Build, config, dependencies |
 | `test` | Adding or fixing tests |
 
-### Scopes
-
-Common scopes: `chart`, `indicators`, `ui`, `panels`, `store`, `api`, `security`, `deps`
-
 ### Examples
-
 ```bash
 git commit -m "feat(chart): add candlestick chart with lightweight-charts v5"
 git commit -m "feat(indicators): add EMA 9/48/200 overlays with exact colors"
 git commit -m "fix(vwap): reset calculation at market open each day"
-git commit -m "feat(panels): add backtest panel with equity curve"
-git commit -m "chore(deps): upgrade motion to v12"
-git commit -m "test(confluence): add 19 unit tests for score calculation"
+git commit -m "feat(ux): Phase 12B — Motion animations, accent colors, skeleton loading"
+git commit -m "chore: code cleanup — add missing tests, fix ESLint warnings"
+git commit -m "docs: update architecture.md, security.md for Phase 12B"
 ```
 
 ### Rules
@@ -55,44 +48,67 @@ git commit -m "test(confluence): add 19 unit tests for score calculation"
 - Lowercase after the colon
 - Under 72 characters for the subject line
 - No period at the end
+- Phase commits use scope to indicate area: `feat(ux)`, `feat(prod)`, `feat(security)`
 
 ---
 
-## Future Branch Strategy (when collaborating)
+## Workflow
 
-```
-main
-└── develop
-    ├── feature/description
-    ├── fix/description
-    └── chore/description
-```
+```bash
+# 1. Do work
+# 2. Run tests + build
+npm run test && npm run build
 
-- `main` — production only, merges from develop via PR
-- `develop` — integration branch
-- `feature/*` — all new work
+# 3. Stage specific files (avoid git add -A)
+git add src/path/to/changed/files
+
+# 4. Commit
+git commit -m "type(scope): description"
+
+# 5. Push
+git push origin main
+```
 
 ---
 
 ## Security Check Before Every Commit
 
 ```bash
-git status                                     # .env must NOT appear
-git diff --staged | grep -i "api_key\|secret"  # must return nothing
+git status
+git diff --staged | grep -i "ALPACA\|api_key\|secret\|token"
+
+# Confirm .env is NOT in staged files
+# If you see real credential values — STOP, do not commit
 ```
 
 ---
 
-## .gitignore (required entries)
+## .gitignore — What Never Gets Committed
 
 ```
+node_modules/
+dist/
 .env
 .env.local
 .env.*.local
-node_modules/
-dist/
 .DS_Store
+Thumbs.db
 *.log
+npm-debug.log*
+.vscode/settings.json
+.idea/
 ```
 
-`.env.example` IS committed (template with placeholder values).
+`.env.example` **IS** committed — shows the variable shape without values.
+
+---
+
+## Deployment
+
+Vercel auto-deploys from `main` on push. No manual deploy step needed
+unless testing a specific build:
+
+```bash
+npm run build && npm run preview   # Test production build locally
+vercel --prod                      # Manual deploy (rare)
+```

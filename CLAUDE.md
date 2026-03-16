@@ -93,7 +93,10 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
   affect flex layout. Motion is only for content inside persistent containers.
 - All animations respect `prefers-reduced-motion` via `useReducedMotion()` hook
 - CSS-only: nav hover keyframes, skeleton shimmer, settings gear spin+glow
-- **Known issue (BUG-001):** Chart area doesn't expand when sidebar closes. See `bugs.md`.
+- **Sidebar resize:** Emits `cheechart:layout-resize` event after transition;
+  all chart instances call `chart.resize()` to match new container size.
+- **Crosshair sync:** Main chart crosshair position is mirrored to RSI/MACD
+  mini-charts via `subscribeCrosshairMove` → `setCrosshairPosition`.
 
 ## Key file locations
 

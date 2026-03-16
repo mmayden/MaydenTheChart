@@ -48,6 +48,7 @@ import { IndicatorTabView } from './components/ui/IndicatorTabView'
 import { CrosshairLegend } from './components/ui/CrosshairLegend'
 import { ToastContainer } from './components/ui/ToastContainer'
 import { OnboardingTour } from './components/ui/OnboardingTour'
+import { ErrorBoundary } from './components/ui/ErrorBoundary'
 
 // Lazy-load on-demand overlays — not rendered until user opens them
 const SettingsModal  = lazy(() => import('./components/ui/SettingsModal').then(m => ({ default: m.SettingsModal })))
@@ -186,10 +187,12 @@ export default function App() {
       style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}
     >
       {/* Shared overlays (lazy-loaded) */}
-      <Suspense fallback={null}>
-        {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
-        <CommandPalette />
-      </Suspense>
+      <ErrorBoundary>
+        <Suspense fallback={null}>
+          {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
+          <CommandPalette />
+        </Suspense>
+      </ErrorBoundary>
       <ToastContainer />
       <OnboardingTour />
 
@@ -206,11 +209,13 @@ export default function App() {
         <div className="flex flex-col flex-1 min-w-0">
 
           {/* Chart sub-header: price + day type */}
-          <div className="flex items-center gap-4 px-4 py-2 border-b border-theme shrink-0">
+          <div className="flex items-center gap-2 sm:gap-4 px-2 sm:px-4 py-2 border-b border-theme shrink-0 overflow-hidden min-w-0">
             {bars && <PriceDisplay bars={bars} byDay={byDay} />}
             <ConfluenceBar confluence={confluence} />
-            <MTFStrip />
-            <div className="ml-auto">
+            <div className="hidden sm:block">
+              <MTFStrip />
+            </div>
+            <div className="ml-auto shrink-0">
               <DayTypeBanner dayType={dayType} />
             </div>
           </div>
@@ -274,7 +279,7 @@ export default function App() {
           </div>
 
           {/* Indicator tab strip (RSI / MACD) */}
-          <IndicatorTabView bars={bars} />
+          <IndicatorTabView bars={bars} mainChart={chart} />
 
           {/* Status bar */}
           <div className="flex items-center px-4 py-1.5 border-t border-theme shrink-0">

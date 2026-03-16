@@ -5,6 +5,7 @@
  * Collapsible on desktop, drawer overlay on mobile.
  */
 
+import { useEffect, useRef } from 'react'
 import { useChartStore } from '../../store/useChartStore'
 import { SymbolInput } from '../chart/SymbolInput'
 import { TimeframeSelector } from '../chart/TimeframeSelector'
@@ -16,6 +17,24 @@ export function Sidebar({ atrGauge }) {
   const sidebarOpen    = useChartStore((s) => s.sidebarOpen)
   const setSidebarOpen = useChartStore((s) => s.setSidebarOpen)
   const theme          = useChartStore((s) => s.theme)
+  const prevOpenRef    = useRef(sidebarOpen)
+
+  // Nudge chart canvases to remeasure after sidebar transition (desktop only).
+  // ResizeObserver can miss the final flex-1 size during CSS transitions.
+  // Dispatching a custom event lets CandlestickChart (and mini-charts) call
+  // chart.resize() with fresh container dimensions.
+  useEffect(() => {
+    if (prevOpenRef.current === sidebarOpen) return
+    prevOpenRef.current = sidebarOpen
+
+    if (window.innerWidth < 768) return
+
+    const timer = setTimeout(() => {
+      window.dispatchEvent(new Event('cheechart:layout-resize'))
+    }, 250)
+
+    return () => clearTimeout(timer)
+  }, [sidebarOpen])
 
   return (
     <>

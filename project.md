@@ -436,7 +436,7 @@ Component state (useState — local only):
 |---|---|
 | `src/components/ui/ConfluenceBar.jsx` | Weighted setup quality readout — traffic light pill + expandable breakdown |
 | `src/components/ui/MTFStrip.jsx` | Multi-timeframe EMA alignment strip (5m/15m/1h/4h/1D) |
-| `src/components/ui/IndicatorTabView.jsx` | RSI/MACD mini chart containers with corner labels below main chart |
+| `src/components/ui/IndicatorTabView.jsx` | RSI/MACD mini chart containers with crosshair sync to main chart |
 | `src/components/ui/ATRGauge.jsx` | Daily range used vs ATR budget gauge |
 | `src/components/ui/DayTypeBanner.jsx` | Trend / Range / Chop live classification |
 | `src/components/ui/IndicatorToggle.jsx` | Sidebar show/hide toggles for all indicators (EMA, VWAP, Bollinger, RVOL, Levels, S/R, RSI, MACD) |

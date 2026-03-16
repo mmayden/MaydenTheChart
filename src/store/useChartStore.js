@@ -6,8 +6,33 @@
  */
 
 import { create } from 'zustand'
-import { DEFAULT_SYMBOL, DEFAULT_TIMEFRAME } from '../constants/chart'
+import { DEFAULT_SYMBOL, DEFAULT_TIMEFRAME, TIMEFRAME_CONFIG } from '../constants/chart'
 import { ACCENT_LOOKUP } from '../constants/accents'
+
+// ─── Read URL params at module load (synchronous, before first render) ─────
+// This ensures the store initializes with URL-specified values so queries
+// don't fire with defaults before useURLState's useEffect runs.
+const SYMBOL_RE = /^[A-Z]{1,10}(\.[A-Z]{1,2})?$/
+const _urlTfLabelToKey = {}
+Object.entries(TIMEFRAME_CONFIG).forEach(([key, cfg]) => {
+  _urlTfLabelToKey[cfg.label.toLowerCase()] = key
+})
+
+function _readURLSymbol() {
+  try {
+    const s = new URLSearchParams(window.location.search).get('s')?.toUpperCase()
+    if (s && SYMBOL_RE.test(s)) return s
+  } catch { /* SSR / test env */ }
+  try { return localStorage.getItem('cheechart-symbol') ?? DEFAULT_SYMBOL } catch { return DEFAULT_SYMBOL }
+}
+
+function _readURLTimeframe() {
+  try {
+    const tf = new URLSearchParams(window.location.search).get('tf')?.toLowerCase()
+    if (tf && _urlTfLabelToKey[tf]) return _urlTfLabelToKey[tf]
+  } catch { /* SSR / test env */ }
+  return DEFAULT_TIMEFRAME
+}
 
 export const useChartStore = create((set) => ({
   // ─── Theme ─────────────────────────────────────────────────────────────────
@@ -46,8 +71,8 @@ export const useChartStore = create((set) => ({
   },
 
   // ─── Selection ─────────────────────────────────────────────────────────────
-  selectedSymbol: (() => { try { return localStorage.getItem('cheechart-symbol') ?? DEFAULT_SYMBOL } catch { return DEFAULT_SYMBOL } })(),
-  selectedTimeframe: DEFAULT_TIMEFRAME,
+  selectedSymbol: _readURLSymbol(),
+  selectedTimeframe: _readURLTimeframe(),
 
   setSymbol: (symbol) => {
     try { localStorage.setItem('cheechart-symbol', symbol) } catch { /* storage unavailable */ }

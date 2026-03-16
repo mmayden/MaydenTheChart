@@ -1,6 +1,9 @@
 /**
  * RSIMiniChart — Standalone RSI(14) mini chart instance (82px tall).
  * Used inside IndicatorTabView below the main chart.
+ *
+ * Crosshair sync: subscribes to the main chart's crosshairMove events
+ * and mirrors the cursor position via setCrosshairPosition / clearCrosshairPosition.
  */
 
 import { useEffect, useRef } from 'react'
@@ -8,7 +11,7 @@ import { createChart, LineSeries } from 'lightweight-charts'
 import { rsi as calcRsi } from '../../utils/indicators'
 import { MINI_CHART_OPTS } from './miniChartConfig'
 
-export function RSIMiniChart({ bars }) {
+export function RSIMiniChart({ bars, mainChart }) {
   const containerRef = useRef(null)
   const chartRef     = useRef(null)
   const seriesRef    = useRef({ line: null, r70: null, r50: null, r30: null })
@@ -38,6 +41,36 @@ export function RSIMiniChart({ bars }) {
 
     return () => { chart.remove(); chartRef.current = null }
   }, [])
+
+  // Force resize on layout change (sidebar toggle)
+  useEffect(() => {
+    function handleLayoutResize() {
+      const chart = chartRef.current
+      const container = containerRef.current
+      if (!chart || !container) return
+      chart.resize(container.clientWidth, container.clientHeight, true)
+    }
+    window.addEventListener('cheechart:layout-resize', handleLayoutResize)
+    return () => window.removeEventListener('cheechart:layout-resize', handleLayoutResize)
+  }, [])
+
+  // Sync crosshair from main chart → this mini chart
+  useEffect(() => {
+    if (!mainChart || !chartRef.current) return
+    const miniChart = chartRef.current
+    const miniLine  = seriesRef.current.line
+
+    const handler = (param) => {
+      if (!param.time || !miniLine) {
+        miniChart.clearCrosshairPosition()
+        return
+      }
+      miniChart.setCrosshairPosition(NaN, param.time, miniLine)
+    }
+
+    mainChart.subscribeCrosshairMove(handler)
+    return () => { mainChart.unsubscribeCrosshairMove(handler) }
+  }, [mainChart])
 
   useEffect(() => {
     const { line, r70, r50, r30 } = seriesRef.current

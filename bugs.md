@@ -8,35 +8,24 @@
 
 ## Open
 
-### BUG-001: Chart area doesn't snap left when sidebar closes
-**Status:** Open — parked. Multiple fix attempts failed. Sidebar reverted to original clean form.
-**Severity:** Medium — functional but the chart/RSI/MACD don't expand to fill sidebar space on close
-**First noticed:** 2026-03-16
-**Introduced:** Unclear — may have always been present, noticed after Phase 12B audit
-
-**Symptoms:**
-- When left sidebar closes, the chart area (main chart + RSI/MACD + status bar)
-  does not expand leftward to fill the vacated space
-- Right panel close/open works perfectly — chart resizes seamlessly
-- The sidebar itself opens/closes fine visually
-
-**What was tried (all failed or reverted):**
-1. `transition-all` restored (was `transition-transform md:transition-none`)
-2. All charts switched to `autoSize: true` (lw-charts v5 built-in)
-3. Sidebar rewritten to mirror RightPanel structure (border on inner, min-w-0, etc.)
-4. `window.dispatchEvent(new Event('resize'))` after transition
-5. Second attempt at RightPanel-mirror pattern
-
-**Current state:** Sidebar is in its original clean form (pre-audit `dca2cad`).
-Charts use `autoSize: true`. No hacks or workarounds. Needs proper DevTools
-diagnosis to understand why the flex-1 chart column doesn't expand when the
-sidebar shrinks to w-0.
-
-**Tracking doc:** `left-bar-problems.md` — full change history
+> No open bugs.
 
 ---
 
 ## Resolved
+
+### BUG-R006: BUG-001 — Chart area doesn't expand when sidebar closes
+**Resolved:** 2026-03-16
+**Introduced:** Unclear — always present, noticed after Phase 12B audit
+
+**Root cause:** lightweight-charts' `autoSize` uses ResizeObserver which can miss
+the final container size during CSS `transition-all` on the sidebar. The chart
+canvas stays at its old width after the flex-1 column expands.
+
+**Fix:** Sidebar emits `cheechart:layout-resize` custom event 250ms after toggle
+(after CSS transition completes). CandlestickChart + RSI/MACD mini-charts listen
+for this event and call `chart.resize(container.clientWidth, container.clientHeight, true)`
+to force the canvas to match its new container dimensions.
 
 ### BUG-R001: Right panel close-pause-jump
 **Resolved:** 2026-03-16 (commit `6ba3510`)

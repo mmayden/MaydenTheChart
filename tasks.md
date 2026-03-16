@@ -535,7 +535,32 @@
 - ✅ RSI/MACD labels via lw-charts watermark (auto-aligned inside plotting area)
 - ✅ Mini chart price scales `minimumWidth: 60` for right-edge alignment with main chart
 - ✅ Created `bugs.md` tracker and `left-bar-problems.md` audit doc
-- 🔲 **BUG-001:** Chart area doesn't expand when sidebar closes — needs DevTools diagnosis (parked)
+- ✅ **BUG-001 resolved:** Sidebar emits `cheechart:layout-resize` event after transition; all charts call `chart.resize()` to match new container
+
+---
+
+## ✅ System Coherence Audit — Data Sync + Layout + Modularity (2026-03-16)
+
+**298/298 tests passing, build clean, ESLint 0 errors**
+
+### Data Sync & Chart Coherence
+- ✅ Crosshair sync: main chart crosshair position mirrored to RSI/MACD mini-charts via `subscribeCrosshairMove` → `setCrosshairPosition`
+- ✅ URL state race condition: store initializers now read URL params synchronously at module load (before first render), so `useAlpacaBars` fetches correct symbol/timeframe immediately
+- ✅ Verified: all indicator overlays use identical `bars` array from single `useAlpacaBars` source
+- ✅ Verified: WebSocket live updates propagate to all consumers (chart, RSI, MACD, confluence, alerts, day type)
+
+### Layout & Resilience
+- ✅ BUG-001 fixed: sidebar toggle emits `cheechart:layout-resize` → all 3 chart instances call `chart.resize()` with fresh container dimensions
+- ✅ Mobile chart sub-header: MTFStrip hidden on <640px, gap/padding reduced, overflow-hidden added
+- ✅ ErrorBoundary wraps lazy Suspense block (SettingsModal + CommandPalette) — chunk load failures show fallback instead of white screen
+
+### Architecture Assessment (no issues found)
+- ✅ Zustand stores: clean separation, zero circular dependencies
+- ✅ Hook dependency arrays: all correct (2 justified eslint-disables)
+- ✅ TanStack Query: proper cache keys, stale times, conditional refetch
+- ✅ Memory management: all cleanup handlers present
+- ✅ Animation system: Motion and CSS transitions don't conflict
+- ✅ `prefers-reduced-motion`: comprehensive coverage
 
 ---
 

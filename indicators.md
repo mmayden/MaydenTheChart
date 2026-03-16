@@ -209,9 +209,11 @@ Band 2 lower = VWAP - 2 × stdDev
 
 ### Code signature
 ```js
-// bars sorted oldest → newest, resets when date changes
-// returns { vwap, band1Upper, band1Lower, band2Upper, band2Lower }
-// each = array of { time, value }
+// bars sorted oldest → newest, resets when date changes (ET timezone)
+// returns { vwap, band1Upper, band1Lower, band2Upper, band2Lower, series, signal }
+// vwap/bands = array of { time, value }
+// series = same as vwap (for indicator contract compatibility)
+// signal = { value, bias, strength }
 vwapWithBands(bars)
 ```
 
@@ -284,12 +286,13 @@ Classification:
 ```
 
 ### Rendering (DayTypeBanner component)
-- Persistent banner at top of UI
+- Persistent banner in chart sub-header area
 - Updates in real time as price breaks levels
-- "📈 Trend Day — Bullish" (green background)
-- "📉 Trend Day — Bearish" (red background)
-- "⚡ Chop — Both Levels Broken" (orange background)
-- "↔️ Range Day — Neither Level Broken" (neutral/gray)
+- "Trend Day — Bullish" (green background)
+- "Trend Day — Bearish" (red background)
+- "Chop — Both Levels Broken" (orange background)
+- "Range Day — Neither Level Broken" (neutral/gray)
+- No emoji prefixes — clean text labels only
 
 ### Code signature
 ```js
@@ -497,30 +500,28 @@ detectRSIDivergences(bars, rsiSeries, lookback = 5)
 
 ---
 
-## Macro Health Status Bar (Minervini-style Market Filter)
+## Confluence Score
 
 ### What it tells you
-Before any individual setup matters, the macro context of QQQ itself shapes the
-probability of all directional trades. Adapted from Mark Minervini's Trend Template.
+Weighted synthesis of all indicator signals into a single "setup quality" readout.
+No retail platform does this — it's the most differentiating feature.
 
-### Logic
+### Weighted Signal System
+| Signal Source | Weight | Trading System Rule |
+|---|---|---|
+| Day Type | **3x (heavy)** | Rule 1 — "the backbone of everything" |
+| EMA Alignment | **3x (heavy)** | Rule 2 — stacked EMA = directional confirmation |
+| VWAP Position | **2x (medium)** | Rule 6 — intraday pivot |
+| ATR Budget | **2x (medium)** | Range exhaustion = don't chase |
+| RSI Zone | **1x (light)** | Confirmation, not a trigger |
+| MACD Direction | **1x (light)** | Confirmation, not a trigger |
+
+### Code signature
+```js
+// returns { score, bias, level, reasons[], warnings[] }
+// score: 0-100, bias: 'bull'|'bear'|'neutral', level: 'strong'|'moderate'|'weak'|'no-setup'
+confluenceScore({ dayType, emaSignals, vwapSignal, atrSignal, rsiSignal, macdSignal })
 ```
-Pull daily bars for QQQ (at least 200 days)
-Compute SMA(50) and SMA(200) of daily close
-
-Bullish:  price > SMA50 > SMA200, both MAs trending up
-Neutral:  price between MAs, or MAs flat
-Bearish:  price < SMA50, SMA200 trending down or price below it
-
-Current market context (March 2026): QQQ is below 200MA — bearish macro bias
-All bullish signals carry extra risk in this context
-```
-
-### Rendering (MacroStatusBar component)
-- One-line persistent bar at top or bottom of UI
-- "📈 Bull Trend — QQQ above 50MA & 200MA" (green)
-- "⚠️ Neutral — Mixed MA alignment" (yellow)
-- "📉 Bear Trend — QQQ below 200MA" (red)
 
 ---
 
@@ -528,20 +529,20 @@ All bullish signals carry extra risk in this context
 
 This is what separates skilled chart reading from guessing.
 
-### High-probability long setup
-1. Macro status: Bull trend (or neutral, not deep bear)
-2. Day type: Trend Day Bullish (PDH broken, not PDL)
-3. Price above VWAP and EMA 48
+### High-probability long setup (Confluence score: strong bull)
+1. Day type: Trend Day Bullish (PDH broken, not PDL)
+2. EMA stack aligned: price > EMA 9 > EMA 48 > EMA 200
+3. Price above VWAP
 4. ATR gauge under 80% consumed
 5. RVOL on the breakout bar ≥ 1.5x
 6. RSI not above 70 (room to run)
 7. MACD histogram green and growing
 → Enter long at ORB high breakout or VWAP bounce
 
-### High-probability short setup
-1. Macro: Bear trend (as of March 2026 — QQQ below 200MA)
-2. Day type: Trend Day Bearish (PDL broken, not PDH)
-3. Price below VWAP and EMA 48
+### High-probability short setup (Confluence score: strong bear)
+1. Day type: Trend Day Bearish (PDL broken, not PDH)
+2. EMA stack inverted: price < EMA 9 < EMA 48 < EMA 200
+3. Price below VWAP
 4. ATR gauge under 80% consumed
 5. RVOL on the breakdown bar ≥ 1.5x
 6. RSI not below 30 (room to fall)
