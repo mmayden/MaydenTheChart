@@ -17,8 +17,7 @@ export function RSIMiniChart({ bars }) {
     if (!containerRef.current) return
     const chart = createChart(containerRef.current, {
       ...MINI_CHART_OPTS,
-      width:  containerRef.current.clientWidth,
-      height: containerRef.current.clientHeight,
+      autoSize: true,
     })
 
     const line = chart.addSeries(LineSeries, {
@@ -33,13 +32,7 @@ export function RSIMiniChart({ bars }) {
     chartRef.current  = chart
     seriesRef.current = { line, r70, r50, r30 }
 
-    const ro = new ResizeObserver(() => {
-      if (!containerRef.current) return
-      chart.applyOptions({ width: containerRef.current.clientWidth, height: containerRef.current.clientHeight })
-    })
-    ro.observe(containerRef.current)
-
-    return () => { ro.disconnect(); chart.remove(); chartRef.current = null }
+    return () => { chart.remove(); chartRef.current = null }
   }, [])
 
   useEffect(() => {

@@ -60,6 +60,7 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
     if (!containerRef.current) return
 
     const chart = createChart(containerRef.current, {
+      autoSize: true,
       layout: {
         background: { color: CHART_BG_COLOR },
         textColor:  '#d1d5db',
@@ -132,18 +133,7 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
     candleRef.current = candleSeries
     volumeRef.current = volumeSeries
 
-    // Responsive resize
-    const ro = new ResizeObserver(() => {
-      if (!containerRef.current) return
-      chart.applyOptions({
-        width:  containerRef.current.clientWidth,
-        height: containerRef.current.clientHeight,
-      })
-    })
-    ro.observe(containerRef.current)
-
     return () => {
-      ro.disconnect()
       chart.remove()
       chartRef.current  = null
       candleRef.current = null

@@ -17,8 +17,7 @@ export function MACDMiniChart({ bars }) {
     if (!containerRef.current) return
     const chart = createChart(containerRef.current, {
       ...MINI_CHART_OPTS,
-      width:  containerRef.current.clientWidth,
-      height: containerRef.current.clientHeight,
+      autoSize: true,
     })
 
     const hist       = chart.addSeries(HistogramSeries, { priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false })
@@ -28,13 +27,7 @@ export function MACDMiniChart({ bars }) {
     chartRef.current  = chart
     seriesRef.current = { hist, macdLine, signalLine }
 
-    const ro = new ResizeObserver(() => {
-      if (!containerRef.current) return
-      chart.applyOptions({ width: containerRef.current.clientWidth, height: containerRef.current.clientHeight })
-    })
-    ro.observe(containerRef.current)
-
-    return () => { ro.disconnect(); chart.remove(); chartRef.current = null }
+    return () => { chart.remove(); chartRef.current = null }
   }, [])
 
   useEffect(() => {
