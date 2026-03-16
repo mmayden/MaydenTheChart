@@ -194,6 +194,9 @@ export function SettingsModal({ onClose }) {
     >
       {/* Modal card */}
       <motion.div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Settings"
         onClick={(e) => e.stopPropagation()}
         data-theme={theme}
         style={{

@@ -360,10 +360,11 @@ RSI = 100 - (100 / (1 + RS))
 - Then use Wilder's smoothing: avg = (prev_avg × 13 + current) / 14
 
 ### Rendering
-- RSI line: solid purple (#a78bfa), 1.5px
-- Reference lines: 70 (red, dashed), 50 (gray, dashed), 30 (green, dashed)
-- HTML overlay label "RSI" in purple at top-left of mini chart (`.mini-chart-label` CSS class, `pointer-events: none`)
+- RSI line: solid purple (`RSI_LINE_COLOR` from chart.js), 1.5px
+- Reference lines: 70 (`RSI_OB_COLOR`, dashed), 50 (`RSI_MID_COLOR`, dashed), 30 (`RSI_OS_COLOR`, dashed)
+- HTML overlay label "RSI" in `RSI_LINE_COLOR` at top-left of mini chart (`.mini-chart-label` CSS class, `pointer-events: none`)
 - Rendered in 82px tall mini chart pane below the main chart via `IndicatorTabView`
+- All colors imported from `src/constants/chart.js` — never hardcoded in component
 
 ### Key levels
 | Level | Meaning |
@@ -404,10 +405,11 @@ Histogram   = MACD Line - Signal Line
 - Zero line cross → trend direction shift
 
 ### Rendering
-- MACD line: solid blue (#3b82f6)
-- Signal line: solid orange (#f97316)
-- Histogram: green bars above zero, red bars below zero
-- HTML overlay label "MACD" in blue at top-left of mini chart (`.mini-chart-label` CSS class, `pointer-events: none`)
+- MACD line: solid blue (`MACD_LINE_COLOR` from chart.js)
+- Signal line: solid orange (`MACD_SIGNAL_COLOR` from chart.js)
+- Histogram: `MACD_HIST_UP` above zero, `MACD_HIST_DOWN` below zero
+- HTML overlay label "MACD" in `MACD_LINE_COLOR` at top-left of mini chart (`.mini-chart-label` CSS class, `pointer-events: none`)
+- All colors imported from `src/constants/chart.js` — never hardcoded in component
 
 ### Code signature
 ```js
@@ -434,9 +436,11 @@ Zone strength = number of pivots merged (more touches = stronger level)
 ```
 
 ### Rendering
-- Support: green horizontal lines (opacity proportional to strength)
-- Resistance: red horizontal lines (opacity proportional to strength)
+- Support: `SR_SUPPORT_RGB` horizontal lines (opacity proportional to strength)
+- Resistance: `SR_RESISTANCE_RGB` horizontal lines (opacity proportional to strength)
+- Swing high markers: `SR_SWING_HIGH`, swing low markers: `SR_SWING_LOW`
 - Label each with price value
+- All colors imported from `src/constants/chart.js` — never hardcoded in component
 
 ### Code signature
 ```js

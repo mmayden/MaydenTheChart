@@ -12,6 +12,7 @@
 
 import { useEffect, useRef } from 'react'
 import { findSupportResistance } from '../../utils/supportResistance'
+import { SR_RESISTANCE_RGB, SR_SUPPORT_RGB, SR_SWING_HIGH, SR_SWING_LOW } from '../../constants/chart'
 
 const MAX_LEVELS = 8  // cap to avoid visual clutter
 
@@ -44,7 +45,7 @@ export function SROverlay({ candleSeries, bars, visible = true }) {
         const opacity = Math.max(0.3, Math.min(1, level.strength / maxStrength))
         const line = candleSeries.createPriceLine({
           price:            level.price,
-          color:            `rgba(239, 68, 68, ${opacity})`,
+          color:            `rgba(${SR_RESISTANCE_RGB.join(',')}, ${opacity})`,
           lineWidth:        1,
           lineStyle:        1, // dotted
           axisLabelVisible: true,
@@ -58,7 +59,7 @@ export function SROverlay({ candleSeries, bars, visible = true }) {
         const opacity = Math.max(0.3, Math.min(1, level.strength / maxStrength))
         const line = candleSeries.createPriceLine({
           price:            level.price,
-          color:            `rgba(34, 197, 94, ${opacity})`,
+          color:            `rgba(${SR_SUPPORT_RGB.join(',')}, ${opacity})`,
           lineWidth:        1,
           lineStyle:        1, // dotted
           axisLabelVisible: true,
@@ -77,7 +78,7 @@ export function SROverlay({ candleSeries, bars, visible = true }) {
         markers.push({
           time:     sh.time,
           position: 'aboveBar',
-          color:    '#ef4444',
+          color:    SR_SWING_HIGH,
           shape:    'arrowDown',
           text:     '',
         })
@@ -88,7 +89,7 @@ export function SROverlay({ candleSeries, bars, visible = true }) {
         markers.push({
           time:     sl.time,
           position: 'belowBar',
-          color:    '#22c55e',
+          color:    SR_SWING_LOW,
           shape:    'arrowUp',
           text:     '',
         })

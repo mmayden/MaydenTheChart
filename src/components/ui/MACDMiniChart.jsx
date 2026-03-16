@@ -9,6 +9,7 @@
 import { useEffect, useRef } from 'react'
 import { createChart, LineSeries, HistogramSeries } from 'lightweight-charts'
 import { macd as calcMacd } from '../../utils/indicators'
+import { MACD_LINE_COLOR, MACD_SIGNAL_COLOR, MACD_HIST_UP, MACD_HIST_DOWN } from '../../constants/chart'
 import { MINI_CHART_OPTS } from './miniChartConfig'
 
 export function MACDMiniChart({ bars, mainChart }) {
@@ -25,8 +26,8 @@ export function MACDMiniChart({ bars, mainChart }) {
     })
 
     const hist       = chart.addSeries(HistogramSeries, { priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false })
-    const macdLine   = chart.addSeries(LineSeries, { color: '#3b82f6', lineWidth: 1.5, priceLineVisible: false, lastValueVisible: true,  crosshairMarkerVisible: true  })
-    const signalLine = chart.addSeries(LineSeries, { color: '#f97316', lineWidth: 1,   lineStyle: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false })
+    const macdLine   = chart.addSeries(LineSeries, { color: MACD_LINE_COLOR, lineWidth: 1.5, priceLineVisible: false, lastValueVisible: true,  crosshairMarkerVisible: true  })
+    const signalLine = chart.addSeries(LineSeries, { color: MACD_SIGNAL_COLOR, lineWidth: 1,   lineStyle: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false })
 
     chartRef.current  = chart
     seriesRef.current = { hist, macdLine, signalLine }
@@ -93,7 +94,7 @@ export function MACDMiniChart({ bars, mainChart }) {
     if (!bars?.length || !hist) return
     const result = calcMacd(bars)
     if (!result.macd.length) return
-    hist.setData(result.histogram.map((p) => ({ time: p.time, value: p.value, color: p.value >= 0 ? '#22c55e' : '#ef4444' })))
+    hist.setData(result.histogram.map((p) => ({ time: p.time, value: p.value, color: p.value >= 0 ? MACD_HIST_UP : MACD_HIST_DOWN })))
     macdLine.setData(result.macd)
     signalLine.setData(result.signalLine)
     // If main chart is connected, it drives the time range via sync.

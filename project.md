@@ -241,7 +241,7 @@ Make it sticky, portable, and hardened.
 |---|---|
 | **Security hardening** | localStorage schema validation at all trust boundaries, API error sanitization, Notification API guard, CSP headers |
 | **Code splitting** | React.lazy() for 6 components, manualChunks for lightweight-charts + vendor-api — bundle 501KB → 226KB main + 164KB charts + 81KB vendor |
-| **CSS theme refactor** | Eliminated 33 !important overrides → 20+ semantic utility classes powered by CSS variables. Nav icons, active panel highlights, alert colors, symbol color, primary buttons (`.btn-primary`), form inputs (`.bg-input`), focus rings, and spinners all use per-theme CSS custom properties. Per-panel icon colors (alerts amber, watchlist teal, backtest purple, journal coral/red, cmd-palette purple, settings cyan/mint/gold). |
+| **CSS theme refactor + two-tier color system** | Eliminated 33 !important overrides → 20+ semantic utility classes powered by CSS variables. All HTML/React colors use CSS variables (`var(--color-bull)`, `var(--bg-base)`, etc.). All lightweight-charts API colors use named constants from `chart.js` (the library needs hex strings). Per-panel icon colors (alerts amber, watchlist teal, backtest purple, journal coral/red, cmd-palette purple, settings cyan/mint/gold). Zero hardcoded hex values in component files. |
 | **Nav button micro-animations** | Each TopNav icon has a unique keyframe hover animation: bell rings, watchlist bounces up, backtest EKG pulses, journal tilts open, search zooms, settings gear spins with glow. All pop to 1.25-1.4x on hover via CSS-only keyframes. |
 | **Mobile polish pass** | Touch targets 44px+ via `@media (pointer: coarse)`, swipe gestures (right=sidebar, left=close), chart fills viewport |
 | **Chart snapshot** | Cmd+Shift+S captures chart as PNG with watermark, copies to clipboard (download fallback). Command palette + settings reference. |
@@ -481,7 +481,7 @@ Component state (useState — local only):
 
 ## Current Status
 
-**298/298 tests passing, build clean, ESLint 0 errors, 0 vulnerabilities. Main bundle 314KB + 161KB lightweight-charts + 92KB motion + 69KB vendor-api (7 lazy chunks). Stack: React 19 + Vite 8 + Zustand 5 + Tailwind 4.**
+**298/298 tests passing, build clean, ESLint 0 errors, 0 vulnerabilities. Main bundle 314KB + 161KB lightweight-charts + 92KB motion + 69KB vendor-api (7 lazy chunks). Stack: React 19 + Vite 8 + Zustand 5 + Tailwind 4. Phase 13B (first impression polish) complete — accessibility + confluence emphasis shipped.**
 
 ### Completed
 - [x] Phases 1–4: Core chart, indicators, levels, S/R detection, ATR gauge, day type
@@ -501,13 +501,18 @@ Component state (useState — local only):
 - [x] Health audits: security headers, input validation, shared utilities, dead code cleanup
 - [x] Comprehensive audit (2026-03-15): security hardening (rate limiting, SSRF guard, input validation), ESLint, timezone tests, backtest test determinism, contract fixes, dead code cleanup
 
-### Upcoming (Phase 12 — detailed plan finalized 2026-03-15)
+### Completed (continued)
 - [x] Phase 12A: Production hardening — cache headers, self-host fonts, SW auto-versioning, OG meta, Sentry, reduced-motion
 - [x] Phase 12B: UX sharpening — Motion library (content transitions), skeleton loading states, accent color customization, layout transition fix
 - [x] Phase 12C: Dependency upgrades — React 19, Zustand 5, Vite 8, Tailwind 4
 - [x] Phase 12D: Data provider abstraction — provider interface, Alpaca adapter, hooks renamed (useBars, useLiveFeed), TIMEFRAME_CONFIG decoupled
 - [x] Phase 12E: Infinite scroll — useInfiniteHistory hook, scroll-back fetch with viewport save/restore, per-timeframe pageSize/maxBars caps, loading indicator
 - [x] Process hardening — husky + lint-staged pre-commit hooks, GitHub Actions CI, shared SYMBOL_RE, font preload, snapshot.js minimal disclosure
+- [x] Phase 13B: First impression polish — 9 hardcoded color violations fixed, confluence bar visual emphasis (glow/pulse on strong setups), accessibility (focus-visible, aria-modal, aria-label/pressed on panels)
+
+### Upcoming
+- [ ] Phase 13A: Traction readiness — enhanced snapshots with confluence watermark, welcome banner, Ko-fi link, OG image
+- [ ] Phase 13C: Discoverability — robots.txt, sitemap, canonical URL, real PWA icons, meta descriptions
 - [ ] Phase 12F: Future differentiators — screener, trade replay, annotations, gap tracking, cloud sync
 
 ---
@@ -559,3 +564,4 @@ Component state (useState — local only):
 | 2026-03-16 | **Phase 12D complete: Data provider abstraction.** Created `src/services/dataProvider.js` (provider interface: `fetchBars()`, `fetchSnapshot()`, `getProviderName()`), `src/services/providers/alpaca.js` (Alpaca adapter: bar normalization, timeframe mapping, WS protocol). Refactored `websocket.js` to provider-agnostic shell — delegates protocol handling to adapter. Renamed hooks: `useAlpacaBars` → `useBars`, `useAlpacaSocket` → `useLiveFeed` (old files kept as re-export wrappers for backward compat). Removed `alpacaTimeframe` from `TIMEFRAME_CONFIG` — provider adapter handles translation. Updated all 6 consumers (App.jsx, BacktestPanel, useMTFSignals, useDailyBars, useWatchlistQuotes, SymbolInput). Serverless proxies documented for `DATA_PROVIDER` env var routing. 298/298 tests, build clean, ESLint 0 errors. |
 | 2026-03-16 | **Process hardening.** Architect-level review of audit findings. Installed `husky` 9 + `lint-staged` 16 for pre-commit ESLint enforcement (`--max-warnings=0`). Created `.github/workflows/ci.yml` — GitHub Actions CI runs lint → test → build on push/PR to `main`. Extracted `SYMBOL_RE` from 5 independent definitions into `src/constants/patterns.js` (single source of truth), updated 4 client-side consumers. Fixed `snapshot.js` minimal-disclosure violation (`Invalid symbol: ${sym}` → `Invalid symbol format`). Added font preload tags for Boogaloo + Inter 800. Added `lint` + `lint:fix` npm scripts. Updated CLAUDE.md (Developer Workflow section, Constants, CI), security.md (Pre-Commit Enforcement, Shared Validation Patterns), tasks.md. 298/298 tests, ESLint 0 errors, build clean. |
 | 2026-03-16 | **Phase 12E complete: Infinite scroll.** `src/hooks/useInfiniteHistory.js` — subscribes to `subscribeVisibleLogicalRangeChange`, triggers fetch when user scrolls within 50 bars of left edge. Debounced 200ms + 500ms cooldown. Fetches older page via `fetchBars()`, deduplicates, prepends to TanStack Query cache. `CandlestickChart.jsx` — detects prepend (bars grew at front, same tail), saves `getVisibleRange()` before `setData()`, restores after to prevent viewport jump. Skips `fitContent()` on prepend. Added `allowShiftVisibleRangeOnWhitespaceReplacement` to timeScale. `TIMEFRAME_CONFIG` — added `pageSize` (bars per scroll-back fetch) and `maxBars` (memory cap) per timeframe. Loading pill at chart left edge during fetch. IndexedDB/Dexie.js deferred. 298/298 tests, build clean, ESLint 0 errors. |
+| 2026-03-16 | **Phase 13B complete: First impression polish.** Fixed 9 hardcoded color violations across AlertsPanel, MACDMiniChart, RSIMiniChart, SROverlay, ErrorBoundary, CandlestickChart, ToastContainer, PresetSelector, IndicatorTabView, CrosshairLegend — all replaced with CSS variable references or chart.js constants. ConfluenceBar visual emphasis: bigger score (text-sm tabular-nums), pulse dot + glow box-shadow on strong setups, thicker border on high-confluence. Accessibility: global `:focus-visible` outline using `--focus-ring` CSS variable, `role="dialog"` + `aria-modal` on CommandPalette and SettingsModal, `aria-label` + `aria-pressed` on all 4 panel toggle buttons. Confluence pulse disabled under `prefers-reduced-motion`. 298/298 tests, build clean, ESLint 0 errors. |

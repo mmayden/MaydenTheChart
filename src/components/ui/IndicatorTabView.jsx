@@ -10,6 +10,7 @@
 import { useChartStore } from '../../store/useChartStore'
 import { RSIMiniChart } from './RSIMiniChart'
 import { MACDMiniChart } from './MACDMiniChart'
+import { RSI_LINE_COLOR, MACD_LINE_COLOR } from '../../constants/chart'
 
 export function IndicatorTabView({ bars, mainChart }) {
   const rsiEnabled  = useChartStore((s) => s.indicators.rsi)
@@ -21,13 +22,13 @@ export function IndicatorTabView({ bars, mainChart }) {
     <div className="shrink-0 border-t border-theme overflow-hidden">
       {rsiEnabled && (
         <div className="w-full overflow-hidden relative" style={{ backgroundColor: 'var(--bg-base)', height: 82 }}>
-          <span className="mini-chart-label" style={{ color: '#a78bfa' }}>RSI</span>
+          <span className="mini-chart-label" style={{ color: RSI_LINE_COLOR }}>RSI</span>
           <RSIMiniChart bars={bars} mainChart={mainChart} />
         </div>
       )}
       {macdEnabled && (
         <div className="w-full overflow-hidden relative" style={{ backgroundColor: 'var(--bg-base)', height: 82 }}>
-          <span className="mini-chart-label" style={{ color: '#3b82f6' }}>MACD</span>
+          <span className="mini-chart-label" style={{ color: MACD_LINE_COLOR }}>MACD</span>
           <MACDMiniChart bars={bars} mainChart={mainChart} />
         </div>
       )}

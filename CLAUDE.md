@@ -69,13 +69,24 @@ TopNav → Sidebar (left) → Chart (center) → RightPanel (right, one at a tim
 Values: `null | 'alerts' | 'backtest' | 'journal' | 'watchlist'`. Same panel = close,
 different panel = switch. On mobile (<768px), panels become full-screen overlays.
 
-**Color architecture:** All colors flow from CSS custom properties in `src/index.css`.
-Each theme defines 25+ variables. Components use semantic CSS classes
-(`.btn-primary`, `.bg-input`, `.border-theme`, `.text-accent`, etc.) or inline
-`var(--name)` references — never hardcoded Tailwind color classes. Each panel button
-has its own `--{id}-color` and `--{id}-active-bg` variables. The settings gear has
-`--settings-color` and `--settings-glow`. Nav button hover animations are CSS-only
-keyframes in `src/index.css` (`.nav-btn-{id}` classes).
+**Color architecture — two-tier system:**
+
+*Tier 1 — CSS custom properties* (`src/index.css`): All theme-varied colors flow from
+25+ CSS variables per theme. Components use semantic CSS classes (`.btn-primary`,
+`.bg-input`, `.border-theme`, `.text-accent`, etc.) or inline `var(--name)` references —
+never hardcoded Tailwind color classes. Each panel button has its own `--{id}-color` and
+`--{id}-active-bg` variables. The settings gear has `--settings-color` and `--settings-glow`.
+Nav button hover animations are CSS-only keyframes in `src/index.css` (`.nav-btn-{id}` classes).
+
+*Tier 2 — chart.js constants* (`src/constants/chart.js`): All colors passed to the
+lightweight-charts API (which needs hex strings, not CSS variables) are defined as named
+exports in chart.js. This includes: `CANDLE_COLORS` (per-theme), `RSI_LINE_COLOR`,
+`RSI_OB/MID/OS_COLOR`, `MACD_LINE_COLOR`, `MACD_SIGNAL_COLOR`, `MACD_HIST_UP/DOWN`,
+`SR_RESISTANCE_RGB`, `SR_SUPPORT_RGB`, `SR_SWING_HIGH/LOW`, `BOLLINGER_*_COLOR`,
+`EMA_COLORS`, `VWAP_*_COLOR`, `VOLUME_UP/DOWN_COLOR`, `SIGNAL_COLORS`.
+
+**Rule:** HTML/React components use CSS variables. lightweight-charts API calls use
+chart.js constants. Never hardcode hex values in component files.
 
 **Data color system:** Universal trading/data colors (bull/bear, status, warnings) are
 defined as CSS custom properties (`--color-bull`, `--color-bear`, `--color-warn`,
@@ -89,6 +100,19 @@ Presets defined in `src/constants/accents.js` (single source of truth), consumed
 both the store (`setAccentColor`) and the SettingsModal UI. Overrides 5 CSS variables
 (`--accent`, `--accent-dim`, `--btn-primary`, `--btn-primary-hover`, `--focus-ring`)
 via inline styles on `<html>`. Resets when theme changes. Persisted to `localStorage`.
+
+**Accessibility:**
+- Global `:focus-visible` outline using `--focus-ring` CSS variable in `src/index.css`
+  (keyboard-only — suppressed on mouse click via `:focus:not(:focus-visible)`)
+- CommandPalette and SettingsModal have `role="dialog"` + `aria-modal="true"` + `aria-label`
+- All panel toggle buttons (Alerts, Watchlist, Backtest, Journal) have `aria-label` + `aria-pressed`
+- ConfluenceBar has `aria-expanded` and descriptive `aria-label` with score/bias/level
+- Touch targets: 44px minimum on `pointer: coarse` devices via `.touch-target` class
+
+**Confluence bar visual states:**
+- Strong setups: glow `box-shadow`, brighter border, pulsing traffic light dot (`.confluence-pulse`)
+- Score uses `text-sm tabular-nums` for prominence
+- All visual emphasis respects `prefers-reduced-motion`
 
 **Animation system:**
 - **RightPanel:** Persistent wrapper with CSS `transition-[transform,width,min-width]`.
@@ -137,7 +161,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Sidebar indicator toggles (all indicators): `src/components/ui/IndicatorToggle.jsx`
 
 ### Synthesis Layer
-- Confluence bar: `src/components/ui/ConfluenceBar.jsx` — setup quality readout
+- Confluence bar: `src/components/ui/ConfluenceBar.jsx` — setup quality readout (glow + pulse on strong setups)
 - MTF status strip: `src/components/ui/MTFStrip.jsx` — multi-timeframe EMA alignment
 - MTF signals hook: `src/hooks/useMTFSignals.js` — fetches bars across 5m/15m/1h/4h/1D
 
@@ -203,7 +227,11 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Icons: `public/icons/icon-192.png`, `public/icons/icon-512.png`
 
 ### Constants
-- Chart constants (EMA colors, timeframes): `src/constants/chart.js`
+- Chart constants (all indicator/chart colors + timeframes): `src/constants/chart.js`
+  - EMA colors, VWAP colors, level colors, volume colors, chart bg/grid
+  - Candle colors per theme (`CANDLE_COLORS`), RSI colors, MACD colors, S/R colors
+  - Bollinger colors, confluence/signal colors, alert sound config
+  - Timeframe config (lookback, page size, max bars), symbol suggestions
 - Shared validation patterns (SYMBOL_RE): `src/constants/patterns.js`
 - Default preset definitions: `src/constants/presets.js`
 - Accent color presets (per-theme): `src/constants/accents.js`

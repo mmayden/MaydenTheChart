@@ -26,6 +26,7 @@ export function ConfluenceBar({ confluence }) {
   const { score, bias, level, reasons, warnings } = confluence
   const color = LEVEL_COLORS[level] ?? LEVEL_COLORS.none
   const biasLabel = BIAS_LABELS[bias] ?? 'Neutral'
+  const isStrong = level === 'strong'
 
   return (
     <div className="relative">
@@ -34,22 +35,23 @@ export function ConfluenceBar({ confluence }) {
         onClick={() => setExpanded((e) => !e)}
         aria-expanded={expanded}
         aria-label={`Confluence: ${score} out of 100, ${biasLabel}, ${level}`}
-        className="flex items-center gap-2 px-3 py-1 rounded text-xs font-mono font-bold tracking-wide transition-colors hover:bg-theme-hover"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-mono font-bold tracking-wide transition-all hover:bg-theme-hover"
         style={{
-          backgroundColor: `${color}12`,
-          border: `1px solid ${color}33`,
+          backgroundColor: `${color}${isStrong ? '18' : '12'}`,
+          border: `1px solid ${color}${isStrong ? '55' : '33'}`,
           color,
+          boxShadow: isStrong ? `0 0 12px ${color}30, 0 0 4px ${color}20` : 'none',
         }}
         title="Click to expand confluence breakdown"
       >
-        {/* Traffic light dot */}
+        {/* Traffic light dot — pulses on strong */}
         <span
-          className="w-2 h-2 rounded-full shrink-0"
+          className={`w-2.5 h-2.5 rounded-full shrink-0${isStrong ? ' confluence-pulse' : ''}`}
           style={{ backgroundColor: color }}
         />
 
-        {/* Score + label */}
-        <span>{score}</span>
+        {/* Score — prominent */}
+        <span className="text-sm tabular-nums">{score}</span>
         <span className="text-theme-muted font-normal">
           {biasLabel} · {level}
         </span>

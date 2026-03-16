@@ -187,6 +187,9 @@ export function CommandPalette() {
 
           {/* Palette */}
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Command palette"
             onClick={(e) => e.stopPropagation()}
             className="relative w-full max-w-lg rounded-xl border border-theme-mid shadow-2xl overflow-hidden"
             style={{ backgroundColor: 'var(--bg-base)' }}

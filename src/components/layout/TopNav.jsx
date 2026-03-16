@@ -99,6 +99,8 @@ export function TopNav() {
         {/* Alerts bell (with badge) — first position */}
         <button
           onClick={() => setActivePanel('alerts')}
+          aria-label={`Toggle Alerts panel${activeCount > 0 ? ` (${activeCount} active)` : ''}`}
+          aria-pressed={activePanel === 'alerts'}
           className="nav-btn-alerts relative flex items-center justify-center w-8 h-8 rounded transition-colors touch-target hover:bg-theme-hover"
           style={{
             color: 'var(--alert-color)',
@@ -122,6 +124,8 @@ export function TopNav() {
           <button
             key={id}
             onClick={() => setActivePanel(id)}
+            aria-label={`Toggle ${title} panel`}
+            aria-pressed={activePanel === id}
             className={`nav-btn-${id} flex items-center justify-center w-8 h-8 rounded transition-colors touch-target hover:bg-theme-hover`}
             style={{
               color: `var(--${id}-color)`,

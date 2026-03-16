@@ -27,16 +27,12 @@ import {
   CROSSHAIR_COLOR,
   VOLUME_UP_COLOR,
   VOLUME_DOWN_COLOR,
+  CANDLE_COLORS,
 } from '../../constants/chart'
 
 // RVOL highlight colors — amber for ≥1.5x, hot red for ≥2x
 const RVOL_AMBER = '#f59e0bcc'  // amber semi-transparent
 const RVOL_HOT   = '#ef4444cc'  // red semi-transparent
-
-const CANDLE_COLORS = {
-  dark:    { up: '#22c55e', down: '#ef4444' },
-  lumpia: { up: '#48B068', down: '#D44020' },
-}
 
 export const CandlestickChart = forwardRef(function CandlestickChart(
   { bars, children, theme = 'dark', dataUpdatedAt, showRvol = false },

@@ -12,10 +12,10 @@
 import { useToast } from '../../store/useToastStore'
 
 const BORDER_COLORS = {
-  info:    '#3b82f6', // blue-500
-  success: '#22c55e', // green-500
-  warning: '#eab308', // yellow-500
-  error:   '#ef4444', // red-500
+  info:    'var(--color-info)',
+  success: 'var(--color-bull)',
+  warning: 'var(--color-warn)',
+  error:   'var(--color-bear)',
 }
 
 export function ToastContainer() {
@@ -55,14 +55,14 @@ export function ToastContainer() {
             key={t.id}
             style={{
               pointerEvents: 'auto',
-              background: 'rgba(23, 23, 23, 0.92)',
+              background: 'color-mix(in srgb, var(--bg-base, #171717) 92%, transparent)',
               borderLeft: `3px solid ${BORDER_COLORS[t.type] ?? BORDER_COLORS.info}`,
               borderRadius: '4px',
               padding: '0.5rem 0.75rem',
               fontFamily: 'monospace',
               fontSize: '11px',
               lineHeight: 1.4,
-              color: '#e5e5e5',
+              color: 'var(--text-primary, #e5e5e5)',
               display: 'flex',
               alignItems: 'flex-start',
               gap: '0.5rem',
@@ -76,7 +76,7 @@ export function ToastContainer() {
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#737373',
+                color: 'var(--text-muted, #737373)',
                 cursor: 'pointer',
                 fontSize: '14px',
                 lineHeight: 1,

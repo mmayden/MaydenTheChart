@@ -75,8 +75,9 @@ export function CrosshairLegend({ chart, bars, theme: _theme = 'dark' }) {
       }
 
       const bullish   = bar.close >= bar.open
-      const closeClr  = bullish ? '#22c55e' : '#ef4444'
-      const dimColor  = '#9ca3af'
+      const styles    = getComputedStyle(document.documentElement)
+      const closeClr  = bullish ? (styles.getPropertyValue('--color-bull').trim() || '#22c55e') : (styles.getPropertyValue('--color-bear').trim() || '#ef4444')
+      const dimColor  = styles.getPropertyValue('--text-muted').trim() || '#9ca3af'
 
       el.style.opacity = '1'
       el.textContent = ''

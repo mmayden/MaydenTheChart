@@ -186,7 +186,7 @@ export function PresetSelector() {
                       <button
                         onClick={() => handleDelete(preset.id)}
                         className="px-2 py-0.5 rounded-l-full text-[9px] font-mono font-semibold transition-colors"
-                        style={{ color: '#f87171' }}
+                        style={{ color: 'var(--color-bear)' }}
                         title="Confirm delete"
                       >
                         Delete?

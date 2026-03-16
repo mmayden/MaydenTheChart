@@ -9,6 +9,7 @@
 import { useEffect, useRef } from 'react'
 import { createChart, LineSeries } from 'lightweight-charts'
 import { rsi as calcRsi } from '../../utils/indicators'
+import { RSI_LINE_COLOR, RSI_OB_COLOR, RSI_MID_COLOR, RSI_OS_COLOR } from '../../constants/chart'
 import { MINI_CHART_OPTS } from './miniChartConfig'
 
 export function RSIMiniChart({ bars, mainChart }) {
@@ -25,13 +26,13 @@ export function RSIMiniChart({ bars, mainChart }) {
     })
 
     const line = chart.addSeries(LineSeries, {
-      color: '#a78bfa', lineWidth: 1.5,
+      color: RSI_LINE_COLOR, lineWidth: 1.5,
       priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: true,
       autoscaleInfoProvider: () => ({ priceRange: { minValue: 0, maxValue: 100 }, margins: { above: 5, below: 5 } }),
     })
-    const r70 = chart.addSeries(LineSeries, { color: '#ef4444', lineWidth: 1, lineStyle: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false })
-    const r50 = chart.addSeries(LineSeries, { color: '#374151', lineWidth: 1, lineStyle: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false })
-    const r30 = chart.addSeries(LineSeries, { color: '#22c55e', lineWidth: 1, lineStyle: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false })
+    const r70 = chart.addSeries(LineSeries, { color: RSI_OB_COLOR, lineWidth: 1, lineStyle: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false })
+    const r50 = chart.addSeries(LineSeries, { color: RSI_MID_COLOR, lineWidth: 1, lineStyle: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false })
+    const r30 = chart.addSeries(LineSeries, { color: RSI_OS_COLOR, lineWidth: 1, lineStyle: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false })
 
     chartRef.current  = chart
     seriesRef.current = { line, r70, r50, r30 }

@@ -43,6 +43,31 @@ export const ATR_PERIOD        = 14
 export const RVOL_PERIOD       = 20
 export const RVOL_THRESHOLD    = 1.5
 
+// ─── Candle colors per theme (lightweight-charts needs hex, not CSS vars) ────
+export const CANDLE_COLORS = {
+  dark:     { up: '#22c55e', down: '#ef4444' },
+  terminal: { up: '#22c55e', down: '#ef4444' },
+  lumpia:   { up: '#48B068', down: '#D44020' },
+}
+
+// ─── RSI mini chart colors ───────────────────────────────────────────────────
+export const RSI_LINE_COLOR = '#a78bfa'   // purple
+export const RSI_OB_COLOR   = '#ef4444'   // overbought (70)
+export const RSI_MID_COLOR  = '#374151'   // midline (50)
+export const RSI_OS_COLOR   = '#22c55e'   // oversold (30)
+
+// ─── MACD mini chart colors ──────────────────────────────────────────────────
+export const MACD_LINE_COLOR   = '#3b82f6'   // blue — MACD line
+export const MACD_SIGNAL_COLOR = '#f97316'   // orange — signal line
+export const MACD_HIST_UP      = '#22c55e'   // histogram positive
+export const MACD_HIST_DOWN    = '#ef4444'   // histogram negative
+
+// ─── S/R overlay colors (RGB tuples for rgba() with variable opacity) ────────
+export const SR_RESISTANCE_RGB = [239, 68, 68]   // red
+export const SR_SUPPORT_RGB    = [34, 197, 94]    // green
+export const SR_SWING_HIGH     = '#ef4444'
+export const SR_SWING_LOW      = '#22c55e'
+
 // ─── Bollinger Bands ─────────────────────────────────────────────────────────
 export const BOLLINGER_PERIOD       = 20
 export const BOLLINGER_MULTIPLIER   = 2

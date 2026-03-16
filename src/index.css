@@ -446,6 +446,29 @@ body,
   transform: rotate(60deg);
 }
 
+/* ── Focus-visible outlines (keyboard accessibility) ─────────────────── */
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring, #3b82f6);
+  outline-offset: 2px;
+}
+
+/* Suppress outline on mouse-click for elements that handle their own focus style */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Confluence bar pulse (strong setups only) ───────────────────────── */
+
+.confluence-pulse {
+  animation: conf-pulse 2s ease-in-out infinite;
+}
+
+@keyframes conf-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 currentColor; }
+  50%      { opacity: 0.7; box-shadow: 0 0 0 4px transparent; }
+}
+
 /* ── Reduced motion — respect user accessibility preference ────────────── */
 
 @media (prefers-reduced-motion: reduce) {
@@ -485,6 +508,11 @@ body,
   /* Disable skeleton shimmer */
   .skeleton-shimmer,
   .chart-skeleton-bar {
+    animation: none;
+  }
+
+  /* Disable confluence pulse */
+  .confluence-pulse {
     animation: none;
   }
 }

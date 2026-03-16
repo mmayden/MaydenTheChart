@@ -20,13 +20,13 @@ function alertLabel(alert) {
 }
 
 function alertDotColor(alert) {
-  if (alert.triggered) return '#4b5563'
+  if (alert.triggered) return 'var(--color-neutral)'
   if (alert.type === 'candle-streak') {
-    if (alert.direction === 'green')  return '#22c55e'
-    if (alert.direction === 'red')    return '#ef4444'
-    return '#eab308'
+    if (alert.direction === 'green')  return 'var(--color-bull)'
+    if (alert.direction === 'red')    return 'var(--color-bear)'
+    return 'var(--color-warn)'
   }
-  return alert.condition === 'above' ? '#22c55e' : '#ef4444'
+  return alert.condition === 'above' ? 'var(--color-bull)' : 'var(--color-bear)'
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -151,7 +151,7 @@ export function AlertsPanel() {
               <div className="flex items-center gap-1.5 text-xs text-theme-muted">
                 <span
                   className="w-1.5 h-1.5 rounded-full shrink-0"
-                  style={{ backgroundColor: currentStreak.direction === 'green' ? '#22c55e' : '#ef4444' }}
+                  style={{ backgroundColor: currentStreak.direction === 'green' ? 'var(--color-bull)' : 'var(--color-bear)' }}
                 />
                 Current streak:&nbsp;
                 <span className="text-theme font-mono">{currentStreak.count} {currentStreak.direction}</span>
