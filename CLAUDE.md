@@ -163,10 +163,14 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 
 **Chart visual tuning (Webull-inspired):**
 - Grid: dotted style (`LineStyle.Dotted`), subtle color (`#141a23`) — data pops, grid fades
+- Crosshair: magnet mode (`CrosshairMode.Magnet`) — snaps to nearest OHLC value for precision
 - Crosshair: dashed (`LineStyle.Dashed`), label bg `#1f2937`
 - Axis borders hidden (`borderVisible: false`) on both time and price scales
 - `barSpacing: 8`, `minBarSpacing: 2`, `rightOffset: 5` — proportional bars at every zoom level
 - `shiftVisibleRangeOnNewBar: true` — live bars scroll smoothly into view
+- Kinetic scroll: `kineticScroll: { touch: true, mouse: true }` — momentum/inertia on drag-release
+- Scroll handling: `vertTouchDrag: false` prevents accidental vertical scroll on mobile pan
+- Scale handling: `axisDoubleClickReset: true` — double-click axis to reset zoom
 - Right price scale: `alignLabels: true`, `scaleMargins: { top: 0.05, bottom: 0.05 }`
 - Volume: 55% alpha, `scaleMargins: { top: 0.82 }` — doesn't compete with candles
 - Mini charts (RSI/MACD): 90px tall, vertical grid hidden, horizontal dotted, no axis borders

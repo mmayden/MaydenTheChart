@@ -67,8 +67,24 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
         vertLines:   { color: GRID_COLOR, style: LineStyle.Dotted },
         horzLines:   { color: GRID_COLOR, style: LineStyle.Dotted },
       },
+      handleScroll: {
+        mouseWheel:      true,
+        pressedMouseMove: true,
+        horzTouchDrag:   true,
+        vertTouchDrag:   false,
+      },
+      handleScale: {
+        mouseWheel:            true,
+        pinch:                 true,
+        axisPressedMouseMove:  true,
+        axisDoubleClickReset:  true,
+      },
+      kineticScroll: {
+        touch: true,
+        mouse: true,
+      },
       crosshair: {
-        mode: CrosshairMode.Normal,
+        mode: CrosshairMode.Magnet,
         vertLine: {
           color: CROSSHAIR_COLOR,
           style: LineStyle.Dashed,

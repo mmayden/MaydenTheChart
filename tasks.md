@@ -53,6 +53,13 @@
 
 > Collapsed summaries. See `project.md` session log for full details.
 
+### Phase 14C — Chart Interaction UX (2026-03-17)
+- Kinetic scrolling (`kineticScroll: { touch: true, mouse: true }`) — momentum/inertia on drag-release
+- Magnet crosshair (`CrosshairMode.Magnet`) — snaps to nearest OHLC value instead of floating freely
+- Explicit `handleScroll` config: `vertTouchDrag: false` prevents accidental vertical scroll on mobile
+- Explicit `handleScale` config: `axisDoubleClickReset: true` for quick zoom reset
+- Full `handleScroll`/`handleScale`/`kineticScroll` config blocks for clarity and maintainability
+
 ### Phase 14B — Observability (2026-03-17)
 - Structured logger (`src/utils/logger.js`): level-gated (debug/info/warn/error), dev gets all, prod gets warn+error
 - All client-side `console.*` calls replaced with `log.*` calls — single logging path
