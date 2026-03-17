@@ -44,10 +44,11 @@ export function useBars() {
     // Keep stale data visible while the new timeframe loads — prevents
     // the chart from flashing black during rapid timeframe switches.
     placeholderData: keepPreviousData,
-    // When WebSocket is streaming live bars, skip REST polling entirely.
+    // When WebSocket is streaming live bars, poll less often as a safety net
+    // (WS may subscribe but stall with no bars on low-volume or market close).
     // Otherwise: intraday refetch every 60s, daily/swing every 5 min.
     refetchInterval: wsStatus === 'subscribed'
-      ? false
+      ? 2 * 60 * 1000
       : (config.intraday ? 60 * 1000 : 5 * 60 * 1000),
   })
 }

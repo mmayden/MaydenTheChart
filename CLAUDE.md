@@ -46,6 +46,12 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - Indicators, backtester, confluence — zero provider coupling (pure math)
 - **Infinite scroll:** `useInfiniteHistory` hook fetches older bars on-demand as user
   scrolls left. Per-timeframe `pageSize` and `maxBars` caps in `TIMEFRAME_CONFIG`
+- **Data freshness strategy:** Three-tier refresh system ensures the chart always stays current:
+  1. WebSocket live bars (real-time, market hours only)
+  2. Safety-net REST polling every 2min even when WS is subscribed (guards against WS stalls on low-volume symbols or connection issues)
+  3. Fallback REST polling every 60s (intraday) / 5min (daily) when WS is disconnected
+  - `refetchOnWindowFocus: 'always'` — data refreshes immediately when user returns to the tab
+  - `staleTime: 30s` — prevents redundant refetches from overlapping triggers
 
 ## Security rules
 - All API endpoints must have rate limiting (in-memory per-instance, IP-based, TTL cleanup every 2min, 10K entry cap)
@@ -217,6 +223,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Provider interface: `src/services/dataProvider.js` — `fetchBars()`, `fetchSnapshot()`, `getProviderName()`
 - Alpaca adapter: `src/services/providers/alpaca.js` — normalization, timeframe mapping, WS protocol
 - WebSocket manager: `src/services/websocket.js` — connection lifecycle, reconnect (provider-agnostic shell)
+- Query client config: `src/services/queryClient.js` — staleTime 30s, refetchOnWindowFocus 'always', retry 1
 - Bar normalizer: `src/utils/normalizeBar.js` — Alpaca `{t,o,h,l,c,v}` → `{time,open,high,low,close,volume}`
 
 ### Hooks

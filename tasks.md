@@ -53,6 +53,11 @@
 
 > Collapsed summaries. See `project.md` session log for full details.
 
+### Bugfix: Data Freshness + Confluence Dropdown (2026-03-17)
+- `useBars.js` — safety-net REST polling (2min) even when WS is 'subscribed' (WS can stall on low-volume or market close)
+- `queryClient.js` — `refetchOnWindowFocus: 'always'` so tab-switching triggers immediate data refresh
+- `App.jsx` — removed `overflow-hidden` from chart sub-header that clipped ConfluenceBar dropdown
+
 ### Phase 14C — Chart Interaction UX (2026-03-17)
 - Kinetic scrolling (`kineticScroll: { touch: true, mouse: true }`) — momentum/inertia on drag-release
 - Magnet crosshair (`CrosshairMode.Magnet`) — snaps to nearest OHLC value instead of floating freely
