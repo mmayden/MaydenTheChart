@@ -1,6 +1,6 @@
 # Security Standards — Cheechart
 
-> Current as of Code Quality Audit (2026-03-16). Security is non-negotiable.
+> Current as of Phase 13A (2026-03-17). Security is non-negotiable.
 
 ---
 
@@ -98,6 +98,11 @@ All data loaded from localStorage is validated against schemas before use:
 
 Implemented in `src/utils/validate.js` (29 unit tests).
 Wired into `usePresetsStore`, `useJournalStore`, `WatchlistPanel`, `SymbolInput`.
+
+### localStorage Key Convention
+All keys use the `cheechart-` prefix: `cheechart-theme`, `cheechart-accent`,
+`cheechart-symbol`, `cheechart-sound-alerts`, `cheechart-welcome-dismissed`.
+Legacy `lumpia-*` keys are read on startup for migration, then cleaned up on write.
 
 ### ErrorBoundary
 `src/components/ui/ErrorBoundary.jsx` wraps the entire app:

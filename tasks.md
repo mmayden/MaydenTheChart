@@ -5,17 +5,6 @@
 
 ---
 
-## 🔲 Phase 13A — Traction Readiness (Shareability)
-
-> Make the tool shareable and give a good first impression. See `growth.md` for strategy context.
-
-- 🔲 Enhanced chart snapshots — include confluence score + day type in watermark overlay (`NVDA 5m · Confluence 8.5 Bull · cheechart.space`)
-- 🔲 First-visit welcome banner — dismissible, one-time: "Free charting — unlimited indicators, no signup, no ads." localStorage gate.
-- 🔲 Ko-fi donate link — small heart icon in StatusBar, links to Ko-fi page
-- 🔲 OG image — replace app icon with actual chart screenshot for social link previews
-
----
-
 ## 🔲 Phase 13C — Discoverability
 
 > After the Reddit/HN launch post — make it findable.
@@ -63,6 +52,13 @@
 ## ✅ Completed Phases — Archive
 
 > Collapsed summaries. See `project.md` session log for full details.
+
+### Phase 13A — Traction Readiness (2026-03-17)
+- Enhanced chart snapshots: watermark includes confluence score + day type (`NVDA 5m · Confluence 85 Bull · Trend Day — Bullish · cheechart.space`)
+- First-visit welcome banner: dismissible, localStorage-gated ("Free charting — unlimited indicators, no signup, no ads")
+- Ko-fi donate link: heart icon in StatusBar with external link
+- OG image: branded 1200x630 PNG with candlestick chart + confluence badge, `summary_large_image` Twitter card
+- Codebase cleanup: removed 3 dead shim files, standardized localStorage keys to `cheechart-*` prefix with migration
 
 ### Phase 13B — First Impression Polish (2026-03-16)
 - 9 hardcoded color violations fixed (AlertsPanel, MACDMiniChart, RSIMiniChart, SROverlay, ErrorBoundary, CandlestickChart, ToastContainer, PresetSelector, IndicatorTabView, CrosshairLegend)

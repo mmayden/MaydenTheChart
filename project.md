@@ -360,7 +360,6 @@ Component state (useState — local only):
 |---|---|
 | `src/services/dataProvider.js` | Provider interface — `fetchBars()`, `fetchSnapshot()`, `getProviderName()` |
 | `src/services/providers/alpaca.js` | Alpaca adapter — bar normalization, timeframe mapping, WS protocol |
-| `src/services/alpaca.js` | Re-export wrapper (backward compat → `dataProvider.js`) |
 | `src/services/queryClient.js` | TanStack Query client config + default options |
 | `src/services/websocket.js` | Provider-agnostic WebSocket manager — connection lifecycle, reconnect with exponential backoff |
 | `src/services/sentry.js` | Sentry error tracking — conditional init via `VITE_SENTRY_DSN` env var |
@@ -371,6 +370,8 @@ Component state (useState — local only):
 | `src/sw.js` | Service worker source — build-time processed by Vite plugin, auto-versioned CACHE_NAME |
 | `public/fonts/boogaloo-regular.woff2` | Self-hosted Boogaloo font (logo) |
 | `public/fonts/inter-800.woff2` | Self-hosted Inter 800 font (symbol display) |
+| `public/og-image.png` | Branded 1200x630 OG image for social link previews |
+| `scripts/generate-og-image.js` | OG image generator (SVG → PNG via sharp devDep) |
 
 ### Stores (Zustand)
 | File | Purpose |
@@ -394,6 +395,7 @@ Component state (useState — local only):
 | `src/hooks/useSwipeGesture.js` | Horizontal swipe detection for sidebar open/close on touch devices |
 | `src/hooks/useURLState.js` | Bidirectional URL state sync (?s=QQQ&tf=5m&p=full&panel=backtest) |
 | `src/hooks/useMTFSignals.js` | Multi-timeframe EMA signals — parallel TanStack Query fetches across 5m/15m/1h/4h/1D |
+| `src/hooks/useWatchlistQuotes.js` | TanStack Query hook for watchlist live prices (Alpaca snapshots, 30s auto-refresh) |
 
 ### Indicator Math (pure functions)
 | File | Purpose |
@@ -406,7 +408,7 @@ Component state (useState — local only):
 | `src/utils/timezone.js` | Shared ET timezone utilities (toETDateString, toETTime) |
 | `src/utils/normalizeBar.js` | Shared Alpaca bar → lightweight-charts bar normalizer |
 | `src/utils/validate.js` | localStorage schema validation (presets, journal, watchlist, symbol usage) |
-| `src/utils/snapshot.js` | Chart screenshot capture, watermark, clipboard/download export |
+| `src/utils/snapshot.js` | Chart screenshot capture, confluence/day-type watermark, clipboard/download export |
 
 ### App Shell
 | File | Purpose |
@@ -462,7 +464,8 @@ Component state (useState — local only):
 | `src/components/ui/SettingsModal.jsx` | Themes + keyboard shortcuts + sound alerts toggle |
 | `src/components/ui/CrosshairLegend.jsx` | OHLCV data overlay on crosshair hover (ref-based, no re-renders) |
 | `src/components/ui/ToastContainer.jsx` | Fixed bottom-right toast notification renderer |
-| `src/components/ui/StatusBar.jsx` | WebSocket/Polling status + last updated time + session stats |
+| `src/components/ui/StatusBar.jsx` | WebSocket/Polling status + last updated time + session stats + Ko-fi donate link |
+| `src/components/ui/WelcomeBanner.jsx` | First-visit dismissible welcome banner (localStorage-gated) |
 | `src/components/ui/ErrorBoundary.jsx` | React error boundary with fallback UI |
 | `src/components/ui/Logo.jsx` | Boogaloo font logo with BETA badge |
 | `src/components/ui/OnboardingTour.jsx` | 4-step tooltip tour (Day Type → ATR → Presets → Cmd+K), auto on first visit + manual restart via Help menu |
@@ -475,13 +478,14 @@ Component state (useState — local only):
 | `indicators.md` | Indicator math reference and code contracts |
 | `brainstorming.md` | Competitive intelligence research + vision document |
 | `security.md` | Security standards, threat model, API endpoint protections |
+| `growth.md` | Growth & traction strategy (gitignored — local only) |
 | `audit.md` | Health audit reusable template |
 
 ---
 
 ## Current Status
 
-**298/298 tests passing, build clean, ESLint 0 errors, 0 vulnerabilities. Main bundle 314KB + 161KB lightweight-charts + 92KB motion + 69KB vendor-api (7 lazy chunks). Stack: React 19 + Vite 8 + Zustand 5 + Tailwind 4. Phase 13B (first impression polish) complete — accessibility + confluence emphasis shipped.**
+**298/298 tests passing, build clean, ESLint 0 errors, 0 vulnerabilities. Main bundle 317KB + 161KB lightweight-charts + 92KB motion + 69KB vendor-api (7 lazy chunks). Stack: React 19 + Vite 8 + Zustand 5 + Tailwind 4. Phase 13A (traction readiness) complete — snapshot watermarks, welcome banner, Ko-fi link, branded OG image, codebase cleanup (dead shims removed, localStorage keys standardized to cheechart-*).**
 
 ### Completed
 - [x] Phases 1–4: Core chart, indicators, levels, S/R detection, ATR gauge, day type
@@ -509,9 +513,9 @@ Component state (useState — local only):
 - [x] Phase 12E: Infinite scroll — useInfiniteHistory hook, scroll-back fetch with viewport save/restore, per-timeframe pageSize/maxBars caps, loading indicator
 - [x] Process hardening — husky + lint-staged pre-commit hooks, GitHub Actions CI, shared SYMBOL_RE, font preload, snapshot.js minimal disclosure
 - [x] Phase 13B: First impression polish — 9 hardcoded color violations fixed, confluence bar visual emphasis (glow/pulse on strong setups), accessibility (focus-visible, aria-modal, aria-label/pressed on panels)
+- [x] Phase 13A: Traction readiness — snapshot watermark with confluence/day-type, welcome banner, Ko-fi link, branded OG image (1200x630), codebase cleanup (dead shims removed, localStorage keys standardized)
 
 ### Upcoming
-- [ ] Phase 13A: Traction readiness — enhanced snapshots with confluence watermark, welcome banner, Ko-fi link, OG image
 - [ ] Phase 13C: Discoverability — robots.txt, sitemap, canonical URL, real PWA icons, meta descriptions
 - [ ] Phase 12F: Future differentiators — screener, trade replay, annotations, gap tracking, cloud sync
 
@@ -565,3 +569,5 @@ Component state (useState — local only):
 | 2026-03-16 | **Process hardening.** Architect-level review of audit findings. Installed `husky` 9 + `lint-staged` 16 for pre-commit ESLint enforcement (`--max-warnings=0`). Created `.github/workflows/ci.yml` — GitHub Actions CI runs lint → test → build on push/PR to `main`. Extracted `SYMBOL_RE` from 5 independent definitions into `src/constants/patterns.js` (single source of truth), updated 4 client-side consumers. Fixed `snapshot.js` minimal-disclosure violation (`Invalid symbol: ${sym}` → `Invalid symbol format`). Added font preload tags for Boogaloo + Inter 800. Added `lint` + `lint:fix` npm scripts. Updated CLAUDE.md (Developer Workflow section, Constants, CI), security.md (Pre-Commit Enforcement, Shared Validation Patterns), tasks.md. 298/298 tests, ESLint 0 errors, build clean. |
 | 2026-03-16 | **Phase 12E complete: Infinite scroll.** `src/hooks/useInfiniteHistory.js` — subscribes to `subscribeVisibleLogicalRangeChange`, triggers fetch when user scrolls within 50 bars of left edge. Debounced 200ms + 500ms cooldown. Fetches older page via `fetchBars()`, deduplicates, prepends to TanStack Query cache. `CandlestickChart.jsx` — detects prepend (bars grew at front, same tail), saves `getVisibleRange()` before `setData()`, restores after to prevent viewport jump. Skips `fitContent()` on prepend. Added `allowShiftVisibleRangeOnWhitespaceReplacement` to timeScale. `TIMEFRAME_CONFIG` — added `pageSize` (bars per scroll-back fetch) and `maxBars` (memory cap) per timeframe. Loading pill at chart left edge during fetch. IndexedDB/Dexie.js deferred. 298/298 tests, build clean, ESLint 0 errors. |
 | 2026-03-16 | **Phase 13B complete: First impression polish.** Fixed 9 hardcoded color violations across AlertsPanel, MACDMiniChart, RSIMiniChart, SROverlay, ErrorBoundary, CandlestickChart, ToastContainer, PresetSelector, IndicatorTabView, CrosshairLegend — all replaced with CSS variable references or chart.js constants. ConfluenceBar visual emphasis: bigger score (text-sm tabular-nums), pulse dot + glow box-shadow on strong setups, thicker border on high-confluence. Accessibility: global `:focus-visible` outline using `--focus-ring` CSS variable, `role="dialog"` + `aria-modal` on CommandPalette and SettingsModal, `aria-label` + `aria-pressed` on all 4 panel toggle buttons. Confluence pulse disabled under `prefers-reduced-motion`. 298/298 tests, build clean, ESLint 0 errors. |
+| 2026-03-17 | **Codebase cleanup.** Removed 3 dead backward-compat re-export files from Phase 12D (`useAlpacaBars.js`, `useAlpacaSocket.js`, `services/alpaca.js`). Removed stale compat aliases from `useBars.js` and `useLiveFeed.js`. Renamed `package.json` name `lumpia` → `cheechart`. Standardized localStorage keys from `lumpia-*` → `cheechart-*` prefix with migration fallback reads. Updated SettingsModal theme display name. |
+| 2026-03-17 | **Phase 13A complete: Traction readiness.** (1) Enhanced chart snapshots — watermark now includes confluence score + bias + day type label (`NVDA 5m · Confluence 85 Bull · Trend Day — Bullish · cheechart.space`), passed via ref to avoid declaration-order lint issues. (2) First-visit welcome banner — `WelcomeBanner.jsx`, dismissible, `cheechart-welcome-dismissed` localStorage gate, renders between TopNav and main content. (3) Ko-fi donate link — heart SVG + "Donate" text in StatusBar, `ml-auto` alignment. (4) OG image — `scripts/generate-og-image.js` generates branded 1200x630 PNG (candlestick chart + EMA line + confluence badge), `sharp` devDep, `index.html` updated to `summary_large_image` Twitter card + `og:image:width/height`. 298/298 tests, build clean. |
