@@ -42,15 +42,15 @@ export function PriceDisplay({ bars, byDay }) {
   const sign   = isUp ? '+' : ''
 
   return (
-    <div className="flex items-baseline gap-3">
-      <span className="text-theme font-mono text-2xl font-bold">
+    <div className="flex items-baseline gap-2.5 min-w-0">
+      <span className="font-mono text-sm font-bold tracking-wide" style={{ color: 'var(--symbol-color)' }}>
+        {symbol}
+      </span>
+      <span className="text-theme font-mono text-lg font-bold tabular-nums">
         {price.toFixed(2)}
       </span>
-      <span className={`font-mono text-sm ${color}`}>
+      <span className={`font-mono text-xs tabular-nums ${color}`}>
         {sign}{change.toFixed(2)} ({sign}{changePct.toFixed(2)}%)
-      </span>
-      <span className="text-accent font-mono text-xs uppercase tracking-wider">
-        {symbol}
       </span>
     </div>
   )

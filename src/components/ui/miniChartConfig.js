@@ -2,24 +2,25 @@
  * Shared configuration for RSI and MACD mini chart instances.
  */
 
-import { CHART_BG_COLOR, GRID_COLOR, CROSSHAIR_COLOR } from '../../constants/chart'
+import { CHART_BG_COLOR, CROSSHAIR_COLOR } from '../../constants/chart'
 
 export const MINI_CHART_OPTS = {
   layout: {
     background: { color: CHART_BG_COLOR },
-    textColor:  CROSSHAIR_COLOR,
+    textColor:  '#6b7280',
     fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+    fontSize:   10,
   },
   grid: {
-    vertLines: { color: '#111827' },
-    horzLines: { color: '#111827' },
+    vertLines: { visible: false },
+    horzLines: { color: '#111827', style: 1 },  // dotted
   },
   crosshair: {
-    vertLine: { color: CROSSHAIR_COLOR, labelBackgroundColor: GRID_COLOR },
-    horzLine: { color: CROSSHAIR_COLOR, labelBackgroundColor: GRID_COLOR },
+    vertLine: { color: CROSSHAIR_COLOR, labelBackgroundColor: '#1f2937' },
+    horzLine: { color: CROSSHAIR_COLOR, labelBackgroundColor: '#1f2937' },
   },
-  rightPriceScale: { borderColor: GRID_COLOR, minimumWidth: 60 },
-  timeScale:       { borderColor: GRID_COLOR, timeVisible: true, secondsVisible: false, visible: false },
+  rightPriceScale: { borderColor: 'transparent', borderVisible: false, minimumWidth: 55 },
+  timeScale:       { borderColor: 'transparent', borderVisible: false, timeVisible: true, secondsVisible: false, visible: false },
   handleScroll:    false,
   handleScale:     false,
 }

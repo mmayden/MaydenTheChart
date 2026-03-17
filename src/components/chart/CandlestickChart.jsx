@@ -17,7 +17,7 @@
  */
 
 import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
-import { createChart, CandlestickSeries, HistogramSeries } from 'lightweight-charts'
+import { createChart, CandlestickSeries, HistogramSeries, CrosshairMode, LineStyle } from 'lightweight-charts'
 import { useViewportPersistence } from '../../hooks/useViewportPersistence'
 import { useChartStore } from '../../store/useChartStore'
 import { relativeVolume } from '../../utils/indicators'
@@ -59,24 +59,45 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
       autoSize: true,
       layout: {
         background: { color: CHART_BG_COLOR },
-        textColor:  '#d1d5db',
+        textColor:  '#9ca3af',
         fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+        fontSize:   11,
       },
       grid: {
-        vertLines:   { color: GRID_COLOR },
-        horzLines:   { color: GRID_COLOR },
+        vertLines:   { color: GRID_COLOR, style: LineStyle.Dotted },
+        horzLines:   { color: GRID_COLOR, style: LineStyle.Dotted },
       },
       crosshair: {
-        vertLine: { color: CROSSHAIR_COLOR, labelBackgroundColor: GRID_COLOR },
-        horzLine: { color: CROSSHAIR_COLOR, labelBackgroundColor: GRID_COLOR },
+        mode: CrosshairMode.Normal,
+        vertLine: {
+          color: CROSSHAIR_COLOR,
+          style: LineStyle.Dashed,
+          width: 1,
+          labelBackgroundColor: '#1f2937',
+        },
+        horzLine: {
+          color: CROSSHAIR_COLOR,
+          style: LineStyle.Dashed,
+          width: 1,
+          labelBackgroundColor: '#1f2937',
+        },
       },
       rightPriceScale: {
-        borderColor: GRID_COLOR,
+        borderColor:    'transparent',
+        borderVisible:  false,
+        scaleMargins:   { top: 0.05, bottom: 0.05 },
+        alignLabels:    true,
+        entireTextOnly: true,
       },
       timeScale: {
-        borderColor:    GRID_COLOR,
+        borderColor:    'transparent',
+        borderVisible:  false,
         timeVisible:    true,
         secondsVisible: false,
+        barSpacing:     8,
+        minBarSpacing:  2,
+        rightOffset:    5,
+        shiftVisibleRangeOnNewBar: true,
         allowShiftVisibleRangeOnWhitespaceReplacement: true,
         // Axis tick marks in ET — TickMarkType: 0=Year 1=Month 2=Day 3=Time
         tickMarkFormatter: (unixSecs, tickMarkType) => {
@@ -123,7 +144,7 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
     })
 
     chart.priceScale('volume').applyOptions({
-      scaleMargins: { top: 0.85, bottom: 0 },
+      scaleMargins: { top: 0.82, bottom: 0 },
     })
 
     chartRef.current  = chart
@@ -253,8 +274,8 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
   return (
     <div className="relative w-full h-full">
       <div ref={containerRef} className="w-full h-full" />
-      {/* Volume section label — sits above the volume bars (bottom ~15% of chart) */}
-      <div className="absolute left-2 bottom-[17%] text-[10px] text-gray-500 font-mono pointer-events-none select-none">
+      {/* Volume section label — sits above the volume bars (bottom ~18% of chart) */}
+      <div className="absolute left-2 bottom-[19%] text-[9px] font-mono pointer-events-none select-none" style={{ color: 'var(--text-muted)', opacity: 0.5 }}>
         VOL
       </div>
       {children}

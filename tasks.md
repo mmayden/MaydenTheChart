@@ -53,6 +53,15 @@
 
 > Collapsed summaries. See `project.md` session log for full details.
 
+### Phase 14A — Chart Visual Overhaul (2026-03-17)
+- Webull-inspired chart refinements: bar spacing (`barSpacing: 8`, `minBarSpacing: 2`), `rightOffset: 5` breathing room
+- Dotted grid lines, dashed crosshair (Webull-style), removed axis borders for cleaner edges
+- Price scale: `alignLabels`, 5% margins, subdued text color
+- Volume bars more transparent (55% opacity), mini charts taller (90px from 82px)
+- Mini chart grid: vertical lines hidden, horizontal dotted, no axis borders
+- Sub-header: tighter layout, symbol-first price display with `tabular-nums`
+- CrosshairLegend: smaller font, tighter positioning, higher contrast background
+
 ### Phase 13A — Traction Readiness (2026-03-17)
 - Enhanced chart snapshots: watermark includes confluence score + day type (`NVDA 5m · Confluence 85 Bull · Trend Day — Bullish · cheechart.space`)
 - First-visit welcome banner: dismissible, localStorage-gated ("Free charting — unlimited indicators, no signup, no ads")

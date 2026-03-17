@@ -129,18 +129,19 @@ export function CrosshairLegend({ chart, bars, theme: _theme = 'dark' }) {
       className="crosshair-legend"
       style={{
         position:        'absolute',
-        top:             8,
-        left:            8,
+        top:             6,
+        left:            6,
         zIndex:          10,
         pointerEvents:   'none',
         opacity:         0,
         fontFamily:      'ui-monospace, "Cascadia Code", "Fira Code", Menlo, monospace',
-        fontSize:        11,
+        fontSize:        10,
         lineHeight:      1,
+        letterSpacing:   '0.02em',
         color:           'var(--text-primary, #d1d5db)',
-        backgroundColor: 'rgba(10, 10, 10, 0.75)',
+        backgroundColor: 'rgba(10, 10, 10, 0.85)',
         padding:         '4px 8px',
-        borderRadius:    4,
+        borderRadius:    3,
         whiteSpace:      'nowrap',
       }}
     />

@@ -228,7 +228,7 @@ export default function App() {
         <div className="flex flex-col flex-1 min-w-0">
 
           {/* Chart sub-header: price + day type */}
-          <div className="flex items-center gap-2 sm:gap-4 px-2 sm:px-4 py-2 border-b border-theme shrink-0 overflow-hidden min-w-0">
+          <div className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 border-b border-theme shrink-0 overflow-hidden min-w-0">
             {bars && <PriceDisplay bars={bars} byDay={byDay} />}
             <ConfluenceBar confluence={confluence} />
             <div className="hidden sm:block">
@@ -309,7 +309,7 @@ export default function App() {
           <IndicatorTabView bars={bars} mainChart={chart} />
 
           {/* Status bar */}
-          <div className="flex items-center px-4 py-1.5 border-t border-theme shrink-0">
+          <div className="flex items-center px-3 py-1 border-t border-theme shrink-0">
             <StatusBar lastUpdated={dataUpdatedAt} />
           </div>
 

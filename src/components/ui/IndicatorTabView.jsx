@@ -19,15 +19,15 @@ export function IndicatorTabView({ bars, mainChart }) {
   if (!bars?.length || (!rsiEnabled && !macdEnabled)) return null
 
   return (
-    <div className="shrink-0 border-t border-theme overflow-hidden">
+    <div className="shrink-0 overflow-hidden" style={{ borderTop: '1px solid var(--border)' }}>
       {rsiEnabled && (
-        <div className="w-full overflow-hidden relative" style={{ backgroundColor: 'var(--bg-base)', height: 82 }}>
+        <div className="w-full overflow-hidden relative" style={{ backgroundColor: 'var(--bg-base)', height: 90 }}>
           <span className="mini-chart-label" style={{ color: RSI_LINE_COLOR }}>RSI</span>
           <RSIMiniChart bars={bars} mainChart={mainChart} />
         </div>
       )}
       {macdEnabled && (
-        <div className="w-full overflow-hidden relative" style={{ backgroundColor: 'var(--bg-base)', height: 82 }}>
+        <div className="w-full overflow-hidden relative" style={{ backgroundColor: 'var(--bg-base)', height: 90 }}>
           <span className="mini-chart-label" style={{ color: MACD_LINE_COLOR }}>MACD</span>
           <MACDMiniChart bars={bars} mainChart={mainChart} />
         </div>

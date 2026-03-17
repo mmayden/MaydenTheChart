@@ -21,13 +21,13 @@ export const ODC_COLOR        = '#f59e0b'  // amber — open of day candle
 export const ORB_COLOR        = '#6366f1'  // indigo — ORB zone
 
 // ─── Volume colors (candle-direction: green up / red down) ───────────────────
-export const VOLUME_UP_COLOR   = '#22c55e80'   // green semi-transparent — close >= open
-export const VOLUME_DOWN_COLOR = '#ef444480'   // red   semi-transparent — close < open
+export const VOLUME_UP_COLOR   = '#22c55e55'   // green semi-transparent — close >= open
+export const VOLUME_DOWN_COLOR = '#ef444455'   // red   semi-transparent — close < open
 
 // ─── Chart background / grid ──────────────────────────────────────────────────
 export const CHART_BG_COLOR   = '#0a0a0a'
-export const GRID_COLOR       = '#1f2937'
-export const CROSSHAIR_COLOR  = '#6b7280'
+export const GRID_COLOR       = '#141a23'       // subtle grid — barely visible
+export const CROSSHAIR_COLOR  = '#4b5563'
 
 // ─── EMA periods ──────────────────────────────────────────────────────────────
 export const EMA_PERIODS = [9, 48, 200]

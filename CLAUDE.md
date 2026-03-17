@@ -139,6 +139,19 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
   visible time range to prevent viewport jump. Per-timeframe `pageSize` and `maxBars` caps in
   `TIMEFRAME_CONFIG`. "Loading..." pill appears at chart left edge during fetch.
 
+**Chart visual tuning (Webull-inspired):**
+- Grid: dotted style (`LineStyle.Dotted`), subtle color (`#141a23`) — data pops, grid fades
+- Crosshair: dashed (`LineStyle.Dashed`), label bg `#1f2937`
+- Axis borders hidden (`borderVisible: false`) on both time and price scales
+- `barSpacing: 8`, `minBarSpacing: 2`, `rightOffset: 5` — proportional bars at every zoom level
+- `shiftVisibleRangeOnNewBar: true` — live bars scroll smoothly into view
+- Right price scale: `alignLabels: true`, `scaleMargins: { top: 0.05, bottom: 0.05 }`
+- Volume: 55% alpha, `scaleMargins: { top: 0.82 }` — doesn't compete with candles
+- Mini charts (RSI/MACD): 90px tall, vertical grid hidden, horizontal dotted, no axis borders
+- Shared mini chart config: `src/components/ui/miniChartConfig.js`
+- Layout font: 11px, text `#9ca3af` for axis labels
+- CrosshairLegend: 10px font, 85% opaque bg, positioned (6,6)
+
 ## Key file locations
 
 ### App Shell
@@ -158,7 +171,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Main chart: `src/components/chart/CandlestickChart.jsx`
 - Symbol input + autocomplete: `src/components/chart/SymbolInput.jsx`
 - Crosshair OHLCV legend: `src/components/ui/CrosshairLegend.jsx`
-- RSI/MACD mini charts: `src/components/ui/IndicatorTabView.jsx` (container + HTML labels) + `RSIMiniChart.jsx` + `MACDMiniChart.jsx`
+- RSI/MACD mini charts: `src/components/ui/IndicatorTabView.jsx` (container + HTML labels) + `RSIMiniChart.jsx` + `MACDMiniChart.jsx` + `miniChartConfig.js` (shared opts)
 - Bollinger Bands overlay: `src/components/indicators/BollingerOverlay.jsx`
 - Sidebar indicator toggles (all indicators): `src/components/ui/IndicatorToggle.jsx`
 

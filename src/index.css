@@ -270,6 +270,11 @@ body,
   display: none !important;
 }
 
+/* Soften price scale label rendering */
+.tv-lightweight-charts table {
+  border-spacing: 0;
+}
+
 /* ── Touch target sizing (WCAG 44px minimum on touch devices) ────────────── */
 
 @media (pointer: coarse) {
