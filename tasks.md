@@ -5,15 +5,15 @@
 
 ---
 
-## 🔲 Phase 13C — Discoverability
+## ✅ Phase 13C — Discoverability (2026-03-17)
 
 > After the Reddit/HN launch post — make it findable.
 
-- 🔲 `public/robots.txt` — allow all crawlers
-- 🔲 `public/sitemap.xml` — single-page sitemap
-- 🔲 Canonical URL meta tag in `index.html`
-- 🔲 Real PWA icons — replace placeholder 1x1 PNGs with branded 192/512 icons
-- 🔲 Meta description targeting "free charting tool" / "TradingView alternative"
+- ✅ `public/robots.txt` — allow all crawlers, sitemap reference
+- ✅ `public/sitemap.xml` — single-page sitemap with daily changefreq
+- ✅ Canonical URL meta tag in `index.html`
+- ✅ Real PWA icons — branded 192/512 PNGs (gold "C" + candlestick chart on dark bg)
+- ✅ Meta description targeting "free charting tool" / "TradingView alternative"
 
 ---
 

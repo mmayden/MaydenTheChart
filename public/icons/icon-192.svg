@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="textGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F5C842"/>
+      <stop offset="55%" stop-color="#E8A020"/>
+      <stop offset="100%" stop-color="#C96B0A"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#111318"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded background -->
+  <rect width="192" height="192" rx="35" fill="url(#bgGrad)"/>
+
+  <!-- Candlestick chart (background decoration) -->
+  
+      <line x1="52.5" y1="83.80000000000001" x2="52.5" y2="118.19999999999999" stroke="#22c55e" stroke-width="1" stroke-opacity="0.6"/>
+      <rect x="44" y="92.4" width="17" height="8.599999999999994" fill="#22c55e" fill-opacity="0.5" rx="1"/>
+    
+      <line x1="73.5" y1="75.19999999999999" x2="73.5" y2="105.30000000000001" stroke="#ef4444" stroke-width="1" stroke-opacity="0.6"/>
+      <rect x="65" y="92.4" width="17" height="12.900000000000006" fill="#ef4444" fill-opacity="0.5" rx="1"/>
+    
+      <line x1="94.5" y1="88.1" x2="94.5" y2="113.9" stroke="#22c55e" stroke-width="1" stroke-opacity="0.6"/>
+      <rect x="86" y="96.69999999999999" width="17" height="8.600000000000023" fill="#22c55e" fill-opacity="0.5" rx="1"/>
+    
+      <line x1="115.5" y1="66.6" x2="115.5" y2="101" stroke="#22c55e" stroke-width="1" stroke-opacity="0.6"/>
+      <rect x="107" y="70.9" width="17" height="25.799999999999983" fill="#22c55e" fill-opacity="0.5" rx="1"/>
+    
+      <line x1="136.5" y1="62.300000000000004" x2="136.5" y2="83.80000000000001" stroke="#22c55e" stroke-width="1" stroke-opacity="0.6"/>
+      <rect x="128" y="66.6" width="17" height="4.300000000000011" fill="#22c55e" fill-opacity="0.5" rx="1"/>
+    
+
+  <!-- "C" monogram in gold gradient -->
+  <text x="96" y="131" text-anchor="middle"
+        font-family="monospace, sans-serif" font-size="100" font-weight="bold"
+        fill="url(#textGrad)" opacity="0.95">C</text>
+
+  <!-- Subtle border -->
+  <rect width="192" height="192" rx="35" fill="none" stroke="#E8A020" stroke-opacity="0.2" stroke-width="1"/>
+</svg>
