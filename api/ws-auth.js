@@ -50,7 +50,15 @@ function isRateLimited(ip) {
   return false
 }
 
+/** Generate a short request ID for log correlation. */
+function requestId() {
+  return Math.random().toString(36).slice(2, 10)
+}
+
 export default async function handler(req, res) {
+  const rid = requestId()
+  res.setHeader('x-request-id', rid)
+
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
   }

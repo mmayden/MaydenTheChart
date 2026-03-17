@@ -9,6 +9,7 @@ import { create } from 'zustand'
 import { DEFAULT_SYMBOL, DEFAULT_TIMEFRAME, TIMEFRAME_CONFIG } from '../constants/chart'
 import { ACCENT_LOOKUP } from '../constants/accents'
 import { SYMBOL_RE } from '../constants/patterns'
+import { log } from '../utils/logger'
 
 // ─── Read URL params at module load (synchronous, before first render) ─────
 // This ensures the store initializes with URL-specified values so queries
@@ -76,9 +77,13 @@ export const useChartStore = create((set) => ({
 
   setSymbol: (symbol) => {
     try { localStorage.setItem('cheechart-symbol', symbol) } catch { /* storage unavailable */ }
+    log.breadcrumb('navigation', 'Symbol changed', { symbol })
     set({ selectedSymbol: symbol })
   },
-  setTimeframe: (timeframe) => set({ selectedTimeframe: timeframe }),
+  setTimeframe: (timeframe) => {
+    log.breadcrumb('navigation', 'Timeframe changed', { timeframe })
+    set({ selectedTimeframe: timeframe })
+  },
 
   // ─── Indicator toggles ─────────────────────────────────────────────────────
   indicators: {

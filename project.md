@@ -362,7 +362,8 @@ Component state (useState — local only):
 | `src/services/providers/alpaca.js` | Alpaca adapter — bar normalization, timeframe mapping, WS protocol |
 | `src/services/queryClient.js` | TanStack Query client config + default options |
 | `src/services/websocket.js` | Provider-agnostic WebSocket manager — connection lifecycle, reconnect with exponential backoff |
-| `src/services/sentry.js` | Sentry error tracking — conditional init via `VITE_SENTRY_DSN` env var |
+| `src/services/sentry.js` | Sentry error tracking + web vitals — conditional init via `VITE_SENTRY_DSN`, `browserTracingIntegration`, `reportWebVitals()` |
+| `src/utils/logger.js` | Structured logger — level-gated (debug/info/warn/error), `[tag]` prefixes, auto Sentry forwarding via `captureException` |
 | `api/bars.js` | Vercel serverless proxy — provider-routed (currently Alpaca, keys server-only, pagination) |
 | `api/ws-auth.js` | Vercel serverless function — returns WS credentials, protected by bearer token |
 | `api/snapshot.js` | Vercel serverless proxy — provider-routed snapshots for watchlist live prices |
@@ -413,7 +414,7 @@ Component state (useState — local only):
 ### App Shell
 | File | Purpose |
 |---|---|
-| `src/main.jsx` | App entry: ErrorBoundary, QueryClientProvider, Sentry init, SW registration |
+| `src/main.jsx` | App entry: ErrorBoundary, QueryClientProvider, Sentry init, web vitals reporting, SW registration |
 | `src/App.jsx` | Single-page shell: TopNav + Sidebar + Chart + Right Panel + overlays |
 | `src/constants/chart.js` | All colors, periods, timeframe configs, symbol suggestions |
 | `src/constants/presets.js` | Default preset definitions (Clean, Full, Scalp, Swing) |
@@ -485,7 +486,7 @@ Component state (useState — local only):
 
 ## Current Status
 
-**298/298 tests passing, build clean, ESLint 0 errors, 0 vulnerabilities. Main bundle 317KB + 161KB lightweight-charts + 92KB motion + 69KB vendor-api (7 lazy chunks). Stack: React 19 + Vite 8 + Zustand 5 + Tailwind 4. Phase 13A (traction readiness) complete — snapshot watermarks, welcome banner, Ko-fi link, branded OG image, codebase cleanup (dead shims removed, localStorage keys standardized to cheechart-*).**
+**298/298 tests passing, build clean, ESLint 0 errors, 0 vulnerabilities. Main bundle 319KB + 161KB lightweight-charts + 92KB motion + 69KB vendor-api (8 lazy chunks incl. web-vitals 5.6KB). Stack: React 19 + Vite 8 + Zustand 5 + Tailwind 4. Phase 14B (observability) complete — structured logger, Sentry enhanced (explicit captures, breadcrumbs, web vitals, browserTracing), API request IDs, data fetch error toasts.**
 
 ### Completed
 - [x] Phases 1–4: Core chart, indicators, levels, S/R detection, ATR gauge, day type
@@ -514,6 +515,8 @@ Component state (useState — local only):
 - [x] Process hardening — husky + lint-staged pre-commit hooks, GitHub Actions CI, shared SYMBOL_RE, font preload, snapshot.js minimal disclosure
 - [x] Phase 13B: First impression polish — 9 hardcoded color violations fixed, confluence bar visual emphasis (glow/pulse on strong setups), accessibility (focus-visible, aria-modal, aria-label/pressed on panels)
 - [x] Phase 13A: Traction readiness — snapshot watermark with confluence/day-type, welcome banner, Ko-fi link, branded OG image (1200x630), codebase cleanup (dead shims removed, localStorage keys standardized)
+- [x] Phase 14A: Chart visual overhaul — Webull-inspired refinements (dotted grid, dashed crosshair, bar spacing, axis cleanup, volume alpha, mini chart tuning)
+- [x] Phase 14B: Observability — structured logger, Sentry enhanced (captureException, breadcrumbs, browserTracing, web vitals), API request IDs, data fetch error toasts
 
 ### Upcoming
 - [ ] Phase 13C: Discoverability — robots.txt, sitemap, canonical URL, real PWA icons, meta descriptions
@@ -572,3 +575,4 @@ Component state (useState — local only):
 | 2026-03-17 | **Codebase cleanup.** Removed 3 dead backward-compat re-export files from Phase 12D (`useAlpacaBars.js`, `useAlpacaSocket.js`, `services/alpaca.js`). Removed stale compat aliases from `useBars.js` and `useLiveFeed.js`. Renamed `package.json` name `lumpia` → `cheechart`. Standardized localStorage keys from `lumpia-*` → `cheechart-*` prefix with migration fallback reads. Updated SettingsModal theme display name. |
 | 2026-03-17 | **Phase 14A complete: Chart visual overhaul (Webull-inspired).** Refined chart config for better zoom/bar appearance: `barSpacing: 8`, `minBarSpacing: 2`, `rightOffset: 5`, `shiftVisibleRangeOnNewBar: true`. Grid lines changed to dotted (`LineStyle.Dotted`) with subtler color (`#141a23`). Crosshair upgraded to dashed style with refined label backgrounds. Both axis borders removed (`borderVisible: false`). Right price scale: `alignLabels: true`, 5% top/bottom margins, subdued text (`#9ca3af`, fontSize 11). Volume bars more transparent (`55` alpha from `80`), volume scale adjusted to 82% top margin. Mini charts (RSI/MACD) taller (90px from 82px), vertical grid hidden, horizontal dotted, axis borders removed, font 10px. Sub-header tightened (`py-1.5`, `gap-3`). PriceDisplay reorganized: symbol first (bold, `--symbol-color`), then price (lg), then change (xs, `tabular-nums`). CrosshairLegend: 10px font, 6px positioning, 85% bg opacity. Status bar padding reduced. 298/298 tests, build clean, ESLint 0 errors. |
 | 2026-03-17 | **Phase 13A complete: Traction readiness.** (1) Enhanced chart snapshots — watermark now includes confluence score + bias + day type label (`NVDA 5m · Confluence 85 Bull · Trend Day — Bullish · cheechart.space`), passed via ref to avoid declaration-order lint issues. (2) First-visit welcome banner — `WelcomeBanner.jsx`, dismissible, `cheechart-welcome-dismissed` localStorage gate, renders between TopNav and main content. (3) Ko-fi donate link — heart SVG + "Donate" text in StatusBar, `ml-auto` alignment. (4) OG image — `scripts/generate-og-image.js` generates branded 1200x630 PNG (candlestick chart + EMA line + confluence badge), `sharp` devDep, `index.html` updated to `summary_large_image` Twitter card + `og:image:width/height`. 298/298 tests, build clean. |
+| 2026-03-17 | **Phase 14B complete: Observability.** Created `src/utils/logger.js` — structured logger with level gating (debug/info dev-only, warn/error always), `[tag]` prefixes, auto Sentry forwarding via `captureException`. Replaced all scattered `console.*` calls in `src/` (websocket.js 6 callsites, alpaca.js, useInfiniteHistory.js, SROverlay.jsx, ErrorBoundary.jsx) with `log.*` calls. Enhanced Sentry: `browserTracingIntegration` for performance monitoring, `reportWebVitals()` for LCP/CLS/INP/FID/TTFB via `web-vitals` library (lazy-loaded 5.6KB chunk). ErrorBoundary now calls `captureException` explicitly + adds component stack as breadcrumb. Added `log.breadcrumb()` for user action tracking (symbol/timeframe changes in useChartStore). API request IDs: all 3 serverless functions generate `x-request-id` header, server-side error logs include `rid=` for Vercel log correlation. Data provider layer (`fetchBars`/`fetchSnapshot`) logs + re-throws errors for Sentry capture. Data fetch errors surfaced as toast notifications in App.jsx (no more silent failures). Added `web-vitals` dependency. 298/298 tests, build clean, ESLint 0 errors. |

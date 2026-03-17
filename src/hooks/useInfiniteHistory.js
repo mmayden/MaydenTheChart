@@ -19,6 +19,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { fetchBars } from '../services/dataProvider'
 import { useChartStore } from '../store/useChartStore'
 import { TIMEFRAME_CONFIG } from '../constants/chart'
+import { log } from '../utils/logger'
 
 const SCROLL_THRESHOLD = 50  // trigger fetch when < 50 bars before left edge
 
@@ -103,7 +104,7 @@ export function useInfiniteHistory(chart, bars) {
         return merged
       })
     } catch (err) {
-      if (import.meta.env.DEV) console.warn('[useInfiniteHistory] fetch error:', err)
+      log.warn('InfiniteHistory', 'Fetch error', err)
     } finally {
       setIsLoadingHistory(false)
       // Unlock after a brief delay to prevent rapid re-triggers

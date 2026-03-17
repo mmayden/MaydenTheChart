@@ -10,11 +10,11 @@
 
 import axios from 'axios'
 import { getWSUrl, handleWSMessages } from './providers/alpaca'
+import { log } from '../utils/logger'
 
 const MAX_RETRIES = 10
 const BASE_DELAY_MS = 1000
 const MAX_DELAY_MS = 30000
-const DEBUG = import.meta.env.DEV
 
 /**
  * Fetch WebSocket credentials from the serverless proxy.
@@ -54,7 +54,7 @@ export function createSocket({ onBar, onStatus, getSymbol }) {
         if (intentionalClose) return // disconnected while fetching creds
 
         if (!key || !secret) {
-          DEBUG && console.error('[WS] Invalid credentials from /api/ws-auth')
+          log.error('WS', 'Invalid credentials from /api/ws-auth')
           onStatus('error')
           return
         }
@@ -66,7 +66,7 @@ export function createSocket({ onBar, onStatus, getSymbol }) {
           try {
             messages = JSON.parse(event.data)
           } catch (e) {
-            DEBUG && console.warn('[WS] Failed to parse message:', e.message)
+            log.warn('WS', 'Failed to parse message', e)
             return
           }
 
@@ -93,12 +93,12 @@ export function createSocket({ onBar, onStatus, getSymbol }) {
         }
 
         ws.onerror = (err) => {
-          DEBUG && console.error('[WS] WebSocket error:', err)
+          log.error('WS', 'WebSocket error', err)
           // onclose will fire after this, which handles reconnect
         }
       })
       .catch((err) => {
-        DEBUG && console.error('[WS] Failed to fetch credentials:', err)
+        log.error('WS', 'Failed to fetch credentials', err)
         onStatus('error')
         scheduleReconnect()
       })
@@ -107,7 +107,7 @@ export function createSocket({ onBar, onStatus, getSymbol }) {
   function scheduleReconnect() {
     if (intentionalClose) return
     if (retryCount >= MAX_RETRIES) {
-      DEBUG && console.error('[WS] Max retries reached, scheduling recovery in 5 minutes')
+      log.error('WS', 'Max retries reached, scheduling recovery in 5 minutes')
       onStatus('error')
       // Auto-recovery: reset retry counter and try again after 5 minutes
       retryTimer = setTimeout(() => {
@@ -123,8 +123,7 @@ export function createSocket({ onBar, onStatus, getSymbol }) {
       BASE_DELAY_MS * Math.pow(2, retryCount - 1) + Math.random() * 1000,
       MAX_DELAY_MS,
     )
-    // eslint-disable-next-line no-console
-    DEBUG && console.log(`[WS] Reconnecting in ${Math.round(delay)}ms (attempt ${retryCount}/${MAX_RETRIES})`)
+    log.debug('WS', `Reconnecting in ${Math.round(delay)}ms (attempt ${retryCount}/${MAX_RETRIES})`)
     retryTimer = setTimeout(connect, delay)
   }
 

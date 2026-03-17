@@ -78,12 +78,21 @@ export default function App() {
 
   // Sync URL params with store
   useURLState()
+  const toast = useToast()
 
   // Apply persisted preset on mount
   useEffect(() => {
     const { activePresetId, applyPreset } = usePresetsStore.getState()
     if (activePresetId) applyPreset(activePresetId)
   }, [])
+
+  // Surface data fetch errors as user-visible toasts
+  useEffect(() => {
+    if (isError && error) {
+      const msg = error?.response?.data?.error || error?.message || 'Failed to load market data'
+      toast.add({ message: msg, type: 'error', duration: 6000 })
+    }
+  }, [isError, error]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Live WebSocket + keyboard shortcuts + alert checker + infinite scroll
   useLiveFeed()
@@ -100,7 +109,6 @@ export default function App() {
   const snapshotCtxRef = useRef({ confluence: null, dayType: null })
 
   // Chart snapshot — listen for cheechart:snapshot custom event
-  const toast = useToast()
   useEffect(() => {
     async function handleSnapshot() {
       const chartInstance = chartRef.current?.chart?.()

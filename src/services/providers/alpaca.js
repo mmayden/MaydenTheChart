@@ -7,6 +7,7 @@
  */
 
 import { normalizeBar } from '../../utils/normalizeBar'
+import { log } from '../../utils/logger'
 
 // ─── Timeframe mapping ───────────────────────────────────────────────────────
 // Maps internal timeframe keys to Alpaca API strings.
@@ -102,8 +103,7 @@ export function handleWSMessages(messages, handlers) {
 
     // Error
     if (msg.T === 'error') {
-      const DEBUG = import.meta.env.DEV
-      DEBUG && console.error('[WS] Provider error:', msg.msg, msg.code)
+      log.error('WS', `Provider error: ${msg.msg}`, { code: msg.code })
       onStatus('error')
     }
   }

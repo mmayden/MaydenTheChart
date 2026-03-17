@@ -32,6 +32,7 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - `feed: 'iex'` required on all Alpaca data fetches (free tier)
 - **No react-router-dom** — single-page app, panel-based architecture
 - Motion v12 (formerly Framer Motion) — AnimatePresence for content transitions (panels, modals)
+- web-vitals — LCP/CLS/INP/FID/TTFB reporting to Sentry (lazy-loaded, only when Sentry DSN set)
 - sharp (devDep) — OG image generation (`scripts/generate-og-image.js`)
 
 ## Data provider strategy
@@ -57,6 +58,27 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - Service worker `CACHE_NAME` is auto-versioned at build time (Vite plugin in `vite.config.js`)
 - Bearer token in `ws-auth.js` is NOT a real secret (ships in client bundle) — rate limiting is the real gate
 - All localStorage keys use `cheechart-` prefix (`cheechart-theme`, `cheechart-accent`, `cheechart-symbol`, etc.)
+
+## Observability
+
+**Logging:** All client-side logging goes through `src/utils/logger.js`. Never use raw
+`console.*` in `src/` — use `log.debug/info/warn/error(tag, message, ...args)` instead.
+Dev builds get all levels; production gets warn + error only. Errors are auto-forwarded
+to Sentry via `captureException`. Use `log.breadcrumb(category, message, data)` to add
+Sentry breadcrumbs for user actions (symbol change, timeframe switch, etc.).
+
+**Sentry:** Conditional on `VITE_SENTRY_DSN`. Captures: unhandled errors (global),
+ErrorBoundary crashes (explicit `captureException`), data fetch failures (via logger),
+WebSocket errors (via logger). Includes `browserTracingIntegration` for performance
+monitoring and web vitals (LCP, CLS, INP, FID, TTFB) via `web-vitals` library.
+Breadcrumbs track user navigation (symbol/timeframe changes).
+
+**API request IDs:** All serverless functions (`api/*.js`) generate a short `x-request-id`
+header on every response. Server-side `console.error` logs include `rid=<id>` for
+correlation with Vercel function logs.
+
+**Error surfacing:** Data fetch errors (bar/snapshot failures) are shown to users as
+toast notifications instead of silent failures. ErrorBoundary provides reset/reload UI.
 
 ## Architecture
 
@@ -227,6 +249,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Onboarding tour (first-visit + manual restart via Help menu): `src/components/ui/OnboardingTour.jsx`
 
 ### Utilities
+- Structured logger: `src/utils/logger.js` — level-gated (`debug`/`info`/`warn`/`error`), auto-forwards errors to Sentry
 - Shared timezone utils: `src/utils/timezone.js`
 - localStorage schema validation: `src/utils/validate.js`
 - Chart snapshot capture + export (confluence watermark): `src/utils/snapshot.js`
@@ -234,7 +257,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 ### Services
 - Data provider: `src/services/dataProvider.js` — provider-abstracted data fetching
 - Alpaca provider adapter: `src/services/providers/alpaca.js`
-- Sentry error tracking (conditional): `src/services/sentry.js`
+- Sentry error tracking + web vitals: `src/services/sentry.js`
 
 ### PWA
 - Manifest: `public/manifest.json`

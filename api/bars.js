@@ -46,7 +46,15 @@ function isRateLimited(ip) {
 /** SSRF guard — only allow known Alpaca data hosts. */
 const ALLOWED_DATA_HOSTS = new Set(['data.alpaca.markets'])
 
+/** Generate a short request ID for log correlation. */
+function requestId() {
+  return Math.random().toString(36).slice(2, 10)
+}
+
 export default async function handler(req, res) {
+  const rid = requestId()
+  res.setHeader('x-request-id', rid)
+
   // Only allow GET
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
@@ -123,7 +131,7 @@ export default async function handler(req, res) {
 
       if (!response.ok) {
         const text = await response.text()
-        console.error('[bars] Alpaca API error:', response.status, text)
+        console.error(`[bars] rid=${rid} Alpaca API error:`, response.status, text)
         // Generic error to client — never leak upstream status codes or details
         const clientStatus = response.status === 404 ? 404 : 502
         const clientMsg = response.status === 404
@@ -144,7 +152,7 @@ export default async function handler(req, res) {
     res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60')
     return res.status(200).json({ bars: allBars })
   } catch (err) {
-    console.error('[bars] Fetch failed:', err.message)
+    console.error(`[bars] rid=${rid} Fetch failed:`, err.message)
     return res.status(500).json({ error: 'Failed to fetch market data' })
   }
 }

@@ -1,4 +1,5 @@
 import React from 'react'
+import { log } from '../../utils/logger'
 
 /**
  * ErrorBoundary — catches render-time errors and shows a fallback UI
@@ -17,7 +18,8 @@ export class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('[ErrorBoundary] Uncaught render error:', error, errorInfo)
+    log.error('ErrorBoundary', 'Uncaught render error', error)
+    log.breadcrumb('error', 'Component stack', { componentStack: errorInfo?.componentStack })
   }
 
   handleReload = () => {

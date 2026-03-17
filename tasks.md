@@ -53,6 +53,14 @@
 
 > Collapsed summaries. See `project.md` session log for full details.
 
+### Phase 14B — Observability (2026-03-17)
+- Structured logger (`src/utils/logger.js`): level-gated (debug/info/warn/error), dev gets all, prod gets warn+error
+- All client-side `console.*` calls replaced with `log.*` calls — single logging path
+- Sentry enhanced: explicit `captureException` in ErrorBoundary + data provider, `browserTracingIntegration`, breadcrumbs on symbol/timeframe changes
+- Web vitals (LCP, CLS, INP, FID, TTFB) reported to Sentry via `web-vitals` library (lazy-loaded chunk)
+- API request IDs: `x-request-id` header on all serverless responses, `rid=` in server-side error logs
+- Data fetch errors surfaced as toast notifications (no more silent failures)
+
 ### Phase 14A — Chart Visual Overhaul (2026-03-17)
 - Webull-inspired chart refinements: bar spacing (`barSpacing: 8`, `minBarSpacing: 2`), `rightOffset: 5` breathing room
 - Dotted grid lines, dashed crosshair (Webull-style), removed axis borders for cleaner edges

@@ -11,6 +11,7 @@
  */
 
 import { useEffect, useRef } from 'react'
+import { log } from '../../utils/logger'
 import { findSupportResistance } from '../../utils/supportResistance'
 import { SR_RESISTANCE_RGB, SR_SUPPORT_RGB, SR_SWING_HIGH, SR_SWING_LOW } from '../../constants/chart'
 
@@ -99,7 +100,7 @@ export function SROverlay({ candleSeries, bars, visible = true }) {
       markers.sort((a, b) => a.time - b.time)
       candleSeries.setMarkers(markers)
     } catch (err) {
-      if (import.meta.env.DEV) console.warn('[SROverlay] Error rendering S/R levels:', err)
+      log.warn('SROverlay', 'Error rendering S/R levels', err)
     }
 
     return () => {

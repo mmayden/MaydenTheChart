@@ -20,6 +20,7 @@ import {
   normalizeBars as alpacaNormalizeBars,
   getProviderTimeframe as alpacaGetTimeframe,
 } from './providers/alpaca'
+import { log } from '../utils/logger'
 
 // ─── Active provider ─────────────────────────────────────────────────────────
 // To add a new provider:
@@ -51,8 +52,13 @@ export function getProviderName() {
 export async function fetchBars(symbol, timeframe, start, end, limit = 1000) {
   const providerTimeframe = alpacaGetTimeframe(timeframe)
   const params = { symbol, timeframe: providerTimeframe, start, end, limit }
-  const { data } = await axios.get('/api/bars', { params })
-  return alpacaNormalizeBars(data.bars ?? [])
+  try {
+    const { data } = await axios.get('/api/bars', { params })
+    return alpacaNormalizeBars(data.bars ?? [])
+  } catch (err) {
+    log.error('dataProvider', `fetchBars failed for ${symbol} ${timeframe}`, err)
+    throw err
+  }
 }
 
 /**
@@ -63,8 +69,13 @@ export async function fetchBars(symbol, timeframe, start, end, limit = 1000) {
  * @returns {Promise<Object>} Snapshots keyed by symbol
  */
 export async function fetchSnapshot(symbols) {
-  const { data } = await axios.get('/api/snapshot', {
-    params: { symbols: symbols.join(',') },
-  })
-  return data.snapshots ?? {}
+  try {
+    const { data } = await axios.get('/api/snapshot', {
+      params: { symbols: symbols.join(',') },
+    })
+    return data.snapshots ?? {}
+  } catch (err) {
+    log.error('dataProvider', `fetchSnapshot failed for ${symbols.join(',')}`, err)
+    throw err
+  }
 }

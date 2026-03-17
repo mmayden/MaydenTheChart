@@ -1,6 +1,6 @@
 # Security Standards — Cheechart
 
-> Current as of Phase 13A (2026-03-17). Security is non-negotiable.
+> Current as of Phase 14B (2026-03-17). Security is non-negotiable.
 
 ---
 
@@ -78,6 +78,11 @@ bypass via `data.alpaca.markets.evil.com`.
 | Limit param | Integer 1–10000 | bars.js |
 | Bearer token | Constant-time comparison | ws-auth.js |
 
+### Request Correlation
+All API endpoints generate a short `x-request-id` header on every response.
+Server-side error logs include `rid=<id>` for tracing failures in Vercel function logs
+without exposing internal details to the client.
+
 ### Error Sanitization
 API error responses **never** leak:
 - Upstream status codes from Alpaca
@@ -108,6 +113,8 @@ Legacy `lumpia-*` keys are read on startup for migration, then cleaned up on wri
 `src/components/ui/ErrorBoundary.jsx` wraps the entire app:
 - **Production:** shows generic error message + reload button
 - **Development:** shows raw error message + stack trace
+- Errors are explicitly captured to Sentry via `log.error()` (auto `captureException`)
+- Component stack trace added as Sentry breadcrumb for debugging context
 
 ### URL Parameter Validation
 `src/hooks/useURLState.js` validates all URL params (`?s=`, `?tf=`, `?panel=`)
