@@ -5,18 +5,6 @@
 
 ---
 
-## ✅ Phase 13C — Discoverability (2026-03-17)
-
-> After the Reddit/HN launch post — make it findable.
-
-- ✅ `public/robots.txt` — allow all crawlers, sitemap reference
-- ✅ `public/sitemap.xml` — single-page sitemap with daily changefreq
-- ✅ Canonical URL meta tag in `index.html`
-- ✅ Real PWA icons — branded 192/512 PNGs (gold "C" + candlestick chart on dark bg)
-- ✅ Meta description targeting "free charting tool" / "TradingView alternative"
-
----
-
 ## 🔲 Phase 12F — Future Differentiators
 
 - 🔲 Screener — scan watchlist for active setups
@@ -52,6 +40,12 @@
 ## ✅ Completed Phases — Archive
 
 > Collapsed summaries. See `project.md` session log for full details.
+
+### Phase 13C — Discoverability (2026-03-17)
+- `robots.txt` + `sitemap.xml` for crawlers, canonical URL meta tag
+- Branded PWA icons (192/512) replacing 1x1 placeholders — gold "C" + candlestick chart
+- SEO meta description targeting "free charting tool" / "TradingView alternative"
+- Vercel rewrite rules for robots.txt + sitemap.xml
 
 ### Level/Line Clarity Overhaul (2026-03-17)
 - S/R filter: resistance strictly above price, support strictly below (no more "R" labels below current price)

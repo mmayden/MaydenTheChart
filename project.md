@@ -519,8 +519,10 @@ Component state (useState — local only):
 - [x] Phase 14B: Observability — structured logger, Sentry enhanced (captureException, breadcrumbs, browserTracing, web vitals), API request IDs, data fetch error toasts
 - [x] Phase 14C: Chart interaction UX — kinetic scrolling (mouse + touch), magnet crosshair, explicit scroll/scale handling, double-click axis reset
 
-### Upcoming
+### Completed (continued)
 - [x] Phase 13C: Discoverability — robots.txt, sitemap, canonical URL, branded PWA icons (192/512), SEO meta description
+
+### Upcoming
 - [ ] Phase 12F: Future differentiators — screener, trade replay, annotations, gap tracking, cloud sync
 
 ---
