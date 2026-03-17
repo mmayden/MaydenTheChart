@@ -49,6 +49,7 @@ import { IndicatorTabView } from './components/ui/IndicatorTabView'
 import { CrosshairLegend } from './components/ui/CrosshairLegend'
 import { ToastContainer } from './components/ui/ToastContainer'
 import { OnboardingTour } from './components/ui/OnboardingTour'
+import { WelcomeBanner } from './components/ui/WelcomeBanner'
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
 
 // Lazy-load on-demand overlays — not rendered until user opens them
@@ -95,6 +96,9 @@ export default function App() {
   const closeSidebar = useCallback(() => useChartStore.getState().setSidebarOpen(false), [])
   useSwipeGesture({ onSwipeRight: openSidebar, onSwipeLeft: closeSidebar })
 
+  // Refs for snapshot context (avoids stale closure / declaration-order issues)
+  const snapshotCtxRef = useRef({ confluence: null, dayType: null })
+
   // Chart snapshot — listen for cheechart:snapshot custom event
   const toast = useToast()
   useEffect(() => {
@@ -107,7 +111,14 @@ export default function App() {
       try {
         const canvas = chartInstance.takeScreenshot()
         const { selectedSymbol: sym, selectedTimeframe: tf } = useChartStore.getState()
-        const blob = await captureSnapshot(canvas, { symbol: sym, timeframe: tf })
+        const { confluence: conf, dayType: dt } = snapshotCtxRef.current
+        const blob = await captureSnapshot(canvas, {
+          symbol: sym,
+          timeframe: tf,
+          confluenceScore: conf?.score,
+          confluenceBias: conf?.bias,
+          dayType: dt?.label,
+        })
         if (!blob) {
           toast.add({ message: 'Snapshot failed', type: 'error' })
           return
@@ -182,6 +193,11 @@ export default function App() {
     return confluenceScore({ dayType, ema9Signal, ema48Signal, ema200Signal, vwapSignal, atrGauge, rsiSignal, macdSignal })
   }, [bars, dayType, atrGauge])
 
+  // Keep snapshot ref in sync with latest computed values
+  useEffect(() => {
+    snapshotCtxRef.current = { confluence, dayType }
+  }, [confluence, dayType])
+
   return (
     <div
       data-theme={theme}
@@ -200,6 +216,7 @@ export default function App() {
 
       {/* Top navigation */}
       <TopNav />
+      <WelcomeBanner />
 
       {/* Main content area: Sidebar + Chart + RightPanel */}
       <div className="flex flex-1 min-h-0 overflow-hidden">

@@ -10,17 +10,29 @@
  *
  * @param {HTMLCanvasElement} canvas — from chart.takeScreenshot()
  * @param {Object} opts
- * @param {string} opts.symbol    — current symbol (e.g. 'QQQ')
- * @param {string} opts.timeframe — current timeframe label (e.g. '5m')
+ * @param {string} opts.symbol     — current symbol (e.g. 'QQQ')
+ * @param {string} opts.timeframe  — current timeframe label (e.g. '5m')
+ * @param {number} [opts.confluenceScore] — confluence score (0–100)
+ * @param {string} [opts.confluenceBias]  — 'bull' | 'bear' | 'neutral'
+ * @param {string} [opts.dayType]         — day type label (e.g. 'Trend Day — Bullish')
  * @returns {Promise<Blob>}
  */
-export function captureSnapshot(canvas, { symbol = '', timeframe = '' } = {}) {
+export function captureSnapshot(canvas, { symbol = '', timeframe = '', confluenceScore, confluenceBias, dayType } = {}) {
   const ctx = canvas.getContext('2d')
   if (!ctx) return Promise.resolve(null)
 
+  // Build watermark parts
+  const parts = [`${symbol} ${timeframe}`]
+  if (confluenceScore != null) {
+    const biasLabel = confluenceBias === 'bull' ? 'Bull' : confluenceBias === 'bear' ? 'Bear' : 'Neutral'
+    parts.push(`Confluence ${confluenceScore} ${biasLabel}`)
+  }
+  if (dayType) parts.push(dayType)
+  parts.push('cheechart.space')
+
   // Draw watermark in bottom-right corner
   const padding = 12
-  const text = `${symbol} ${timeframe} · cheechart.space · ${new Date().toLocaleDateString()}`
+  const text = parts.join(' · ')
 
   ctx.save()
   ctx.font = '11px monospace'

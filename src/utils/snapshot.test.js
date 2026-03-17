@@ -20,13 +20,18 @@ describe('captureSnapshot', () => {
       toBlob: (cb) => cb(mockBlob),
     }
 
-    const blob = await captureSnapshot(canvas, { symbol: 'QQQ', timeframe: '5m' })
+    const blob = await captureSnapshot(canvas, {
+      symbol: 'QQQ', timeframe: '5m',
+      confluenceScore: 82, confluenceBias: 'bull', dayType: 'Trend Day — Bullish',
+    })
     expect(blob).toBe(mockBlob)
     expect(mockCtx.fillText).toHaveBeenCalledOnce()
-    // Watermark should contain symbol and timeframe
+    // Watermark should contain symbol, timeframe, confluence, day type, and site
     const text = mockCtx.fillText.mock.calls[0][0]
     expect(text).toContain('QQQ')
     expect(text).toContain('5m')
+    expect(text).toContain('Confluence 82 Bull')
+    expect(text).toContain('Trend Day')
     expect(text).toContain('cheechart.space')
   })
 

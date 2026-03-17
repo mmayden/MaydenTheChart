@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Grid lines -->
+  <line x1="80" y1="220" x2="1120" y2="220" stroke="#6b7280" stroke-opacity="0.15" stroke-dasharray="4,4"/><line x1="80" y1="300" x2="1120" y2="300" stroke="#6b7280" stroke-opacity="0.15" stroke-dasharray="4,4"/><line x1="80" y1="380" x2="1120" y2="380" stroke="#6b7280" stroke-opacity="0.15" stroke-dasharray="4,4"/>
+
+  <!-- Candles -->
+  
+    <line x1="112.5" y1="361.53846153846155" x2="112.5" y2="460" stroke="#22c55e" stroke-width="1.5"/>
+    <rect x="82" y="386.15384615384613" width="61" height="49.230769230769226" fill="#22c55e" rx="1"/>
+  
+    <line x1="177.5" y1="336.9230769230769" x2="177.5" y2="410.7692307692308" stroke="#22c55e" stroke-width="1.5"/>
+    <rect x="147" y="346.7692307692308" width="61" height="39.38461538461536" fill="#22c55e" rx="1"/>
+  
+    <line x1="242.5" y1="312.30769230769226" x2="242.5" y2="386.15384615384613" stroke="#ef4444" stroke-width="1.5"/>
+    <rect x="212" y="346.7692307692308" width="61" height="29.538461538461547" fill="#ef4444" rx="1"/>
+  
+    <line x1="307.5" y1="356.61538461538464" x2="307.5" y2="435.38461538461536" stroke="#ef4444" stroke-width="1.5"/>
+    <rect x="277" y="376.3076923076923" width="61" height="49.230769230769226" fill="#ef4444" rx="1"/>
+  
+    <line x1="372.5" y1="386.15384615384613" x2="372.5" y2="445.2307692307692" stroke="#22c55e" stroke-width="1.5"/>
+    <rect x="342" y="396" width="61" height="29.538461538461547" fill="#22c55e" rx="1"/>
+  
+    <line x1="437.5" y1="327.0769230769231" x2="437.5" y2="405.8461538461538" stroke="#22c55e" stroke-width="1.5"/>
+    <rect x="407" y="336.9230769230769" width="61" height="59.076923076923094" fill="#22c55e" rx="1"/>
+  
+    <line x1="502.5" y1="263.0769230769231" x2="502.5" y2="346.7692307692308" stroke="#22c55e" stroke-width="1.5"/>
+    <rect x="472" y="277.84615384615387" width="61" height="59.07692307692304" fill="#22c55e" rx="1"/>
+  
+    <line x1="567.5" y1="238.46153846153845" x2="567.5" y2="297.53846153846155" stroke="#22c55e" stroke-width="1.5"/>
+    <rect x="537" y="248.30769230769232" width="61" height="29.538461538461547" fill="#22c55e" rx="1"/>
+  
+    <line x1="632.5" y1="228.6153846153846" x2="632.5" y2="287.69230769230774" stroke="#ef4444" stroke-width="1.5"/>
+    <rect x="602" y="248.30769230769232" width="61" height="19.69230769230768" fill="#ef4444" rx="1"/>
+  
+    <line x1="697.5" y1="213.84615384615384" x2="697.5" y2="277.84615384615387" stroke="#22c55e" stroke-width="1.5"/>
+    <rect x="667" y="228.6153846153846" width="61" height="39.38461538461539" fill="#22c55e" rx="1"/>
+  
+    <line x1="762.5" y1="189.23076923076923" x2="762.5" y2="248.30769230769232" stroke="#ef4444" stroke-width="1.5"/>
+    <rect x="732" y="228.6153846153846" width="61" height="29.538461538461576" fill="#ef4444" rx="1"/>
+  
+    <line x1="827.5" y1="238.46153846153845" x2="827.5" y2="312.30769230769226" stroke="#ef4444" stroke-width="1.5"/>
+    <rect x="797" y="258.1538461538462" width="61" height="39.38461538461536" fill="#ef4444" rx="1"/>
+  
+    <line x1="892.5" y1="263.0769230769231" x2="892.5" y2="317.2307692307692" stroke="#22c55e" stroke-width="1.5"/>
+    <rect x="862" y="272.9230769230769" width="61" height="24.61538461538464" fill="#22c55e" rx="1"/>
+  
+    <line x1="957.5" y1="199.0769230769231" x2="957.5" y2="287.69230769230774" stroke="#22c55e" stroke-width="1.5"/>
+    <rect x="927" y="208.92307692307693" width="61" height="63.99999999999997" fill="#22c55e" rx="1"/>
+  
+    <line x1="1022.5" y1="164.61538461538458" x2="1022.5" y2="218.76923076923077" stroke="#22c55e" stroke-width="1.5"/>
+    <rect x="992" y="179.38461538461536" width="61" height="29.538461538461576" fill="#22c55e" rx="1"/>
+  
+    <line x1="1087.5" y1="140" x2="1087.5" y2="199.0769230769231" stroke="#22c55e" stroke-width="1.5"/>
+    <rect x="1057" y="149.84615384615387" width="61" height="29.53846153846149" fill="#22c55e" rx="1"/>
+  
+
+  <!-- EMA line -->
+  <polyline points="112.5,386.15384615384613 177.5,346.7692307692308 242.5,376.3076923076923 307.5,425.53846153846155 372.5,396 437.5,336.9230769230769 502.5,277.84615384615387 567.5,248.30769230769232 632.5,268 697.5,228.6153846153846 762.5,258.1538461538462 827.5,297.53846153846155 892.5,272.9230769230769 957.5,208.92307692307693 1022.5,179.38461538461536 1087.5,149.84615384615387" fill="none" stroke="#60a5fa" stroke-width="2" stroke-opacity="0.6" stroke-linejoin="round"/>
+
+  <!-- Title -->
+  <text x="600" y="60" text-anchor="middle" font-family="monospace" font-size="42" font-weight="bold" fill="#f3f4f6">Cheechart</text>
+
+  <!-- Tagline -->
+  <text x="600" y="100" text-anchor="middle" font-family="monospace" font-size="18" fill="#6b7280">Free charting — unlimited indicators, no signup, no ads</text>
+
+  <!-- Bottom URL -->
+  <text x="600" y="590" text-anchor="middle" font-family="monospace" font-size="16" fill="#60a5fa">cheechart.space</text>
+
+  <!-- Confluence badge -->
+  <rect x="500" y="550" width="200" height="28" rx="14" fill="#22c55e" fill-opacity="0.15" stroke="#22c55e" stroke-opacity="0.3"/>
+  <text x="600" y="569" text-anchor="middle" font-family="monospace" font-size="13" fill="#22c55e">Confluence 85 · Bull</text>
+
+  <!-- Border -->
+  <rect x="0" y="0" width="1200" height="630" fill="none" stroke="#6b7280" stroke-opacity="0.2" rx="8"/>
+</svg>
