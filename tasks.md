@@ -53,6 +53,12 @@
 
 > Collapsed summaries. See `project.md` session log for full details.
 
+### Level/Line Clarity Overhaul (2026-03-17)
+- S/R filter: resistance strictly above price, support strictly below (no more "R" labels below current price)
+- S/R labels always show strength: "R ×1", "S ×2" etc. (was blank for single-pivot)
+- ODC color changed from amber (#f59e0b) to slate (#94a3b8) — visually distinct from gold PDH/PDL
+- S/R cap reduced to 5 per type, sorted by strength (strongest survive the cap)
+
 ### Bugfix: Data Freshness + Confluence Dropdown (2026-03-17)
 - `useBars.js` — safety-net REST polling (2min) even when WS is 'subscribed' (WS can stall on low-volume or market close)
 - `queryClient.js` — `refetchOnWindowFocus: 'always'` so tab-switching triggers immediate data refresh

@@ -15,7 +15,7 @@ import { log } from '../../utils/logger'
 import { findSupportResistance } from '../../utils/supportResistance'
 import { SR_RESISTANCE_RGB, SR_SUPPORT_RGB, SR_SWING_HIGH, SR_SWING_LOW } from '../../constants/chart'
 
-const MAX_LEVELS = 8  // cap to avoid visual clutter
+const MAX_LEVELS = 5  // cap to avoid visual clutter on right axis
 
 export function SROverlay({ candleSeries, bars, visible = true }) {
   const linesRef = useRef([])
@@ -41,8 +41,9 @@ export function SROverlay({ candleSeries, bars, visible = true }) {
       const allLevels = [...support, ...resistance]
       const maxStrength = Math.max(1, ...allLevels.map((l) => l.strength))
 
-      // Draw resistance lines (red, above price)
-      for (const level of resistance.slice(0, MAX_LEVELS)) {
+      // Draw resistance lines (red, above price) — strongest first
+      const sortedResistance = [...resistance].sort((a, b) => b.strength - a.strength)
+      for (const level of sortedResistance.slice(0, MAX_LEVELS)) {
         const opacity = Math.max(0.3, Math.min(1, level.strength / maxStrength))
         const line = candleSeries.createPriceLine({
           price:            level.price,
@@ -50,13 +51,14 @@ export function SROverlay({ candleSeries, bars, visible = true }) {
           lineWidth:        1,
           lineStyle:        1, // dotted
           axisLabelVisible: true,
-          title:            `R ${level.strength > 1 ? '×' + level.strength : ''}`,
+          title:            `R ×${level.strength}`,
         })
         linesRef.current.push(line)
       }
 
-      // Draw support lines (green, below price)
-      for (const level of support.slice(0, MAX_LEVELS)) {
+      // Draw support lines (green, below price) — strongest first
+      const sortedSupport = [...support].sort((a, b) => b.strength - a.strength)
+      for (const level of sortedSupport.slice(0, MAX_LEVELS)) {
         const opacity = Math.max(0.3, Math.min(1, level.strength / maxStrength))
         const line = candleSeries.createPriceLine({
           price:            level.price,
@@ -64,7 +66,7 @@ export function SROverlay({ candleSeries, bars, visible = true }) {
           lineWidth:        1,
           lineStyle:        1, // dotted
           axisLabelVisible: true,
-          title:            `S ${level.strength > 1 ? '×' + level.strength : ''}`,
+          title:            `S ×${level.strength}`,
         })
         linesRef.current.push(line)
       }

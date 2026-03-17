@@ -113,15 +113,14 @@ export function findSupportResistance(bars, lookback = 10, clusterThreshold = 0.
   const resistanceClusters = clusterPivots(swingHighs, clusterThreshold)
   const supportClusters = clusterPivots(swingLows, clusterThreshold)
 
-  // Filter: resistance should be above current price, support below
-  // Keep nearby zones within 0.2% of price for context
+  // Filter: resistance strictly above current price, support strictly below
   const resistance = resistanceClusters
-    .filter((z) => z.price >= lastPrice * 0.998)
+    .filter((z) => z.price > lastPrice)
     .map((z) => ({ price: parseFloat(z.price.toFixed(2)), strength: z.strength }))
     .sort((a, b) => a.price - b.price)
 
   const support = supportClusters
-    .filter((z) => z.price <= lastPrice * 1.002)
+    .filter((z) => z.price < lastPrice)
     .map((z) => ({ price: parseFloat(z.price.toFixed(2)), strength: z.strength }))
     .sort((a, b) => b.price - a.price)
 
