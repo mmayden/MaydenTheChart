@@ -19,6 +19,28 @@
 
 ---
 
+## 📌 Assessment Findings — Priority Fixes (2026-03-18)
+
+> From comprehensive deep-dive audit across mobile, architecture, security, performance, and CSS.
+
+### High Priority
+- ✅ BottomSheet missing `safe-area-inset-bottom` — fixed: added `padding-bottom: env(safe-area-inset-bottom)` to `.bottom-sheet` CSS
+- ✅ `usePullToRefresh` dependency array — fixed: replaced state deps with refs (`pullProgressRef`, `isRefreshingRef`, `onRefreshRef`), effect now stable on `[threshold, handleRefresh]`
+
+### Medium Priority
+- 🔲 RVOL calculation not memoized in CandlestickChart — `relativeVolume(bars)` recalculates every render (wrap in `useMemo`)
+- 🔲 Sentry bundled unconditionally — ~50-100KB loaded even when `VITE_SENTRY_DSN` unset (dynamic import instead)
+- 🔲 No mobile component tests — BottomNav, BottomSheet, useMediaQuery, usePullToRefresh have zero test coverage
+- 🔲 No localStorage schema migration system — adding new fields to journal/presets silently drops old entries' data
+
+### Low Priority
+- 🔲 API request IDs use `Math.random()` — switch to `crypto.randomUUID()` for better entropy
+- 🔲 No explicit fetch timeout on API proxy calls — could hang until Vercel's 30s hard limit
+- 🔲 RVOL_AMBER/RVOL_HOT hardcoded in CandlestickChart — should be in `constants/chart.js`
+- 🔲 `setTheme()` mutates DOM inside store action — ideally a `useEffect` in App.jsx
+
+---
+
 ## 📌 Deferred — Mobile Polish (follow-up QA)
 
 > Core mobile overhaul (M1–M5) complete. These are follow-up QA items.

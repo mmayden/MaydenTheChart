@@ -108,10 +108,11 @@ The first bar's open price. The "open of day" is used as a directional
 pivot — price reclaiming the open is bullish; price losing the open is bearish.
 
 ### Rendering
-- Thin solid white line, scoped to today's session only (does not bleed into previous days)
+- Thin dashed slate line (`#94a3b8`), scoped to today's session only (does not bleed into previous days)
 - Rendered as a `LineSeries` with two data points (session start → session end), not a price line
 - Label: "ODC" (Open of Day Candle)
 - Only on intraday timeframes
+- Color deliberately distinct from gold PDH/PDL lines
 
 ### Code signature
 ```js
@@ -363,7 +364,7 @@ RSI = 100 - (100 / (1 + RS))
 - RSI line: solid purple (`RSI_LINE_COLOR` from chart.js), 1.5px
 - Reference lines: 70 (`RSI_OB_COLOR`, dashed), 50 (`RSI_MID_COLOR`, dashed), 30 (`RSI_OS_COLOR`, dashed)
 - HTML overlay label "RSI" in `RSI_LINE_COLOR` at top-left of mini chart (`.mini-chart-label` CSS class, `pointer-events: none`)
-- Rendered in 82px tall mini chart pane below the main chart via `IndicatorTabView`
+- Rendered in 90px (desktop) / 70px (mobile) tall mini chart pane below the main chart via `IndicatorTabView`
 - All colors imported from `src/constants/chart.js` — never hardcoded in component
 
 ### Key levels
@@ -436,10 +437,11 @@ Zone strength = number of pivots merged (more touches = stronger level)
 ```
 
 ### Rendering
-- Support: `SR_SUPPORT_RGB` horizontal lines (opacity proportional to strength)
-- Resistance: `SR_RESISTANCE_RGB` horizontal lines (opacity proportional to strength)
-- Swing high markers: `SR_SWING_HIGH`, swing low markers: `SR_SWING_LOW`
-- Label each with price value
+- Support: `SR_SUPPORT_RGB` (green) horizontal lines, opacity proportional to strength, strictly below current price
+- Resistance: `SR_RESISTANCE_RGB` (red) horizontal lines, opacity proportional to strength, strictly above current price
+- Labels always show strength: "R ×1", "S ×2", etc.
+- Max 5 per type, sorted by strength (strongest survive the cap)
+- Swing high markers: `SR_SWING_HIGH` (▼), swing low markers: `SR_SWING_LOW` (▲)
 - All colors imported from `src/constants/chart.js` — never hardcoded in component
 
 ### Code signature

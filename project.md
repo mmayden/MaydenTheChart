@@ -166,8 +166,11 @@ friction — you can't see backtest results alongside the chart that produced th
 Journal, or Watchlist), toggled via TopNav icons or Cmd+K. Same pattern as VS Code's
 sidebar, Linear's detail panels, and Bloomberg's modular layout.
 
-**Mobile:** Right panels become full-screen overlays (same pattern as the existing sidebar
-drawer). The chart fills the viewport; everything else is an overlay.
+**Mobile (<768px):** Bottom navigation bar replaces TopNav panel toggles. Right panels render
+inside a draggable `BottomSheet` component (snap points 50%/90%, velocity-based dismiss).
+Sidebar opens as a fixed overlay. Safe areas respected via `env(safe-area-inset-*)`.
+Landscape mode hides status bar and mini charts, compacts sub-header.
+All mobile changes gated behind `useIsMobile()` hook — desktop is zero-regression.
 
 **Routing:** No react-router-dom. Single-page app. URL state sync handles `?s=QQQ&tf=5m&p=full`
 for shareability without page routes.
@@ -312,7 +315,7 @@ createSocket({ onBar, onStatus, getSymbol }) → { connect, disconnect }
 - Permissions-Policy: camera/microphone/geolocation disabled
 
 **Performance targets:**
-- Main bundle: <320KB (currently 314KB + 161KB charts + 92KB motion + 69KB vendor, 7 lazy chunks — Vite 8/Rolldown)
+- Main bundle: <330KB (currently 329KB + 161KB charts + 92KB motion + 69KB vendor, 8 lazy chunks — Vite 8/Rolldown)
 - LCP: <2.5s (self-hosted fonts, no external blocking requests)
 - INP: <200ms (canvas-based chart interactions bypass DOM)
 - CLS: <0.1 (fixed layout, no late-loading content)
@@ -397,6 +400,8 @@ Component state (useState — local only):
 | `src/hooks/useURLState.js` | Bidirectional URL state sync (?s=QQQ&tf=5m&p=full&panel=backtest) |
 | `src/hooks/useMTFSignals.js` | Multi-timeframe EMA signals — parallel TanStack Query fetches across 5m/15m/1h/4h/1D |
 | `src/hooks/useWatchlistQuotes.js` | TanStack Query hook for watchlist live prices (Alpaca snapshots, 30s auto-refresh) |
+| `src/hooks/useMediaQuery.js` | Reactive media query hook — `useIsMobile()`, `useIsTablet()`, `useIsLandscape()` convenience exports |
+| `src/hooks/usePullToRefresh.js` | Touch-only pull-to-refresh gesture — 60px threshold, spinner feedback |
 
 ### Indicator Math (pure functions)
 | File | Purpose |
@@ -424,7 +429,9 @@ Component state (useState — local only):
 |---|---|
 | `src/components/layout/TopNav.jsx` | Top navigation (Logo, panel toggles, ⌘K, bell, settings) |
 | `src/components/layout/Sidebar.jsx` | Left sidebar — symbol, timeframe, presets, indicators, ATR gauge |
-| `src/components/layout/RightPanel.jsx` | Generic right panel shell — renders active panel content |
+| `src/components/layout/RightPanel.jsx` | Generic right panel shell — side panel on desktop, bottom sheet on mobile |
+| `src/components/layout/BottomNav.jsx` | Mobile-only bottom navigation — timeframe pills, panel toggles, sidebar hamburger |
+| `src/components/ui/BottomSheet.jsx` | Draggable bottom sheet — snap points (50%/90%), velocity dismiss, GPU-accelerated |
 
 ### Chart Components
 | File | Purpose |
@@ -486,7 +493,7 @@ Component state (useState — local only):
 
 ## Current Status
 
-**298/298 tests passing, build clean, ESLint 0 errors, 0 vulnerabilities. Main bundle 319KB + 161KB lightweight-charts + 92KB motion + 69KB vendor-api (8 lazy chunks incl. web-vitals 5.6KB). Stack: React 19 + Vite 8 + Zustand 5 + Tailwind 4. Phase 14C (chart interaction UX) complete — kinetic scrolling, magnet crosshair, modern scroll/scale handling.**
+**298/298 tests passing, build clean, ESLint 0 errors, 0 vulnerabilities. Main bundle 329KB + 161KB lightweight-charts + 92KB motion + 69KB vendor-api (8 lazy chunks incl. web-vitals 5.6KB). Stack: React 19 + Vite 8 + Zustand 5 + Tailwind 4. Mobile-first overhaul (M1–M5) complete — bottom nav, bottom sheets, safe areas, landscape mode, pull-to-refresh.**
 
 ### Completed
 - [x] Phases 1–4: Core chart, indicators, levels, S/R detection, ATR gauge, day type
@@ -576,4 +583,5 @@ Component state (useState — local only):
 | 2026-03-17 | **Bugfix: data freshness + confluence dropdown.** (1) Live data not updating — `useBars.js` disabled REST polling entirely when WebSocket reported 'subscribed' status, but WS can subscribe without delivering bars (low volume, market closed, stale connection). Changed to 2-minute safety-net poll even when WS is active. (2) `queryClient.js` `refetchOnWindowFocus` changed from `false` to `'always'` — switching tabs now triggers immediate data refresh instead of requiring manual reload. (3) ConfluenceBar dropdown invisible — `overflow-hidden` on the chart sub-header div (`App.jsx`) clipped the absolutely-positioned expanded breakdown panel. Removed `overflow-hidden`. 298/298 tests, build clean. |
 | 2026-03-17 | **Level/line clarity overhaul.** (1) S/R filter tightened — resistance strictly above price, support strictly below (removed 0.2% buffer that put "R ×3" labels below current price). (2) S/R labels now always show strength: "R ×1", "S ×2" etc. (was "R " with trailing space for single-pivot). (3) ODC color changed from amber (#f59e0b) to slate (#94a3b8) — distinct from gold PDH/PDL. (4) S/R max levels reduced from 8 to 5 per type, sorted by strength before cap (strongest survive). 298/298 tests, build clean. |
 | 2026-03-17 | **Phase 13C complete: Discoverability.** (1) `robots.txt` — allow all crawlers with sitemap reference. (2) `sitemap.xml` — single URL, daily changefreq. (3) Canonical URL `<link rel="canonical">` in index.html. (4) Branded PWA icons — `scripts/generate-icons.js` creates 192/512 PNGs via sharp (gold "C" monogram + candlestick chart on dark bg, rounded corners). Replaced 1x1 placeholder PNGs. (5) SEO meta description updated to target "free day trading chart tool" / "TradingView alternative" with feature list. OG description synced. Vercel rewrite rules added for robots.txt + sitemap.xml. 298/298 tests, build clean. |
+| 2026-03-18 | **High-priority assessment fixes.** (1) BottomSheet safe-area-inset-bottom — added `padding-bottom: env(safe-area-inset-bottom, 0px)` to `.bottom-sheet` CSS class. Content was clipped behind iPhone home indicator/notch. (2) usePullToRefresh dependency array — replaced `pullProgress`, `isRefreshing`, and `handleRefresh` in the useEffect deps with refs (`pullProgressRef`, `isRefreshingRef`, `onRefreshRef`). Effect now depends only on `[threshold, handleRefresh]` where `handleRefresh` is stable (empty deps, reads from refs). Touch listeners are attached once instead of being torn down and re-added on every drag gesture. 298/298 tests, build clean. |
 | 2026-03-18 | **Mobile-first overhaul complete (M1–M5).** Deep-dive UX research on Webull/TradingView/thinkorswim/Robinhood mobile apps + modern PWA design patterns. 5-phase implementation, 4 new files, 14 modified files, 0 new dependencies. **M1 Foundation:** `useMediaQuery`/`useIsMobile`/`useIsLandscape` reactive hooks, safe area CSS vars (`env(safe-area-inset-*)`), `100dvh` with fallback, `viewport-fit=cover`. **M2 Bottom Nav:** `BottomNav.jsx` mobile-only thumb-zone bar with scrollable timeframe pills + panel toggles. TopNav slimmed to `h-9` with compact PriceDisplay. StatusBar mobile-optimized. Panel toggles + hamburger moved from TopNav to BottomNav on mobile. **M3 Bottom Sheets:** `BottomSheet.jsx` with drag handle, snap points (50%/90%), velocity-based dismiss, Motion v12 springs. RightPanel conditionally renders bottom sheet on mobile. Chart sub-header stacks into 2 rows on mobile. ConfluenceBar dropdown repositioned. Mini charts 70px on mobile. **M4 Landscape + Performance:** Responsive font scaling (`clamp()`), landscape rules (`.landscape-hide`/`.landscape-compact`), mini charts hidden in mobile landscape, `contain: layout style` on chart, orientation change fires resize event. **M5 Polish:** `usePullToRefresh` hook (touch-only, 60px threshold). Haptic feedback on alerts (`navigator.vibrate`). PWA manifest: `orientation: any`, `categories`, shortcuts for QQQ/SPY/NVDA. Global: `overscroll-behavior: none`, `touch-action: manipulation`, `-webkit-tap-highlight-color: transparent`. Desktop zero-regression — all mobile changes gated behind `useIsMobile()` / `md:` breakpoints. 298/298 tests, build clean, ESLint 0 errors. |

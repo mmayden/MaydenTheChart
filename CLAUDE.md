@@ -297,7 +297,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Default preset definitions: `src/constants/presets.js`
 - Accent color presets (per-theme): `src/constants/accents.js`
 - Command palette (Cmd+K): `src/components/ui/CommandPalette.jsx`
-- Settings modal (themes + accent colors + shortcuts + sound alerts): `src/components/ui/SettingsModal.jsx`
+- Settings modal (3 themes + 6 accent presets/theme + shortcuts + sound alerts): `src/components/ui/SettingsModal.jsx`
 - Error boundary: `src/components/ui/ErrorBoundary.jsx`
 - Logo: `src/components/ui/Logo.jsx`
 - Toast notifications: `src/components/ui/ToastContainer.jsx`
@@ -369,3 +369,15 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - `prefers-reduced-motion: reduce` must be respected for all animations
 - Open Graph meta tags required in `index.html` for social sharing previews
 - Error tracking via Sentry free tier (5K errors/month, session replay)
+
+## Known issues (from 2026-03-18 deep assessment)
+
+### High — RESOLVED
+- ~~`BottomSheet` CSS missing `safe-area-inset-bottom`~~ — fixed: `padding-bottom: env(safe-area-inset-bottom)` added
+- ~~`usePullToRefresh.js` dependency array~~ — fixed: replaced state deps with refs, effect now stable
+
+### Medium — address when touching related code
+- `CandlestickChart.jsx`: `relativeVolume(bars)` not wrapped in `useMemo` — recalculates every render
+- `src/services/sentry.js`: Sentry imported unconditionally (~50-100KB) — should dynamic import
+- Zero test coverage on mobile components (BottomNav, BottomSheet, useMediaQuery, usePullToRefresh)
+- No localStorage schema migration system — new fields on journal/presets silently lost on old data

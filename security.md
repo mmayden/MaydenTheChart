@@ -83,6 +83,15 @@ All API endpoints generate a short `x-request-id` header on every response.
 Server-side error logs include `rid=<id>` for tracing failures in Vercel function logs
 without exposing internal details to the client.
 
+> **Known improvement:** Request IDs currently use `Math.random().toString(36)` —
+> not cryptographically secure. Low risk (log correlation only), but should migrate
+> to `crypto.randomUUID()` for better entropy.
+
+### Fetch Timeouts
+> **Known gap:** API proxy fetch calls to Alpaca have no explicit timeout.
+> They rely on Vercel's 30s hard limit. Should add `AbortSignal.timeout(10000)`
+> for faster failure on network issues.
+
 ### Error Sanitization
 API error responses **never** leak:
 - Upstream status codes from Alpaca

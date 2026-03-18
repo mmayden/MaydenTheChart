@@ -20,30 +20,42 @@ export function usePullToRefresh({ onRefresh, threshold = 60 } = {}) {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const startY = useRef(0)
   const pulling = useRef(false)
+  const pullProgressRef = useRef(0)
+  const isRefreshingRef = useRef(false)
+  const onRefreshRef = useRef(onRefresh)
+
+  // Keep refs in sync with latest values
+  onRefreshRef.current = onRefresh
+  isRefreshingRef.current = isRefreshing
+
+  // Sync pullProgress to ref whenever state changes
+  useEffect(() => {
+    pullProgressRef.current = pullProgress
+  }, [pullProgress])
 
   const handleRefresh = useCallback(async () => {
-    if (!onRefresh || isRefreshing) return
+    if (!onRefreshRef.current || isRefreshingRef.current) return
     setIsRefreshing(true)
     try {
-      await onRefresh()
+      await onRefreshRef.current()
     } finally {
       setIsRefreshing(false)
       setPullProgress(0)
     }
-  }, [onRefresh, isRefreshing])
+  }, [])
 
   useEffect(() => {
     if (!isTouchDevice()) return
 
     function onTouchStart(e) {
       // Only activate when at the very top of the page
-      if (window.scrollY > 0 || isRefreshing) return
+      if (window.scrollY > 0 || isRefreshingRef.current) return
       startY.current = e.touches[0].clientY
       pulling.current = true
     }
 
     function onTouchMove(e) {
-      if (!pulling.current || isRefreshing) return
+      if (!pulling.current || isRefreshingRef.current) return
       const dy = e.touches[0].clientY - startY.current
       if (dy < 0) {
         pulling.current = false
@@ -57,7 +69,7 @@ export function usePullToRefresh({ onRefresh, threshold = 60 } = {}) {
     function onTouchEnd() {
       if (!pulling.current) return
       pulling.current = false
-      if (pullProgress >= 1) {
+      if (pullProgressRef.current >= 1) {
         handleRefresh()
       } else {
         setPullProgress(0)
@@ -73,7 +85,7 @@ export function usePullToRefresh({ onRefresh, threshold = 60 } = {}) {
       document.removeEventListener('touchmove', onTouchMove)
       document.removeEventListener('touchend', onTouchEnd)
     }
-  }, [threshold, isRefreshing, pullProgress, handleRefresh])
+  }, [threshold, handleRefresh])
 
   return { pullProgress, isRefreshing }
 }
