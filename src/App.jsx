@@ -21,6 +21,7 @@ import { useInfiniteHistory } from './hooks/useInfiniteHistory'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import { useAlertChecker } from './hooks/useAlertChecker'
 import { useSwipeGesture } from './hooks/useSwipeGesture'
+import { usePullToRefresh } from './hooks/usePullToRefresh'
 import { useURLState } from './hooks/useURLState'
 import { useChartStore } from './store/useChartStore'
 import { usePresetsStore } from './store/usePresetsStore'
@@ -34,6 +35,8 @@ import { confluenceScore } from './utils/confluence'
 import { TopNav } from './components/layout/TopNav'
 import { Sidebar } from './components/layout/Sidebar'
 import { RightPanel } from './components/layout/RightPanel'
+import { BottomNav } from './components/layout/BottomNav'
+import { useIsMobile, useIsLandscape } from './hooks/useMediaQuery'
 import { CandlestickChart } from './components/chart/CandlestickChart'
 import { PriceDisplay } from './components/chart/PriceDisplay'
 import { EMAOverlay } from './components/indicators/EMAOverlay'
@@ -60,6 +63,9 @@ export default function App() {
   const chartRef = useRef(null)
   const [chart, setChart]             = useState(null)
   const [candleSeries, setCandleSeries] = useState(null)
+  const isMobile    = useIsMobile()
+  const isLandscape = useIsLandscape()
+  const isMobileLandscape = isMobile && isLandscape
 
   const theme             = useChartStore((s) => s.theme)
   const settingsOpen      = useChartStore((s) => s.settingsOpen)
@@ -100,10 +106,28 @@ export default function App() {
   useKeyboardShortcuts()
   useAlertChecker(bars, selectedTimeframe)
 
+  // Pull-to-refresh on mobile
+  const { pullProgress, isRefreshing } = usePullToRefresh({ onRefresh: refetch })
+
   // Swipe gestures — open/close sidebar on touch devices
   const openSidebar  = useCallback(() => useChartStore.getState().setSidebarOpen(true), [])
   const closeSidebar = useCallback(() => useChartStore.getState().setSidebarOpen(false), [])
   useSwipeGesture({ onSwipeRight: openSidebar, onSwipeLeft: closeSidebar })
+
+  // Orientation change — nudge chart to remeasure after rotation
+  useEffect(() => {
+    let timer
+    function handleOrientation() {
+      timer = setTimeout(() => {
+        window.dispatchEvent(new Event('cheechart:layout-resize'))
+      }, 200)
+    }
+    window.addEventListener('orientationchange', handleOrientation)
+    return () => {
+      window.removeEventListener('orientationchange', handleOrientation)
+      clearTimeout(timer)
+    }
+  }, [])
 
   // Refs for snapshot context (avoids stale closure / declaration-order issues)
   const snapshotCtxRef = useRef({ confluence: null, dayType: null })
@@ -209,7 +233,7 @@ export default function App() {
   return (
     <div
       data-theme={theme}
-      className="flex flex-col h-screen overflow-hidden font-mono"
+      className="flex flex-col h-screen-safe overflow-hidden font-mono pt-safe"
       style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}
     >
       {/* Shared overlays (lazy-loaded) */}
@@ -227,7 +251,7 @@ export default function App() {
       <WelcomeBanner />
 
       {/* Main content area: Sidebar + Chart + RightPanel */}
-      <div className="flex flex-1 min-h-0 overflow-hidden">
+      <div className={`flex flex-1 min-h-0 overflow-hidden ${isMobile ? 'pb-[calc(48px+var(--safe-bottom))]' : ''}`}>
 
         {/* Sidebar */}
         <Sidebar atrGauge={atrGauge} />
@@ -236,19 +260,45 @@ export default function App() {
         <div className="flex flex-col flex-1 min-w-0">
 
           {/* Chart sub-header: price + day type */}
-          <div className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 border-b border-theme shrink-0 min-w-0">
-            {bars && <PriceDisplay bars={bars} byDay={byDay} />}
-            <ConfluenceBar confluence={confluence} />
-            <div className="hidden sm:block">
-              <MTFStrip />
+          <div className={`${isMobile ? 'flex flex-col gap-0.5 px-2 py-1' : 'flex items-center gap-3 px-3 py-1.5'} border-b border-theme shrink-0 min-w-0 landscape-compact`}>
+            {/* Row 1: Price (full width on mobile) */}
+            <div className={isMobile ? '' : 'contents'}>
+              {bars && <PriceDisplay bars={bars} byDay={byDay} compact={isMobile} />}
             </div>
-            <div className="ml-auto shrink-0">
-              <DayTypeBanner dayType={dayType} />
+            {/* Row 2 on mobile / same row on desktop: confluence + day type */}
+            <div className={isMobile ? 'flex items-center gap-2 min-w-0' : 'contents'}>
+              <ConfluenceBar confluence={confluence} />
+              {!isMobile && (
+                <div className="hidden sm:block">
+                  <MTFStrip />
+                </div>
+              )}
+              <div className={isMobile ? 'ml-auto shrink-0' : 'ml-auto shrink-0'}>
+                <DayTypeBanner dayType={dayType} />
+              </div>
             </div>
           </div>
 
           {/* Chart */}
-          <div className="flex-1 relative overflow-hidden min-h-0">
+          <div className="flex-1 relative overflow-hidden min-h-0 chart-contain">
+
+            {/* Pull-to-refresh indicator (mobile) */}
+            {(pullProgress > 0 || isRefreshing) && (
+              <div
+                className="absolute left-1/2 -translate-x-1/2 z-10 flex items-center justify-center pointer-events-none"
+                style={{
+                  top: 8,
+                  opacity: isRefreshing ? 1 : pullProgress,
+                  transform: `translateX(-50%) scale(${0.5 + pullProgress * 0.5})`,
+                  transition: isRefreshing ? 'none' : 'opacity 0.1s',
+                }}
+              >
+                <div
+                  className={`w-6 h-6 border-2 border-accent border-t-transparent rounded-full ${isRefreshing ? 'animate-spin' : ''}`}
+                  style={!isRefreshing ? { transform: `rotate(${pullProgress * 360}deg)` } : undefined}
+                />
+              </div>
+            )}
 
             {isLoading && (
               <div
@@ -313,11 +363,13 @@ export default function App() {
             )}
           </div>
 
-          {/* Indicator tab strip (RSI / MACD) */}
-          <IndicatorTabView bars={bars} mainChart={chart} />
+          {/* Indicator tab strip (RSI / MACD) — hidden in landscape mobile */}
+          {!isMobileLandscape && (
+            <IndicatorTabView bars={bars} mainChart={chart} />
+          )}
 
-          {/* Status bar */}
-          <div className="flex items-center px-3 py-1 border-t border-theme shrink-0">
+          {/* Status bar — hidden in landscape mobile to maximize chart */}
+          <div className="flex items-center px-3 py-1 border-t border-theme shrink-0 landscape-hide">
             <StatusBar lastUpdated={dataUpdatedAt} />
           </div>
 
@@ -327,6 +379,9 @@ export default function App() {
         <RightPanel />
 
       </div>
+
+      {/* Bottom navigation — mobile only */}
+      {isMobile && <BottomNav />}
     </div>
   )
 }

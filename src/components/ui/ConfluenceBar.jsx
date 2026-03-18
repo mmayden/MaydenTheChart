@@ -9,6 +9,7 @@
 
 import { useState } from 'react'
 import { SIGNAL_COLORS } from '../../constants/chart'
+import { useIsMobile } from '../../hooks/useMediaQuery'
 
 const LEVEL_COLORS = SIGNAL_COLORS
 
@@ -20,6 +21,7 @@ const BIAS_LABELS = {
 
 export function ConfluenceBar({ confluence }) {
   const [expanded, setExpanded] = useState(false)
+  const isMobile = useIsMobile()
 
   if (!confluence || confluence.level === 'none') return null
 
@@ -71,7 +73,7 @@ export function ConfluenceBar({ confluence }) {
       {/* Expanded breakdown dropdown */}
       {expanded && (
         <div
-          className="absolute top-full left-0 mt-1 z-50 w-72 rounded-lg border border-theme-mid shadow-xl font-mono text-xs"
+          className={`${isMobile ? 'fixed left-2 right-2 bottom-[calc(52px+var(--safe-bottom))]' : 'absolute top-full left-0 mt-1 w-72'} z-50 rounded-lg border border-theme-mid shadow-xl font-mono text-xs`}
           style={{ backgroundColor: 'var(--bg-surface, #0d1117)' }}
         >
           {/* Header */}

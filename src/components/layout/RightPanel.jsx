@@ -15,6 +15,8 @@
 import { lazy, Suspense } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react' // eslint-disable-line no-unused-vars -- motion used as JSX namespace
 import { useChartStore } from '../../store/useChartStore'
+import { useIsMobile } from '../../hooks/useMediaQuery'
+import { BottomSheet } from '../ui/BottomSheet'
 
 // Lazy-load panel components — only loaded when the user first opens them
 const AlertsPanel    = lazy(() => import('../panels/AlertsPanel').then(m => ({ default: m.AlertsPanel })))
@@ -49,41 +51,52 @@ export function RightPanel() {
   const activePanel = useChartStore((s) => s.activePanel)
   const closePanel  = useChartStore((s) => s.closePanel)
   const prefersReduced = useReducedMotion()
+  const isMobile = useIsMobile()
 
   const isOpen = activePanel !== null
   const panel  = activePanel ? PANELS[activePanel] : null
 
+  // Mobile: render panel content inside a bottom sheet
+  if (isMobile) {
+    return (
+      <BottomSheet isOpen={isOpen} onClose={closePanel}>
+        {isOpen && panel && (
+          <>
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-theme shrink-0">
+              <span className="text-sm font-bold tracking-wide">{panel.title}</span>
+              <button
+                onClick={closePanel}
+                className="text-theme-muted hover:text-theme transition-colors text-lg leading-none touch-target"
+              >
+                ×
+              </button>
+            </div>
+            {/* Panel content */}
+            <div className="flex-1 min-h-0 overflow-y-auto pb-safe">
+              <Suspense fallback={<PanelSkeleton />}>
+                <panel.Component />
+              </Suspense>
+            </div>
+          </>
+        )}
+      </BottomSheet>
+    )
+  }
+
+  // Desktop: side panel with width transition
   return (
     <>
-      {/* Backdrop (mobile only) */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            key="panel-backdrop"
-            className="fixed inset-0 bg-black/30 z-[45] md:hidden"
-            onClick={closePanel}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: prefersReduced ? 0 : 0.2 }}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Panel wrapper — always in DOM so width transitions are seamless.
-          On mobile: fixed overlay, slides via translateX.
-          On desktop: relative in flex layout, width transitions smoothly. */}
+      {/* Panel wrapper — always in DOM so width transitions are seamless. */}
       <div
         className={[
-          'fixed top-0 right-0 h-full z-50',
-          'md:relative md:z-auto md:top-auto md:right-auto md:h-auto',
-          'shrink-0 overflow-hidden',
+          'shrink-0 overflow-hidden relative',
           prefersReduced
             ? ''
-            : 'transition-[transform,width,min-width] duration-300 ease-out',
+            : 'transition-[width,min-width] duration-300 ease-out',
           isOpen
-            ? 'translate-x-0 w-full md:w-[340px] md:min-w-[340px]'
-            : 'translate-x-full md:translate-x-0 w-0 md:w-0 md:min-w-0 pointer-events-none',
+            ? 'w-[340px] min-w-[340px]'
+            : 'w-0 min-w-0 pointer-events-none',
         ].join(' ')}
         style={{ backgroundColor: isOpen ? 'var(--bg-surface)' : 'transparent' }}
       >
@@ -91,7 +104,7 @@ export function RightPanel() {
           {isOpen && panel && (
             <motion.div
               key={activePanel}
-              className="flex flex-col h-full border-l border-theme w-full md:w-[340px]"
+              className="flex flex-col h-full border-l border-theme w-[340px]"
               initial={prefersReduced ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={prefersReduced ? undefined : { opacity: 0 }}

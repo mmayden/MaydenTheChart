@@ -11,6 +11,7 @@ import { useState, useRef, useEffect } from 'react'
 import Logo from '../ui/Logo'
 import { useChartStore } from '../../store/useChartStore'
 import { useAlertsStore } from '../../store/useAlertsStore'
+import { useIsMobile } from '../../hooks/useMediaQuery'
 
 const PANEL_BUTTONS = [
   {
@@ -55,6 +56,7 @@ export function TopNav() {
   const setCommandPaletteOpen = useChartStore((s) => s.setCommandPaletteOpen)
   const toggleSidebar        = useChartStore((s) => s.toggleSidebar)
   const startTour            = useChartStore((s) => s.startTour)
+  const isMobile             = useIsMobile()
 
   const alerts      = useAlertsStore((s) => s.alerts)
   const activeCount = alerts.filter((a) => !a.triggered).length
@@ -74,72 +76,78 @@ export function TopNav() {
 
   return (
     <nav
-      className="flex items-center gap-2 px-3 h-11 border-b border-theme shrink-0"
+      className={`flex items-center gap-2 px-3 pl-safe pr-safe border-b border-theme shrink-0 ${isMobile ? 'h-9' : 'h-11'}`}
       style={{ backgroundColor: 'var(--bg-surface)' }}
     >
-      {/* Sidebar toggle */}
-      <button
-        onClick={toggleSidebar}
-        className="flex items-center justify-center w-8 h-8 rounded nav-icon hover:bg-theme-hover transition-colors touch-target"
-        title="Toggle sidebar"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-          <line x1="3" y1="6" x2="21" y2="6" />
-          <line x1="3" y1="12" x2="21" y2="12" />
-          <line x1="3" y1="18" x2="21" y2="18" />
-        </svg>
-      </button>
+      {/* Sidebar toggle — desktop only (mobile uses BottomNav) */}
+      {!isMobile && (
+        <button
+          onClick={toggleSidebar}
+          className="flex items-center justify-center w-8 h-8 rounded nav-icon hover:bg-theme-hover transition-colors touch-target"
+          title="Toggle sidebar"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      )}
 
       <Logo />
 
       <div className="flex-1" />
 
-      {/* Panel toggle icons — order: Alerts, Watchlist, Backtest, Journal */}
-      <div className="flex items-center gap-0.5">
-        {/* Alerts bell (with badge) — first position */}
-        <button
-          onClick={() => setActivePanel('alerts')}
-          aria-label={`Toggle Alerts panel${activeCount > 0 ? ` (${activeCount} active)` : ''}`}
-          aria-pressed={activePanel === 'alerts'}
-          className="nav-btn-alerts relative flex items-center justify-center w-8 h-8 rounded transition-colors touch-target hover:bg-theme-hover"
-          style={{
-            color: 'var(--alert-color)',
-            backgroundColor: activePanel === 'alerts' ? 'var(--alert-active-bg)' : undefined,
-          }}
-          title="Alerts"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="w-4 h-4">
-            <path strokeLinecap="round" strokeLinejoin="round"
-              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-            />
-          </svg>
-          {activeCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-3.5 h-3.5 rounded-full bg-badge text-[8px] font-bold text-white leading-none">
-              {activeCount > 9 ? '9+' : activeCount}
-            </span>
-          )}
-        </button>
+      {/* Panel toggle icons — desktop only (mobile uses BottomNav) */}
+      {!isMobile && (
+        <>
+          <div className="flex items-center gap-0.5">
+            {/* Alerts bell (with badge) — first position */}
+            <button
+              onClick={() => setActivePanel('alerts')}
+              aria-label={`Toggle Alerts panel${activeCount > 0 ? ` (${activeCount} active)` : ''}`}
+              aria-pressed={activePanel === 'alerts'}
+              className="nav-btn-alerts relative flex items-center justify-center w-8 h-8 rounded transition-colors touch-target hover:bg-theme-hover"
+              style={{
+                color: 'var(--alert-color)',
+                backgroundColor: activePanel === 'alerts' ? 'var(--alert-active-bg)' : undefined,
+              }}
+              title="Alerts"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                />
+              </svg>
+              {activeCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-3.5 h-3.5 rounded-full bg-badge text-[8px] font-bold text-white leading-none">
+                  {activeCount > 9 ? '9+' : activeCount}
+                </span>
+              )}
+            </button>
 
-        {PANEL_BUTTONS.map(({ id, title, icon }) => (
-          <button
-            key={id}
-            onClick={() => setActivePanel(id)}
-            aria-label={`Toggle ${title} panel`}
-            aria-pressed={activePanel === id}
-            className={`nav-btn-${id} flex items-center justify-center w-8 h-8 rounded transition-colors touch-target hover:bg-theme-hover`}
-            style={{
-              color: `var(--${id}-color)`,
-              backgroundColor: activePanel === id ? `var(--${id}-active-bg)` : undefined,
-            }}
-            title={title}
-          >
-            {icon}
-          </button>
-        ))}
-      </div>
+            {PANEL_BUTTONS.map(({ id, title, icon }) => (
+              <button
+                key={id}
+                onClick={() => setActivePanel(id)}
+                aria-label={`Toggle ${title} panel`}
+                aria-pressed={activePanel === id}
+                className={`nav-btn-${id} flex items-center justify-center w-8 h-8 rounded transition-colors touch-target hover:bg-theme-hover`}
+                style={{
+                  color: `var(--${id}-color)`,
+                  backgroundColor: activePanel === id ? `var(--${id}-active-bg)` : undefined,
+                }}
+                title={title}
+              >
+                {icon}
+              </button>
+            ))}
+          </div>
 
-      {/* Divider */}
-      <div className="w-px h-5 bg-theme-border mx-1" />
+          {/* Divider */}
+          <div className="w-px h-5 bg-theme-border mx-1" />
+        </>
+      )}
 
       {/* Command palette trigger */}
       <button

@@ -1,6 +1,6 @@
 # Security Standards — Cheechart
 
-> Current as of Phase 14B (2026-03-17). Security is non-negotiable.
+> Current as of Mobile Overhaul M1–M5 (2026-03-18). Security is non-negotiable.
 
 ---
 

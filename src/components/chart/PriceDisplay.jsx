@@ -6,7 +6,7 @@
 import { useMemo } from 'react'
 import { useChartStore } from '../../store/useChartStore'
 
-export function PriceDisplay({ bars, byDay }) {
+export function PriceDisplay({ bars, byDay, compact = false }) {
   const symbol = useChartStore((s) => s.selectedSymbol)
 
   const { price, change, changePct } = useMemo(() => {
@@ -40,6 +40,22 @@ export function PriceDisplay({ bars, byDay }) {
   const isUp   = change >= 0
   const color  = isUp ? 'text-bull' : 'text-bear'
   const sign   = isUp ? '+' : ''
+
+  if (compact) {
+    return (
+      <div className="flex items-baseline gap-1.5 min-w-0 truncate">
+        <span className="font-mono text-xs font-bold" style={{ color: 'var(--symbol-color)' }}>
+          {symbol}
+        </span>
+        <span className="text-theme font-mono text-sm font-bold tabular-nums">
+          {price.toFixed(2)}
+        </span>
+        <span className={`font-mono text-[10px] tabular-nums ${color}`}>
+          {sign}{changePct.toFixed(2)}%
+        </span>
+      </div>
+    )
+  }
 
   return (
     <div className="flex items-baseline gap-2.5 min-w-0">

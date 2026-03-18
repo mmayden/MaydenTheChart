@@ -7,6 +7,7 @@
 
 import { useEffect, useRef } from 'react'
 import { useChartStore } from '../../store/useChartStore'
+import { useIsMobile } from '../../hooks/useMediaQuery'
 import { SymbolInput } from '../chart/SymbolInput'
 import { TimeframeSelector } from '../chart/TimeframeSelector'
 import { PresetSelector } from '../ui/PresetSelector'
@@ -17,6 +18,7 @@ export function Sidebar({ atrGauge }) {
   const sidebarOpen    = useChartStore((s) => s.sidebarOpen)
   const setSidebarOpen = useChartStore((s) => s.setSidebarOpen)
   const theme          = useChartStore((s) => s.theme)
+  const isMobile       = useIsMobile()
   const prevOpenRef    = useRef(sidebarOpen)
 
   // Nudge chart canvases to remeasure after sidebar transition (desktop only).
@@ -27,14 +29,14 @@ export function Sidebar({ atrGauge }) {
     if (prevOpenRef.current === sidebarOpen) return
     prevOpenRef.current = sidebarOpen
 
-    if (window.innerWidth < 768) return
+    if (isMobile) return
 
     const timer = setTimeout(() => {
       window.dispatchEvent(new Event('cheechart:layout-resize'))
     }, 250)
 
     return () => clearTimeout(timer)
-  }, [sidebarOpen])
+  }, [sidebarOpen, isMobile])
 
   return (
     <>
@@ -55,11 +57,12 @@ export function Sidebar({ atrGauge }) {
         style={{ backgroundColor: 'var(--bg-surface)' }}
       >
         <div
-          className="flex flex-col gap-5 px-3 py-4 overflow-y-auto flex-1 transition-opacity duration-200"
+          className="flex flex-col gap-5 px-3 py-4 overflow-y-auto flex-1 transition-opacity duration-200 pb-safe"
           style={{
             opacity: sidebarOpen ? 1 : 0,
             pointerEvents: sidebarOpen ? 'auto' : 'none',
             minWidth: 168,
+            paddingBottom: isMobile ? 'calc(60px + var(--safe-bottom))' : undefined,
           }}
         >
           <div>

@@ -48,6 +48,12 @@
 *::before,
 *::after {
   box-sizing: border-box;
+  -webkit-user-drag: none; /* prevent drag ghost images on iOS */
+}
+
+/* Eliminate 300ms tap delay on mobile */
+html {
+  touch-action: manipulation;
 }
 
 html,
@@ -58,6 +64,8 @@ body,
   padding: 0;
   background-color: #0a0a0a;
   color: #f3f4f6;
+  overscroll-behavior: none; /* prevent iOS rubber-band bounce interfering with chart */
+  -webkit-tap-highlight-color: transparent; /* remove tap flash on iOS/Android */
 }
 
 /* ── Scrollbar styling ───────────────────────────────────────────────────── */
@@ -182,6 +190,12 @@ body,
   --color-info:    #60a5fa;
   --color-neutral: #6b7280;
   --color-badge:   #ef4444;
+
+  /* ── Safe area insets (notched/home-indicator devices) ──────────────── */
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left, 0px);
+  --safe-right:  env(safe-area-inset-right, 0px);
 }
 
 /* Shell backgrounds (root + sidebar) — set via inline style in components */
@@ -285,6 +299,93 @@ body,
     align-items: center;
     justify-content: center;
   }
+}
+
+/* ── Responsive font scaling ─────────────────────────────────────────────── */
+
+:root {
+  --text-xs:   clamp(0.625rem, 0.58rem + 0.2vw, 0.75rem);   /* 10px–12px */
+  --text-sm:   clamp(0.75rem, 0.7rem + 0.2vw, 0.875rem);     /* 12px–14px */
+  --text-base: clamp(0.875rem, 0.82rem + 0.2vw, 1rem);       /* 14px–16px */
+}
+
+/* ── Safe viewport height (dvh with fallback) ───────────────────────────── */
+
+.h-screen-safe {
+  height: 100vh;
+}
+@supports (height: 100dvh) {
+  .h-screen-safe { height: 100dvh; }
+}
+
+/* ── Safe area padding utilities ─────────────────────────────────────────── */
+
+.pt-safe { padding-top:    var(--safe-top); }
+.pb-safe { padding-bottom: var(--safe-bottom); }
+.pl-safe { padding-left:   var(--safe-left); }
+.pr-safe { padding-right:  var(--safe-right); }
+
+/* ── Bottom navigation (mobile only) ─────────────────────────────────────── */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  height: 48px;
+  border-top: 1px solid var(--border);
+  padding-bottom: var(--safe-bottom);
+  background: color-mix(in srgb, var(--bg-surface) 88%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Hide scrollbar on timeframe pill strip */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Bottom sheet (mobile panels) ────────────────────────────────────────── */
+
+.bottom-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px 16px 0 0;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-mid);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  contain: layout style;
+}
+
+.bottom-sheet-handle {
+  width: 48px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border-mid);
+}
+
+/* ── Landscape mobile (short viewport) ───────────────────────────────────── */
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .landscape-hide { display: none !important; }
+  .landscape-compact { padding-top: 2px !important; padding-bottom: 2px !important; }
+}
+
+/* ── Paint containment for chart area ────────────────────────────────────── */
+
+.chart-contain {
+  contain: layout style;
 }
 
 /* ── Mobile responsive ───────────────────────────────────────────────────── */

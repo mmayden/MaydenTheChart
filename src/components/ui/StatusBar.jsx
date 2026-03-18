@@ -6,6 +6,7 @@
 import { useMemo } from 'react'
 import { useChartStore } from '../../store/useChartStore'
 import { useJournalStore } from '../../store/useJournalStore'
+import { useIsMobile } from '../../hooks/useMediaQuery'
 
 /** Map market + WS state to visual properties. */
 function getConnectionStatus(isMarketOpen, wsStatus) {
@@ -28,6 +29,7 @@ export function StatusBar({ lastUpdated }) {
   const wsStatus = useChartStore((s) => s.wsStatus)
   const isMarketOpen = useChartStore((s) => s.isMarketOpen)
   const entries = useJournalStore((s) => s.entries)
+  const isMobile = useIsMobile()
 
   // Today's session stats from journal
   const sessionStats = useMemo(() => {
@@ -55,18 +57,18 @@ export function StatusBar({ lastUpdated }) {
       <div className="flex items-center gap-1.5">
         <span className={`w-1.5 h-1.5 rounded-full ${dotClass}`} />
         <span className={labelColor}>{label}</span>
-        {sublabel && (
+        {!isMobile && sublabel && (
           <span className="text-theme-muted">({sublabel})</span>
         )}
       </div>
-      {timeStr && (
+      {!isMobile && timeStr && (
         <span className="text-theme-muted">
           Updated {timeStr} ET
         </span>
       )}
 
-      {/* Session stats */}
-      {sessionStats && (
+      {/* Session stats — desktop only */}
+      {!isMobile && sessionStats && (
         <div className="flex items-center gap-1.5 ml-auto">
           <span className="text-theme-muted">Today:</span>
           <span className="text-theme">{sessionStats.trades}t</span>
@@ -75,20 +77,22 @@ export function StatusBar({ lastUpdated }) {
         </div>
       )}
 
-      {/* Ko-fi donate link */}
-      <a
-        href="https://ko-fi.com/cheechart"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="ml-auto flex items-center gap-1 text-theme-muted hover:text-bear transition-colors shrink-0"
-        aria-label="Support Cheechart on Ko-fi"
-        title="Support Cheechart"
-      >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-        </svg>
-        <span className="hidden sm:inline">Donate</span>
-      </a>
+      {/* Ko-fi donate link — desktop only */}
+      {!isMobile && (
+        <a
+          href="https://ko-fi.com/cheechart"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ml-auto flex items-center gap-1 text-theme-muted hover:text-bear transition-colors shrink-0"
+          aria-label="Support Cheechart on Ko-fi"
+          title="Support Cheechart"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+          <span className="hidden sm:inline">Donate</span>
+        </a>
+      )}
     </div>
   )
 }

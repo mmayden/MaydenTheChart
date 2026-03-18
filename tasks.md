@@ -19,15 +19,15 @@
 
 ---
 
-## 📌 Deferred — Mobile Polish (low priority)
+## 📌 Deferred — Mobile Polish (follow-up QA)
 
-> Touch targets + swipe gestures are in place. Revisit after core desktop features are complete.
+> Core mobile overhaul (M1–M5) complete. These are follow-up QA items.
 
-- 🔲 Mobile-specific layout testing + QA pass across iOS Safari / Chrome Android
-- 🔲 Panel transitions/animations for mobile overlays
-- 🔲 Responsive chart sub-header (confluence bar + MTF strip overflow on narrow screens)
+- 🔲 iOS Safari / Chrome Android cross-device QA pass
 - 🔲 Onboarding tour mobile variant (currently welcome toast only)
 - 🔲 Lighthouse PWA audit pass
+- 🔲 Bottom sheet snap tuning (spring constants, velocity sensitivity)
+- 🔲 Offline chart data caching (service worker strategy)
 
 ---
 
@@ -38,6 +38,13 @@
 ---
 
 ## ✅ Completed Phases — Archive
+
+### Mobile-First Overhaul (M1–M5) (2026-03-18)
+- **M1:** Safe areas (`env(safe-area-inset-*)`), `100dvh` with fallback, `useMediaQuery`/`useIsMobile`/`useIsLandscape` hooks, `viewport-fit=cover`
+- **M2:** BottomNav (mobile-only): thumb-zone timeframe pills + panel toggles + sidebar hamburger. TopNav slimmed to `h-9` with compact PriceDisplay. StatusBar mobile-optimized (dot+label only)
+- **M3:** BottomSheet component (drag handle, snap points, velocity-based dismiss). RightPanel uses bottom sheet on mobile. Chart sub-header stacks into 2 rows on mobile. ConfluenceBar dropdown repositioned for mobile. Mini chart height 70px on mobile (was 90px)
+- **M4:** Responsive font scaling (`clamp()`). Landscape mode: `landscape-hide`/`landscape-compact` utilities, mini charts hidden, status bar hidden. Chart `contain: layout style`. Orientation change fires `cheechart:layout-resize`
+- **M5:** Pull-to-refresh hook (`usePullToRefresh`). Haptic feedback (`navigator.vibrate`) on alert triggers. PWA manifest: `orientation: any`, `categories`, shortcuts for QQQ/SPY/NVDA
 
 > Collapsed summaries. See `project.md` session log for full details.
 

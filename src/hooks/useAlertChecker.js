@@ -56,6 +56,9 @@ function fireNotification(title, body) {
   // Play sound if enabled
   const soundEnabled = useChartStore.getState().soundAlerts
   if (soundEnabled) playAlertSound()
+
+  // Haptic feedback on mobile (feature-detected)
+  if (navigator.vibrate) navigator.vibrate(200)
 }
 
 /**

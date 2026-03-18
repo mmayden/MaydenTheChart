@@ -97,7 +97,9 @@ TopNav → Sidebar (left) → Chart (center) → RightPanel (right, one at a tim
 
 **Right panel system:** `activePanel` in useChartStore controls which panel is shown.
 Values: `null | 'alerts' | 'backtest' | 'journal' | 'watchlist'`. Same panel = close,
-different panel = switch. On mobile (<768px), panels become full-screen overlays.
+different panel = switch. On mobile (<768px), panels render inside a draggable `BottomSheet`
+component (snap points at 50%/90%, velocity-based dismiss). On desktop, side panel with
+width transition.
 
 **Color architecture — two-tier system:**
 
@@ -145,8 +147,10 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - All visual emphasis respects `prefers-reduced-motion`
 
 **Animation system:**
-- **RightPanel:** Persistent wrapper with CSS `transition-[transform,width,min-width]`.
+- **RightPanel (desktop):** Persistent wrapper with CSS `transition-[width,min-width]`.
   Border on inner content, not wrapper. Chart area resizes seamlessly.
+- **RightPanel (mobile):** Renders inside `<BottomSheet>` — no width transitions,
+  uses GPU-accelerated height transform. Backdrop handled by BottomSheet component.
 - **Sidebar:** Simple `transition-all duration-200` on the `<aside>`. Original pattern.
 - **Content transitions (Motion):** RightPanel uses `AnimatePresence` opacity fade for
   panel switching. CommandPalette and SettingsModal use scale+fade entrance/exit.
@@ -189,10 +193,32 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Scale handling: `axisDoubleClickReset: true` — double-click axis to reset zoom
 - Right price scale: `alignLabels: true`, `scaleMargins: { top: 0.05, bottom: 0.05 }`
 - Volume: 55% alpha, `scaleMargins: { top: 0.82 }` — doesn't compete with candles
-- Mini charts (RSI/MACD): 90px tall, vertical grid hidden, horizontal dotted, no axis borders
+- Mini charts (RSI/MACD): 90px desktop / 70px mobile, vertical grid hidden, horizontal dotted, no axis borders
 - Shared mini chart config: `src/components/ui/miniChartConfig.js`
 - Layout font: 11px, text `#9ca3af` for axis labels
 - CrosshairLegend: 10px font, 85% opaque bg, positioned (6,6)
+
+**Mobile architecture (M1–M5 overhaul):**
+- **Breakpoint strategy:** `useIsMobile()` (max-width 767px) is the primary gate. All mobile
+  changes are gated behind this hook or `md:` Tailwind breakpoints. Desktop is zero-regression.
+- **Bottom navigation:** `BottomNav.jsx` (mobile only, `md:hidden`). Fixed bottom bar with
+  scrollable timeframe pills, panel toggles, sidebar hamburger. 48px + safe-area-bottom.
+  Translucent `backdrop-filter: blur(12px)`.
+- **Bottom sheets:** `BottomSheet.jsx` replaces full-screen panel overlays on mobile.
+  Drag handle, snap points (50%/90%), velocity-based dismiss. GPU-accelerated (transform only).
+  `RightPanel.jsx` conditionally renders `<BottomSheet>` when `useIsMobile()`.
+- **Safe areas:** `viewport-fit=cover` in `index.html`. CSS vars `--safe-*` from
+  `env(safe-area-inset-*)`. Utility classes `.pt-safe`/`.pb-safe`/`.pl-safe`/`.pr-safe`.
+  TopNav uses `pl-safe pr-safe`, sidebar uses `pb-safe`.
+- **Viewport height:** `.h-screen-safe` uses `100dvh` with `100vh` fallback.
+- **Landscape:** `@media (orientation: landscape) and (max-height: 500px)` —
+  `.landscape-hide` (status bar), `.landscape-compact` (sub-header). Mini charts hidden
+  in mobile landscape. Orientation change fires `cheechart:layout-resize`.
+- **Responsive fonts:** CSS vars `--text-xs`/`--text-sm`/`--text-base` using `clamp()`.
+- **Performance:** `.chart-contain` (`contain: layout style`) on chart wrapper.
+  `.bottom-sheet` has `contain: layout style`. All animations use transform/opacity only.
+- **Pull-to-refresh:** `usePullToRefresh` hook — touch-only, 60px threshold, shows spinner.
+- **Haptic feedback:** `navigator.vibrate(200)` on alert triggers (feature-detected).
 
 ## Key file locations
 
@@ -200,7 +226,9 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - App shell (single-page): `src/App.jsx`
 - Top navigation bar: `src/components/layout/TopNav.jsx`
 - Left sidebar (chart controls): `src/components/layout/Sidebar.jsx`
-- Right panel shell: `src/components/layout/RightPanel.jsx`
+- Right panel shell: `src/components/layout/RightPanel.jsx` (side panel desktop, bottom sheet mobile)
+- Bottom navigation (mobile only): `src/components/layout/BottomNav.jsx` — timeframe pills + panel toggles
+- Bottom sheet (mobile panels): `src/components/ui/BottomSheet.jsx` — draggable, snap points, velocity dismiss
 - URL state sync: `src/hooks/useURLState.js`
 
 ### Chart & Indicators
@@ -211,11 +239,19 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Backtester engine: `src/utils/backtest.js`
 - Constants (EMA colors etc): `src/constants/chart.js`
 - Main chart: `src/components/chart/CandlestickChart.jsx`
+- Live price + % change header: `src/components/chart/PriceDisplay.jsx`
 - Symbol input + autocomplete: `src/components/chart/SymbolInput.jsx`
+- Timeframe button group: `src/components/chart/TimeframeSelector.jsx`
 - Crosshair OHLCV legend: `src/components/ui/CrosshairLegend.jsx`
 - RSI/MACD mini charts: `src/components/ui/IndicatorTabView.jsx` (container + HTML labels) + `RSIMiniChart.jsx` + `MACDMiniChart.jsx` + `miniChartConfig.js` (shared opts)
-- Bollinger Bands overlay: `src/components/indicators/BollingerOverlay.jsx`
 - Sidebar indicator toggles (all indicators): `src/components/ui/IndicatorToggle.jsx`
+
+### Indicator Overlays
+- EMA 9/48/200 line series: `src/components/indicators/EMAOverlay.jsx`
+- VWAP + σ band series: `src/components/indicators/VWAPOverlay.jsx`
+- Prev H/L, ORB zone, ODC: `src/components/indicators/LevelOverlay.jsx`
+- S/R lines + swing markers: `src/components/indicators/SROverlay.jsx`
+- Bollinger Bands: `src/components/indicators/BollingerOverlay.jsx`
 
 ### Synthesis Layer
 - Confluence bar: `src/components/ui/ConfluenceBar.jsx` — setup quality readout (glow + pulse on strong setups)
@@ -247,8 +283,10 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - MTF signals: `src/hooks/useMTFSignals.js`
 - Watchlist quotes: `src/hooks/useWatchlistQuotes.js`
 - Swipe gestures (touch devices): `src/hooks/useSwipeGesture.js`
+- Media queries (reactive): `src/hooks/useMediaQuery.js` — `useIsMobile()`, `useIsTablet()`, `useIsLandscape()`
+- Pull-to-refresh (mobile): `src/hooks/usePullToRefresh.js` — touch gesture, threshold-based trigger
 
-### Right Panels (slide-out, one at a time)
+### Right Panels (slide-out on desktop, bottom sheet on mobile)
 - Alerts panel: `src/components/panels/AlertsPanel.jsx`
 - Backtest panel: `src/components/panels/BacktestPanel.jsx`
 - Journal panel: `src/components/panels/JournalPanel.jsx`

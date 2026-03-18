@@ -498,29 +498,22 @@ Component state (useState — local only):
 - [x] Phase 10A: Architecture consolidation — single-page panel system, killed react-router-dom
 - [x] Phase 10B: Synthesis layer — confluence score, MTF strip, backtester upgrade
 - [x] Phase 10C: Panel content — watchlist live prices, journal analytics, sound alerts, session stats
-- [x] Phase 11A: Security hardening — localStorage schema validation, API error sanitization, Notification guard, code splitting (501KB → 303KB main)
-- [x] Phase 11B: CSS theme refactor (eliminated 33 !important overrides), touch targets (44px+), swipe gestures, chart snapshot (Cmd+Shift+S)
+- [x] Phase 11A: Security hardening — localStorage validation, API error sanitization, code splitting (501KB → 303KB)
+- [x] Phase 11B: CSS theme refactor (33 !important eliminated), touch targets 44px+, swipe gestures, chart snapshot
 - [x] Phase 11C: PWA (manifest, service worker, icons), onboarding tour (4-step tooltip)
-- [x] Alert system: price-level + candle-streak alerts with browser notifications
-- [x] QOL: crosshair legend, toasts, viewport persistence, keyboard shortcuts, error boundary
-- [x] Health audits: security headers, input validation, shared utilities, dead code cleanup
-- [x] Comprehensive audit (2026-03-15): security hardening (rate limiting, SSRF guard, input validation), ESLint, timezone tests, backtest test determinism, contract fixes, dead code cleanup
-
-### Completed (continued)
 - [x] Phase 12A: Production hardening — cache headers, self-host fonts, SW auto-versioning, OG meta, Sentry, reduced-motion
-- [x] Phase 12B: UX sharpening — Motion library (content transitions), skeleton loading states, accent color customization, layout transition fix
+- [x] Phase 12B: UX sharpening — Motion library, skeleton loading, accent color customization, layout transition fix
 - [x] Phase 12C: Dependency upgrades — React 19, Zustand 5, Vite 8, Tailwind 4
-- [x] Phase 12D: Data provider abstraction — provider interface, Alpaca adapter, hooks renamed (useBars, useLiveFeed), TIMEFRAME_CONFIG decoupled
-- [x] Phase 12E: Infinite scroll — useInfiniteHistory hook, scroll-back fetch with viewport save/restore, per-timeframe pageSize/maxBars caps, loading indicator
-- [x] Process hardening — husky + lint-staged pre-commit hooks, GitHub Actions CI, shared SYMBOL_RE, font preload, snapshot.js minimal disclosure
-- [x] Phase 13B: First impression polish — 9 hardcoded color violations fixed, confluence bar visual emphasis (glow/pulse on strong setups), accessibility (focus-visible, aria-modal, aria-label/pressed on panels)
-- [x] Phase 13A: Traction readiness — snapshot watermark with confluence/day-type, welcome banner, Ko-fi link, branded OG image (1200x630), codebase cleanup (dead shims removed, localStorage keys standardized)
-- [x] Phase 14A: Chart visual overhaul — Webull-inspired refinements (dotted grid, dashed crosshair, bar spacing, axis cleanup, volume alpha, mini chart tuning)
-- [x] Phase 14B: Observability — structured logger, Sentry enhanced (captureException, breadcrumbs, browserTracing, web vitals), API request IDs, data fetch error toasts
-- [x] Phase 14C: Chart interaction UX — kinetic scrolling (mouse + touch), magnet crosshair, explicit scroll/scale handling, double-click axis reset
-
-### Completed (continued)
-- [x] Phase 13C: Discoverability — robots.txt, sitemap, canonical URL, branded PWA icons (192/512), SEO meta description
+- [x] Phase 12D: Data provider abstraction — provider interface, Alpaca adapter, hooks renamed
+- [x] Phase 12E: Infinite scroll — useInfiniteHistory hook, scroll-back fetch, per-timeframe caps
+- [x] Phase 13A: Traction readiness — snapshot watermarks, welcome banner, Ko-fi link, branded OG image
+- [x] Phase 13B: First impression polish — hardcoded color fixes, confluence glow/pulse, accessibility
+- [x] Phase 13C: Discoverability — robots.txt, sitemap, canonical URL, branded PWA icons, SEO meta
+- [x] Phase 14A: Chart visual overhaul — Webull-inspired (dotted grid, dashed crosshair, bar spacing, axis cleanup)
+- [x] Phase 14B: Observability — structured logger, Sentry enhanced, API request IDs, web vitals, error toasts
+- [x] Phase 14C: Chart interaction UX — kinetic scrolling, magnet crosshair, scroll/scale handling
+- [x] Process hardening — husky + lint-staged, GitHub Actions CI, shared SYMBOL_RE
+- [x] Comprehensive audits — security (rate limiting, SSRF, input validation), ESLint, timezone tests, dead code cleanup
 
 ### Upcoming
 - [ ] Phase 12F: Future differentiators — screener, trade replay, annotations, gap tracking, cloud sync
@@ -583,3 +576,4 @@ Component state (useState — local only):
 | 2026-03-17 | **Bugfix: data freshness + confluence dropdown.** (1) Live data not updating — `useBars.js` disabled REST polling entirely when WebSocket reported 'subscribed' status, but WS can subscribe without delivering bars (low volume, market closed, stale connection). Changed to 2-minute safety-net poll even when WS is active. (2) `queryClient.js` `refetchOnWindowFocus` changed from `false` to `'always'` — switching tabs now triggers immediate data refresh instead of requiring manual reload. (3) ConfluenceBar dropdown invisible — `overflow-hidden` on the chart sub-header div (`App.jsx`) clipped the absolutely-positioned expanded breakdown panel. Removed `overflow-hidden`. 298/298 tests, build clean. |
 | 2026-03-17 | **Level/line clarity overhaul.** (1) S/R filter tightened — resistance strictly above price, support strictly below (removed 0.2% buffer that put "R ×3" labels below current price). (2) S/R labels now always show strength: "R ×1", "S ×2" etc. (was "R " with trailing space for single-pivot). (3) ODC color changed from amber (#f59e0b) to slate (#94a3b8) — distinct from gold PDH/PDL. (4) S/R max levels reduced from 8 to 5 per type, sorted by strength before cap (strongest survive). 298/298 tests, build clean. |
 | 2026-03-17 | **Phase 13C complete: Discoverability.** (1) `robots.txt` — allow all crawlers with sitemap reference. (2) `sitemap.xml` — single URL, daily changefreq. (3) Canonical URL `<link rel="canonical">` in index.html. (4) Branded PWA icons — `scripts/generate-icons.js` creates 192/512 PNGs via sharp (gold "C" monogram + candlestick chart on dark bg, rounded corners). Replaced 1x1 placeholder PNGs. (5) SEO meta description updated to target "free day trading chart tool" / "TradingView alternative" with feature list. OG description synced. Vercel rewrite rules added for robots.txt + sitemap.xml. 298/298 tests, build clean. |
+| 2026-03-18 | **Mobile-first overhaul complete (M1–M5).** Deep-dive UX research on Webull/TradingView/thinkorswim/Robinhood mobile apps + modern PWA design patterns. 5-phase implementation, 4 new files, 14 modified files, 0 new dependencies. **M1 Foundation:** `useMediaQuery`/`useIsMobile`/`useIsLandscape` reactive hooks, safe area CSS vars (`env(safe-area-inset-*)`), `100dvh` with fallback, `viewport-fit=cover`. **M2 Bottom Nav:** `BottomNav.jsx` mobile-only thumb-zone bar with scrollable timeframe pills + panel toggles. TopNav slimmed to `h-9` with compact PriceDisplay. StatusBar mobile-optimized. Panel toggles + hamburger moved from TopNav to BottomNav on mobile. **M3 Bottom Sheets:** `BottomSheet.jsx` with drag handle, snap points (50%/90%), velocity-based dismiss, Motion v12 springs. RightPanel conditionally renders bottom sheet on mobile. Chart sub-header stacks into 2 rows on mobile. ConfluenceBar dropdown repositioned. Mini charts 70px on mobile. **M4 Landscape + Performance:** Responsive font scaling (`clamp()`), landscape rules (`.landscape-hide`/`.landscape-compact`), mini charts hidden in mobile landscape, `contain: layout style` on chart, orientation change fires resize event. **M5 Polish:** `usePullToRefresh` hook (touch-only, 60px threshold). Haptic feedback on alerts (`navigator.vibrate`). PWA manifest: `orientation: any`, `categories`, shortcuts for QQQ/SPY/NVDA. Global: `overscroll-behavior: none`, `touch-action: manipulation`, `-webkit-tap-highlight-color: transparent`. Desktop zero-regression — all mobile changes gated behind `useIsMobile()` / `md:` breakpoints. 298/298 tests, build clean, ESLint 0 errors. |
