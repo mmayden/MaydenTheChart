@@ -14,8 +14,8 @@ interface that makes high-probability setups obvious and low-probability conditi
 
 **Target audience:** Beginner-to-intermediate day traders who want structure. People
 overwhelmed by TradingView's complexity, or limited by its free tier (1 indicator/chart).
-Cheechart gives 8 indicators, confluence scoring, one-click backtesting, and a trade
-journal — no signup, no ads, no paywall. Free forever, donation-supported.
+Cheechart gives 10+ indicators, confluence scoring, one-click backtesting, a setup
+screener, and a trade journal — no signup, no ads, no paywall. Free forever, donation-supported.
 
 **Growth strategy:** Shareable chart screenshots with confluence score watermarks drive
 organic discovery. See `growth.md` for full traction plan.
@@ -156,21 +156,40 @@ friction — you can't see backtest results alongside the chart that produced th
 │ Indic. │                                          │ [Watchlist]  │
 │ ATR    │                                          │ [Alerts]     │
 │        ├──────────────────────────────────────────┤              │
-│        │  RSI / MACD mini-charts (labeled)          │              │
+│        │  [RSI|MACD] tabbed sub-chart + value       │              │
 │        ├──────────────────────────────────────────┤              │
 │        │  Status bar                              │              │
 └────────┴──────────────────────────────────────────┴──────────────┘
 ```
 
-**Right panel system:** A single slot — only one panel open at a time (Alerts, Backtest,
-Journal, or Watchlist), toggled via TopNav icons or Cmd+K. Same pattern as VS Code's
-sidebar, Linear's detail panels, and Bloomberg's modular layout.
+**Right panel system:** A single slot — only one panel open at a time (Alerts, Screener,
+Watchlist, Backtest, Journal, or Replay), toggled via TopNav icons or Cmd+K. Same pattern as
+VS Code's sidebar, Linear's detail panels, and Bloomberg's modular layout.
 
 **Mobile (<768px):** Bottom navigation bar replaces TopNav panel toggles. Right panels render
 inside a draggable `BottomSheet` component (snap points 50%/90%, velocity-based dismiss).
 Sidebar opens as a fixed overlay. Safe areas respected via `env(safe-area-inset-*)`.
-Landscape mode hides status bar and mini charts, compacts sub-header.
 All mobile changes gated behind `useIsMobile()` hook — desktop is zero-regression.
+
+**Mobile layout optimization (Phase 15D):** Price, confluence, and day type moved into TopNav
+on mobile — sub-header row eliminated (~50px saved). Status bar removed on mobile — connection
+status dot integrated into BottomNav hamburger button (~28px saved). Chart gets 69% of iPhone 14
+screen (582px), up from 60% (504px). Desktop layout unchanged.
+
+**Sub-indicator system (Phase 15A):** RSI and MACD render in a single tabbed sub-chart area.
+Inline tab labels inside chart (no separate row overhead). Only one indicator visible at a time
+on mobile; desktop preserves stacked option. Value overlay (`SubIndicatorValueOverlay`) shows
+current indicator reading as HTML label (ref-based DOM mutation, updates on crosshair move).
+Swipe-down (>30px) on mobile dismisses sub-indicators.
+
+**Full-screen chart mode (Phase 15B):** Double-click (desktop) or double-tap (mobile) to enter.
+All chrome hides — chart fills 100dvh. Exit: ESC key, exit pill (persistent "Tap to exit" on
+mobile, auto-fading "ESC to exit" on desktop), or double-tap again. `isFullscreen` state in
+useChartStore. Chart fires `cheechart:layout-resize` on toggle.
+
+**Long-press alerts (Phase 15C):** 500ms long-press on chart → haptic → price from touch Y →
+alert created via `useAlertsStore` + success toast. Auto-detects above/below based on current
+price. Ignores volume zone (bottom 18% of chart). Fastest alert creation path on any free platform.
 
 **Routing:** No react-router-dom. Single-page app. URL state sync handles `?s=QQQ&tf=5m&p=full`
 for shareability without page routes.
@@ -246,23 +265,57 @@ Make it sticky, portable, and hardened.
 | **Code splitting** | React.lazy() for 6 components, manualChunks for lightweight-charts + vendor-api — bundle 501KB → 226KB main + 164KB charts + 81KB vendor |
 | **CSS theme refactor + two-tier color system** | Eliminated 33 !important overrides → 20+ semantic utility classes powered by CSS variables. All HTML/React colors use CSS variables (`var(--color-bull)`, `var(--bg-base)`, etc.). All lightweight-charts API colors use named constants from `chart.js` (the library needs hex strings). Per-panel icon colors (alerts amber, watchlist teal, backtest purple, journal coral/red, cmd-palette purple, settings cyan/mint/gold). Zero hardcoded hex values in component files. |
 | **Nav button micro-animations** | Each TopNav icon has a unique keyframe hover animation: bell rings, watchlist bounces up, backtest EKG pulses, journal tilts open, search zooms, settings gear spins with glow. All pop to 1.25-1.4x on hover via CSS-only keyframes. |
-| **Mobile polish pass** | Touch targets 44px+ via `@media (pointer: coarse)`, swipe gestures (right=sidebar, left=close), chart fills viewport |
+| **Mobile polish pass** | Touch targets 44px+ via `@media (pointer: coarse)`, chart fills viewport, sidebar via BottomNav hamburger (swipe gestures removed — redundant with button) |
 | **Chart snapshot** | Cmd+Shift+S captures chart as PNG with watermark, copies to clipboard (download fallback). Command palette + settings reference. |
 | **PWA manifest** | Installable to home screen — manifest.json, network-first service worker, apple-touch-icon |
 | **First-visit onboarding** | 4-step tooltip tour highlighting Day Type, ATR gauge, presets, Cmd+K. Mobile gets welcome toast. |
 
-### Tier 6 — Future Differentiators (Phase 12+)
+### Tier 6 — Future Differentiators (Phase 12F+)
 The nuclear options — each one could be a product on its own.
 
-| Feature | Why it's here |
-|---|---|
-| **Screener** | Scan watchlist for active setups ("QQQ: ORB breakout + RVOL 2.1x"). No free tool does this. |
-| **Trade replay mode** | Step through historical days bar-by-bar with indicators updating live. Webull's replay is visual-only — ours would have simulated trades + stats. |
-| **Chart annotations** | Click to add notes/arrows directly on chart, saved per symbol |
-| **Weekly gap tracking** | Panel showing unfilled QQQ weekly gaps with distance from current price |
-| **Volume profile (horizontal)** | Price levels with most traded volume = strongest S/R |
-| **Alert sets per preset** | Tie alert configurations to presets — huge pain point on every platform |
-| **Cloud sync / preset export** | Multi-device persistence, preset sharing between traders |
+| Feature | Status | Why it's here |
+|---|---|---|
+| **Screener** | ✅ DONE | Scans watchlist for active setups, ranked by confluence score. No free tool does this. |
+| **RSI Divergence Markers** | ✅ DONE | Detects bull/bear divergences, renders ▲/▼ arrows on main chart. Toggle: `rsiDiv`. |
+| **4hr EMA Cross Annotations** | ✅ DONE | Fetches 4hr bars, detects EMA 9×48 crosses, maps to current timeframe. Toggle: `emaCross`. |
+| **Trade Replay** | ✅ DONE | Step through historical days bar-by-bar. Play/pause/speed (1x–10x). Simulated buy/sell trades with running P&L, trade history, win rate. Arrow keys + Space for transport. |
+| **Chart Annotations** | ✅ DONE | Click to add text notes, arrows, horizontal lines on chart, saved per symbol in localStorage. Floating toolbar, keyboard shortcut `N`. |
+| **Weekly Gap Tracking** | ✅ DONE | Detects unfilled weekly gaps, renders as price line pairs on chart. Fill % tracking. Uses `useWeeklyBars` hook for 1yr weekly bars. Toggle: `gaps`. |
+| **Volume profile (horizontal)** | ✅ DONE | Price-level volume histogram via ISeriesPrimitive canvas drawing. POC (Point of Control) + Value Area (70% volume). Bull/bear split per row. Toggle: `volProfile`. |
+| **Alert sets per preset** | ✅ DONE | Alerts persist per-preset in localStorage (`cheechart-alerts-{presetId}`). Switch presets = swap alert sets. Save-as copies, delete cleans up. |
+| **Backup & restore** | ✅ DONE | Versioned JSON export/import (Settings > Data tab). 5MB gate, magic marker, all fields validated, proto rejection, array caps. Command palette commands. |
+| **Preset share links** | ✅ DONE | `?share=<base64url>` with compact indicator bitfield. Stateless — works with or without auth. Decoded, applied, URL cleaned. |
+| **Cloud sync** | Planned | Multi-device persistence — deferred until auth/user accounts exist |
+
+### Phase 15 — Mobile UX Leap (Sub-indicator + Fullscreen + Long-press Alerts)
+
+Competitive gap analysis: Webull/TradingView mobile apps have 3 key patterns Cheechart lacks.
+This phase closes the gap and adds features neither competitor offers for free.
+
+**Phase 15A: Tabbed Sub-indicator**
+- Replace stacked RSI + MACD (two separate `createChart()` instances, 140px on mobile) with a
+  single tabbed sub-chart area. Tab bar: `RSI | MACD` — tappable, swipeable on mobile.
+- **Value overlay:** Current indicator value shown as an HTML label (e.g., "RSI(14): 62.35",
+  "MACD: 0.42 / Sig: 0.31 / Hist: 0.11") — no more squinting at the tiny right axis.
+- **Crosshair value:** When crosshair is active, the overlay updates to show the value at
+  the hovered bar, not just the latest value.
+- Single chart instance instead of two = better memory/perf on mobile.
+- Desktop: tabs still available but both can show simultaneously (existing behavior preserved
+  as an option). Mobile: strictly one at a time.
+
+**Phase 15B: Full-screen Chart Mode**
+- Tap chart area → all chrome fades out (TopNav, BottomNav, sub-charts, status bar, sub-header).
+  Chart fills 100% of viewport. Tap again → chrome returns.
+- This is the #1 most-requested mobile feature on Webull/TradingView app stores.
+- Respects `prefers-reduced-motion` (instant show/hide instead of fade).
+- Small floating "exit fullscreen" pill in top-right corner (auto-fades after 2s).
+
+**Phase 15C: Long-press Alert Creation**
+- Long-press (500ms) anywhere on chart → haptic feedback → horizontal price line appears at
+  touch Y position → bottom sheet slides up with "Create Alert at $XXX.XX" pre-filled.
+- Eliminates multi-step flow: open alerts panel → tap add → enter price.
+- Webull has this on mobile but requires paid tier. TradingView has it but limits free alerts.
+- Uses existing `useAlertsStore` — just a faster input path.
 
 ---
 
@@ -315,7 +368,7 @@ createSocket({ onBar, onStatus, getSymbol }) → { connect, disconnect }
 - Permissions-Policy: camera/microphone/geolocation disabled
 
 **Performance targets:**
-- Main bundle: <330KB (currently 329KB + 161KB charts + 92KB motion + 69KB vendor, 8 lazy chunks — Vite 8/Rolldown)
+- Main bundle: <350KB (currently 324KB + 161KB charts + 92KB motion + 69KB vendor, 11 lazy chunks — Vite 8/Rolldown)
 - LCP: <2.5s (self-hosted fonts, no external blocking requests)
 - INP: <200ms (canvas-based chart interactions bypass DOM)
 - CLS: <0.1 (fixed layout, no late-loading content)
@@ -334,9 +387,10 @@ Server state (TanStack Query):
 Client state (Zustand — useChartStore):
   - selectedTimeframe: '5Min'
   - selectedSymbol: 'QQQ'
-  - indicators: { ema, vwap, rvol, rsi, macd, levels, sr, bollinger }
+  - indicators: { ema, vwap, rvol, rsi, macd, levels, sr, bollinger, rsiDiv, emaCross, gaps, volProfile }
   - theme: 'dark' | 'lumpia' | 'terminal'
-  - activePanel: null | 'alerts' | 'backtest' | 'journal' | 'watchlist'
+  - activePanel: null | 'alerts' | 'backtest' | 'journal' | 'watchlist' | 'screener' | 'replay'
+  - annotationMode: null | 'text' | 'arrow' | 'hline'
   - sidebarOpen: boolean
   - wsStatus, isMarketOpen
 
@@ -348,6 +402,12 @@ Client state (Zustand — useJournalStore):
 
 Client state (Zustand — useAlertsStore):
   - Alert definitions + triggered state
+
+Client state (Zustand — useAnnotationsStore):
+  - Per-symbol chart annotations: text notes, arrows, hlines (persisted to localStorage)
+
+Client state (Zustand — useReplayStore):
+  - Replay mode: bar stepping, play/pause/speed, simulated trades, running P&L
 
 Component state (useState — local only):
   - Hover states, animation, tooltip position
@@ -365,7 +425,7 @@ Component state (useState — local only):
 | `src/services/providers/alpaca.js` | Alpaca adapter — bar normalization, timeframe mapping, WS protocol |
 | `src/services/queryClient.js` | TanStack Query client config + default options |
 | `src/services/websocket.js` | Provider-agnostic WebSocket manager — connection lifecycle, reconnect with exponential backoff |
-| `src/services/sentry.js` | Sentry error tracking + web vitals — conditional init via `VITE_SENTRY_DSN`, `browserTracingIntegration`, `reportWebVitals()` |
+| `src/services/sentry.js` | Sentry error tracking + web vitals — dynamically imported via `import()` (zero cost when DSN unset), `browserTracingIntegration`, `reportWebVitals()`, `getSentry()` accessor for logger |
 | `src/utils/logger.js` | Structured logger — level-gated (debug/info/warn/error), `[tag]` prefixes, auto Sentry forwarding via `captureException` |
 | `api/bars.js` | Vercel serverless proxy — provider-routed (currently Alpaca, keys server-only, pagination) |
 | `api/ws-auth.js` | Vercel serverless function — returns WS credentials, protected by bearer token |
@@ -380,11 +440,13 @@ Component state (useState — local only):
 ### Stores (Zustand)
 | File | Purpose |
 |---|---|
-| `src/store/useChartStore.js` | Primary UI state — timeframe, symbol, indicator toggles, active panel, theme, sound alerts, WS status |
+| `src/store/useChartStore.js` | Primary UI state — timeframe, symbol, indicator toggles, active panel, annotationMode, theme, sound alerts, WS status |
 | `src/store/usePresetsStore.js` | Preset CRUD — save/load/rename/delete named presets, localStorage persistence |
 | `src/store/useAlertsStore.js` | Alert definitions, triggered state |
 | `src/store/useJournalStore.js` | Trade journal CRUD + stats (localStorage persisted) |
 | `src/store/useToastStore.js` | Toast notification queue (add/remove/auto-dismiss) |
+| `src/store/useAnnotationsStore.js` | Per-symbol chart annotations (text/arrow/hline), localStorage persistence |
+| `src/store/useReplayStore.js` | Replay state — bar stepping, play/pause/speed, simulated trades, P&L tracking |
 
 ### Hooks
 | File | Purpose |
@@ -393,15 +455,20 @@ Component state (useState — local only):
 | `src/hooks/useInfiniteHistory.js` | Infinite scroll-back — fetches older bars on scroll, prepends to TanStack cache |
 | `src/hooks/useLiveFeed.js` | React hook — WS market-hours gating, 1-min bar aggregation, TanStack cache injection |
 | `src/hooks/useDailyBars.js` | TanStack Query hook for daily bars (ATR gauge) |
-| `src/hooks/useKeyboardShortcuts.js` | Global keyboard shortcuts (1-6 timeframes, [/] presets, Cmd+K, panel toggles) |
+| `src/hooks/useWeeklyBars.js` | TanStack Query hook for weekly bars (gap detection) |
+| `src/hooks/useKeyboardShortcuts.js` | Global keyboard shortcuts (1-6 timeframes, [/] presets, Cmd+K, A/B/J/W/F/R panels, N annotate) |
 | `src/hooks/useViewportPersistence.js` | Preserves chart zoom/scroll across live data updates |
 | `src/hooks/useAlertChecker.js` | Checks alert conditions against incoming bar data |
-| `src/hooks/useSwipeGesture.js` | Horizontal swipe detection for sidebar open/close on touch devices |
+| `src/hooks/useSwipeGesture.js` | Horizontal swipe detection (sidebar open/close on desktop touch devices; disabled on mobile — BottomNav hamburger is the single toggle) |
 | `src/hooks/useURLState.js` | Bidirectional URL state sync (?s=QQQ&tf=5m&p=full&panel=backtest) |
 | `src/hooks/useMTFSignals.js` | Multi-timeframe EMA signals — parallel TanStack Query fetches across 5m/15m/1h/4h/1D |
 | `src/hooks/useWatchlistQuotes.js` | TanStack Query hook for watchlist live prices (Alpaca snapshots, 30s auto-refresh) |
+| `src/hooks/useScreener.js` | Scans watchlist symbols — fetches 5m + daily bars, computes confluence for each, returns ranked results |
+| `src/hooks/useEMACrosses.js` | Fetches 4hr bars, computes EMA 9/48, detects crossovers — returns `[{ time, direction }]` |
 | `src/hooks/useMediaQuery.js` | Reactive media query hook — `useIsMobile()`, `useIsTablet()`, `useIsLandscape()` convenience exports |
 | `src/hooks/usePullToRefresh.js` | Touch-only pull-to-refresh gesture — 60px threshold, spinner feedback |
+| `src/hooks/useLongPress.js` | Long-press detection (500ms, 10px move cancel) — used for mobile chart alert creation |
+| `src/hooks/useFocusTrap.js` | Focus trap for modals — Tab/Shift+Tab cycle within container, focus restore on close |
 
 ### Indicator Math (pure functions)
 | File | Purpose |
@@ -414,6 +481,9 @@ Component state (useState — local only):
 | `src/utils/timezone.js` | Shared ET timezone utilities (toETDateString, toETTime) |
 | `src/utils/normalizeBar.js` | Shared Alpaca bar → lightweight-charts bar normalizer |
 | `src/utils/validate.js` | localStorage schema validation (presets, journal, watchlist, symbol usage) |
+| `src/utils/gaps.js` | Weekly gap detection + fill tracking (15 tests) |
+| `src/utils/volumeProfile.js` | Volume profile math — price-level bins, POC, Value Area, bull/bear split (21 tests) |
+| `src/utils/backup.js` | Backup export/import (versioned JSON envelope), preset share link encode/decode (base64url indicator bitfield) |
 | `src/utils/snapshot.js` | Chart screenshot capture, confluence/day-type watermark, clipboard/download export |
 
 ### App Shell
@@ -427,10 +497,10 @@ Component state (useState — local only):
 ### Layout Components
 | File | Purpose |
 |---|---|
-| `src/components/layout/TopNav.jsx` | Top navigation (Logo, panel toggles, ⌘K, bell, settings) |
+| `src/components/layout/TopNav.jsx` | Top navigation — on mobile: also renders PriceDisplay + ConfluenceBar + DayTypeBanner (props: bars, byDay, confluence, dayType). Desktop: panel toggles + icons. |
 | `src/components/layout/Sidebar.jsx` | Left sidebar — symbol, timeframe, presets, indicators, ATR gauge |
 | `src/components/layout/RightPanel.jsx` | Generic right panel shell — side panel on desktop, bottom sheet on mobile |
-| `src/components/layout/BottomNav.jsx` | Mobile-only bottom navigation — timeframe pills, panel toggles, sidebar hamburger |
+| `src/components/layout/BottomNav.jsx` | Mobile-only bottom navigation — timeframe pills, panel toggles, sidebar hamburger + connection status dot |
 | `src/components/ui/BottomSheet.jsx` | Draggable bottom sheet — snap points (50%/90%), velocity dismiss, GPU-accelerated |
 
 ### Chart Components
@@ -447,36 +517,57 @@ Component state (useState — local only):
 | `src/components/indicators/EMAOverlay.jsx` | EMA 9/48/200 line series |
 | `src/components/indicators/VWAPOverlay.jsx` | VWAP + σ band series |
 | `src/components/indicators/LevelOverlay.jsx` | Prev H/L, ORB zone, ODC as session-scoped LineSeries |
-| `src/components/indicators/SROverlay.jsx` | Support/resistance lines + swing high/low markers |
+| `src/components/indicators/SROverlay.jsx` | S/R lines + swing markers + merged `extraMarkers` (RSI divergences, EMA crosses) |
 | `src/components/indicators/BollingerOverlay.jsx` | Bollinger Bands (middle + upper/lower series) |
+| `src/components/indicators/GapOverlay.jsx` | Unfilled weekly gap zones (price line pairs, fill % tracking) |
+| `src/components/indicators/VolumeProfileOverlay.jsx` | Volume profile histogram — ISeriesPrimitive canvas drawing, POC + Value Area |
+| `src/primitives/VolumeProfilePrimitive.js` | lightweight-charts v5 ISeriesPrimitive — horizontal volume bars drawn on chart canvas |
+| `src/components/indicators/AnnotationOverlay.jsx` | User-drawn annotations (hline price lines + marker generation for text/arrow) |
 
 ### Right Panels (slide-out, one at a time)
 | File | Purpose |
 |---|---|
 | `src/components/panels/AlertsPanel.jsx` | Alert management (price-level + candle-streak) |
+| `src/components/panels/ScreenerPanel.jsx` | Setup scanner — ranks watchlist symbols by confluence score, shows day type + RSI + ATR |
 | `src/components/panels/BacktestPanel.jsx` | Backtester — ORB/EMA-cross/VWAP Bounce, equity curve, day type breakdown |
 | `src/components/panels/JournalPanel.jsx` | Trade journal — log entries, analytics (streaks, setup breakdown, rating corr), filter tabs |
 | `src/components/panels/WatchlistPanel.jsx` | Symbol watchlist with live prices — add/remove, click to switch chart |
+| `src/components/panels/ReplayPanel.jsx` | Trade replay — date picker, play/pause/step/speed, simulated buy/sell, P&L, trade history |
 
 ### UI Components
 | File | Purpose |
 |---|---|
 | `src/components/ui/ConfluenceBar.jsx` | Weighted setup quality readout — traffic light pill + expandable breakdown |
 | `src/components/ui/MTFStrip.jsx` | Multi-timeframe EMA alignment strip (5m/15m/1h/4h/1D) |
-| `src/components/ui/IndicatorTabView.jsx` | RSI/MACD mini chart containers — crosshair + time range synced to main chart |
+| `src/components/ui/IndicatorTabView.jsx` | Tabbed sub-indicator (RSI\|MACD tabs on mobile, stacked on desktop) + value overlay |
+| `src/components/ui/SubIndicatorValueOverlay.jsx` | Live indicator value readout — updates on crosshair move (ref-based, zero re-renders) |
 | `src/components/ui/ATRGauge.jsx` | Daily range used vs ATR budget gauge |
 | `src/components/ui/DayTypeBanner.jsx` | Trend / Range / Chop live classification |
-| `src/components/ui/IndicatorToggle.jsx` | Sidebar show/hide toggles for all indicators (EMA, VWAP, Bollinger, RVOL, Levels, S/R, RSI, MACD) |
+| `src/components/ui/IndicatorToggle.jsx` | Sidebar show/hide toggles for all indicators (EMA, VWAP, Bollinger, RVOL, Levels, S/R, RSI, MACD, RSI Div, EMA ×, Gaps, Vol Profile) |
+| `src/components/ui/AnnotationToolbar.jsx` | Floating chart toolbar — text note / arrow / hline draw tools + clear button |
 | `src/components/ui/PresetSelector.jsx` | Sidebar preset grid — switch, save, rename, delete |
 | `src/components/ui/CommandPalette.jsx` | Cmd+K search overlay (symbols, timeframes, indicators, panels) |
-| `src/components/ui/SettingsModal.jsx` | Themes + keyboard shortcuts + sound alerts toggle |
+| `src/components/ui/SettingsModal.jsx` | Themes + keyboard shortcuts + sound alerts toggle + data backup/restore tab |
 | `src/components/ui/CrosshairLegend.jsx` | OHLCV data overlay on crosshair hover (ref-based, no re-renders) |
 | `src/components/ui/ToastContainer.jsx` | Fixed bottom-right toast notification renderer |
-| `src/components/ui/StatusBar.jsx` | WebSocket/Polling status + last updated time + session stats + Ko-fi donate link |
+| `src/components/ui/StatusBar.jsx` | Desktop-only: WebSocket/Polling status + last updated time + session stats + Ko-fi donate link (mobile uses BottomNav dot instead) |
 | `src/components/ui/WelcomeBanner.jsx` | First-visit dismissible welcome banner (localStorage-gated) |
+| `src/components/ui/DataTab.jsx` | Backup export/import/reset tab in Settings modal |
 | `src/components/ui/ErrorBoundary.jsx` | React error boundary with fallback UI |
 | `src/components/ui/Logo.jsx` | Boogaloo font logo with BETA badge |
 | `src/components/ui/OnboardingTour.jsx` | 4-step tooltip tour (Day Type → ATR → Presets → Cmd+K), auto on first visit + manual restart via Help menu |
+
+### Testing (472 tests, 22 test files, coverage via @vitest/coverage-v8)
+| File | Purpose |
+|---|---|
+| `src/test-setup.js` | Vitest setup — provides `globalThis.React` for JSX transforms in component tests |
+| `src/hooks/useMediaQuery.test.js` | 8 tests — initial state, live updates, cleanup, re-subscribe, convenience hooks |
+| `src/hooks/usePullToRefresh.test.js` | 10 tests — drag progress, threshold trigger, clamp, reset, scroll guard, non-touch no-op |
+| `src/components/ui/BottomSheet.test.jsx` | 6 tests — open/closed render, backdrop dismiss, drag handle, content isolation |
+| `src/components/layout/BottomNav.test.jsx` | 15 tests — timeframe pills, sidebar toggle, alerts badge, watchlist, more menu |
+| `src/store/*.test.js` | Store tests — useChartStore (19), usePresetsStore (21), useJournalStore (8), useAlertsStore (22), useToastStore (11) |
+| `src/utils/*.test.js` | Pure math tests — indicators (81), levels (32), validate (62), backup (56), backtest (16), timezone (17), S/R (12), confluence (19), snapshot (7), normalizeBar (5), gaps (15), volumeProfile (21) |
+| `src/constants/accents.test.js` | Accent color preset structure validation (9) |
 
 ### Docs
 | File | Purpose |
@@ -493,7 +584,7 @@ Component state (useState — local only):
 
 ## Current Status
 
-**298/298 tests passing, build clean, ESLint 0 errors, 0 vulnerabilities. Main bundle 329KB + 161KB lightweight-charts + 92KB motion + 69KB vendor-api (8 lazy chunks incl. web-vitals 5.6KB). Stack: React 19 + Vite 8 + Zustand 5 + Tailwind 4. Mobile-first overhaul (M1–M5) complete — bottom nav, bottom sheets, safe areas, landscape mode, pull-to-refresh.**
+**472/472 tests passing (with coverage via `@vitest/coverage-v8`), build clean, ESLint 0 errors, 0 vulnerabilities. Main bundle 324KB + 161KB lightweight-charts + 92KB motion + 69KB vendor-api (11 lazy chunks). Stack: React 19 + Vite 8 + Zustand 5 + Tailwind 4. All phases complete — Phase 15A–D + Phase 12F (9/9 items). Focus traps on modals (useFocusTrap hook). CI coverage reporting. All features shipped.**
 
 ### Completed
 - [x] Phases 1–4: Core chart, indicators, levels, S/R detection, ATR gauge, day type
@@ -521,9 +612,24 @@ Component state (useState — local only):
 - [x] Phase 14C: Chart interaction UX — kinetic scrolling, magnet crosshair, scroll/scale handling
 - [x] Process hardening — husky + lint-staged, GitHub Actions CI, shared SYMBOL_RE
 - [x] Comprehensive audits — security (rate limiting, SSRF, input validation), ESLint, timezone tests, dead code cleanup
+- [x] Mobile-first overhaul (M1–M5) — bottom nav, bottom sheets, safe areas, landscape, pull-to-refresh
+- [x] Assessment fixes — RVOL memoization, Sentry dynamic import, API request IDs (UUID), fetch timeouts, theme DOM mutation cleanup
+- [x] Mobile component tests — 39 tests across BottomNav (15), BottomSheet (6), useMediaQuery (8), usePullToRefresh (10), test infra (jsdom + @testing-library/react)
+- [x] Phase 12F batch 1: RSI divergence markers, 4hr EMA cross annotations, screener panel (confluence-ranked watchlist scanner)
+- [x] Phase 15A: Tabbed sub-indicator — inline tab labels, value overlay, swipe-down dismiss
+- [x] Phase 15B: Full-screen chart mode — double-tap/double-click toggle, persistent exit pill on mobile
+- [x] Phase 15C: Long-press alert creation — haptic + coordinateToPrice + auto above/below
+- [x] Phase 15D: Mobile layout optimization — status bar killed, price in TopNav, sub-header eliminated (~78px reclaimed)
+- [x] Phase 12F batch 2: Trade replay (bar-by-bar stepping, simulated trades, P&L), chart annotations (text/arrow/hline, per-symbol localStorage), weekly gap tracking (detection + fill %, GapOverlay)
+- [x] Phase 12F batch 3: Volume profile — horizontal volume histogram via ISeriesPrimitive canvas drawing, POC + Value Area, bull/bear split, 21 tests
+- [x] Phase 12F batch 4: Alert sets per preset — per-preset localStorage persistence, swap on switch, copy on save-as, cleanup on delete, 22 alert store tests
+- [x] Phase 12F batch 5: Backup & restore + preset share links — JSON export/import, 5MB gate, full validation, preset share URLs (?share=), 76 new tests (56 backup + 20 validator)
 
 ### Upcoming
-- [ ] Phase 12F: Future differentiators — screener, trade replay, annotations, gap tracking, cloud sync
+- [ ] localStorage schema migration system
+- [ ] SW precache strategy — only caches shell, not JS/CSS assets (consider Workbox)
+- [ ] Cloud sync (deferred until auth/user accounts)
+- [ ] Mobile QA: iOS Safari / Chrome Android cross-device pass, Lighthouse PWA audit
 
 ---
 
@@ -584,4 +690,15 @@ Component state (useState — local only):
 | 2026-03-17 | **Level/line clarity overhaul.** (1) S/R filter tightened — resistance strictly above price, support strictly below (removed 0.2% buffer that put "R ×3" labels below current price). (2) S/R labels now always show strength: "R ×1", "S ×2" etc. (was "R " with trailing space for single-pivot). (3) ODC color changed from amber (#f59e0b) to slate (#94a3b8) — distinct from gold PDH/PDL. (4) S/R max levels reduced from 8 to 5 per type, sorted by strength before cap (strongest survive). 298/298 tests, build clean. |
 | 2026-03-17 | **Phase 13C complete: Discoverability.** (1) `robots.txt` — allow all crawlers with sitemap reference. (2) `sitemap.xml` — single URL, daily changefreq. (3) Canonical URL `<link rel="canonical">` in index.html. (4) Branded PWA icons — `scripts/generate-icons.js` creates 192/512 PNGs via sharp (gold "C" monogram + candlestick chart on dark bg, rounded corners). Replaced 1x1 placeholder PNGs. (5) SEO meta description updated to target "free day trading chart tool" / "TradingView alternative" with feature list. OG description synced. Vercel rewrite rules added for robots.txt + sitemap.xml. 298/298 tests, build clean. |
 | 2026-03-18 | **High-priority assessment fixes.** (1) BottomSheet safe-area-inset-bottom — added `padding-bottom: env(safe-area-inset-bottom, 0px)` to `.bottom-sheet` CSS class. Content was clipped behind iPhone home indicator/notch. (2) usePullToRefresh dependency array — replaced `pullProgress`, `isRefreshing`, and `handleRefresh` in the useEffect deps with refs (`pullProgressRef`, `isRefreshingRef`, `onRefreshRef`). Effect now depends only on `[threshold, handleRefresh]` where `handleRefresh` is stable (empty deps, reads from refs). Touch listeners are attached once instead of being torn down and re-added on every drag gesture. 298/298 tests, build clean. |
+| 2026-03-18 | **Assessment fixes — medium + low priority.** (1) RVOL memoization — `relativeVolume(bars)` wrapped in `useMemo` (was recalculating every render), RVOL_AMBER/RVOL_HOT constants moved from CandlestickChart to `constants/chart.js`. (2) Sentry dynamic import — `@sentry/react` now loaded via `import()` only when `VITE_SENTRY_DSN` is set, zero bundle cost otherwise. Logger accesses Sentry via `getSentry()` accessor. (3) API request IDs upgraded from `Math.random().toString(36)` to `crypto.randomUUID()` in all 3 serverless functions. (4) Fetch timeout — 15s `AbortSignal.timeout()` added to bars + snapshot API proxy calls. (5) `setTheme()` DOM mutation (clearing accent CSS vars) moved from Zustand store action to `useEffect` in App.jsx. Main bundle 329KB → 327KB. 298/298 tests, build clean. |
 | 2026-03-18 | **Mobile-first overhaul complete (M1–M5).** Deep-dive UX research on Webull/TradingView/thinkorswim/Robinhood mobile apps + modern PWA design patterns. 5-phase implementation, 4 new files, 14 modified files, 0 new dependencies. **M1 Foundation:** `useMediaQuery`/`useIsMobile`/`useIsLandscape` reactive hooks, safe area CSS vars (`env(safe-area-inset-*)`), `100dvh` with fallback, `viewport-fit=cover`. **M2 Bottom Nav:** `BottomNav.jsx` mobile-only thumb-zone bar with scrollable timeframe pills + panel toggles. TopNav slimmed to `h-9` with compact PriceDisplay. StatusBar mobile-optimized. Panel toggles + hamburger moved from TopNav to BottomNav on mobile. **M3 Bottom Sheets:** `BottomSheet.jsx` with drag handle, snap points (50%/90%), velocity-based dismiss, Motion v12 springs. RightPanel conditionally renders bottom sheet on mobile. Chart sub-header stacks into 2 rows on mobile. ConfluenceBar dropdown repositioned. Mini charts 70px on mobile. **M4 Landscape + Performance:** Responsive font scaling (`clamp()`), landscape rules (`.landscape-hide`/`.landscape-compact`), mini charts hidden in mobile landscape, `contain: layout style` on chart, orientation change fires resize event. **M5 Polish:** `usePullToRefresh` hook (touch-only, 60px threshold). Haptic feedback on alerts (`navigator.vibrate`). PWA manifest: `orientation: any`, `categories`, shortcuts for QQQ/SPY/NVDA. Global: `overscroll-behavior: none`, `touch-action: manipulation`, `-webkit-tap-highlight-color: transparent`. Desktop zero-regression — all mobile changes gated behind `useIsMobile()` / `md:` breakpoints. 298/298 tests, build clean, ESLint 0 errors. |
+| 2026-03-18 | **Mobile component tests + test infrastructure.** Added 39 tests across 4 files: `useMediaQuery.test.js` (8 — initial state, live updates, cleanup, re-subscribe, convenience hooks), `usePullToRefresh.test.js` (10 — drag progress, threshold trigger, clamp, reset, scroll guard, non-touch no-op, cleanup), `BottomSheet.test.jsx` (6 — open/closed render, backdrop dismiss, drag handle, content click isolation), `BottomNav.test.jsx` (15 — timeframe pills, active highlight, switching, sidebar toggle, alerts badge/count/9+ cap, watchlist, more menu). Test infrastructure: installed `jsdom` + `@testing-library/react` + `@testing-library/jest-dom` as devDeps. Created `src/test-setup.js` (provides `globalThis.React` for JSX transform compatibility in vitest). Added `setupFiles` to vitest config. Component tests use `// @vitest-environment jsdom` pragma. 337/337 tests, build clean, ESLint 0 errors. |
+| 2026-03-18 | **Phase 12F batch 1: RSI divergences, EMA crosses, screener.** Three features shipped: (1) RSI divergence markers — `detectRSIDivergences()` (existing math) wired to main chart via SROverlay `extraMarkers` prop. Green ▲ "Bull Div" / red ▼ "Bear Div" arrows. Toggle: `rsiDiv` (off by default, on in Full/Swing presets). (2) 4hr EMA cross annotations — new `useEMACrosses` hook fetches 4hr bars via TanStack Query, computes EMA 9/48, runs `detectEMACrosses()`, maps cross times to nearest bar in current timeframe (4hr tolerance). Blue/orange arrows. Toggle: `emaCross`. (3) Screener panel — new `ScreenerPanel.jsx` (lazy-loaded 7.5KB chunk) in right panel slot. For each watchlist symbol: parallel-fetches 5m + daily bars, runs full confluence computation (day type, EMA alignment, VWAP, ATR, RSI, MACD), displays ranked by score with day type chip, RSI value, ATR % consumed, top setup reasons/warnings. Shares watchlist with WatchlistPanel (same localStorage). **Marker aggregation:** SROverlay now accepts `extraMarkers` prop — merges SR swing markers with divergence + EMA cross markers in a single `setMarkers()` call. Each source toggles independently. New: `useScreener.js` hook, `useEMACrosses.js` hook, `RSI_DIV_*` / `EMA_CROSS_*` color constants, `--screener-color` / `--screener-active-bg` CSS vars (all 3 themes), screener in TopNav + BottomNav (More menu) + CommandPalette + keyboard shortcuts (`F`). Presets updated with `rsiDiv` + `emaCross` keys. 337/337 tests, build clean, ESLint 0 errors. |
+| 2026-03-18 | **Phase 15A–C: Mobile UX Leap.** Competitive analysis of Webull/TradingView mobile patterns → 3 features shipped. **15A Tabbed sub-indicator:** Replaced stacked RSI+MACD with tabbed system. Inline tab labels inside chart area (no separate row). Mobile shows one at a time. `SubIndicatorValueOverlay` shows live values. Swipe-down dismisses. **15B Full-screen chart:** Double-click (desktop) / double-tap (mobile via `useDoubleTap`). Exit pill: persistent "Tap to exit" on mobile, auto-fading on desktop. ESC in keyboard shortcuts. **15C Long-press alerts:** `useLongPress` (500ms, haptic). Volume zone excluded (>82% Y ratio). Auto above/below. |
+| 2026-03-18 | **Phase 12F batch 2: Trade replay, chart annotations, weekly gaps.** Three features shipped: (1) Trade replay panel — `useReplayStore` + `ReplayPanel.jsx` (lazy-loaded 8.3KB). Pick a date, fetch 5m bars, step bar-by-bar with play/pause/speed (1x/2x/5x/10x). Simulated buy/sell with running P&L, trade history, win rate. Arrow/Space keyboard controls. Chart shows progressive bar reveal. (2) Chart annotations — `useAnnotationsStore` (localStorage per-symbol). Three types: text notes (circle markers), arrows (arrowUp/arrowDown), horizontal lines (price lines). `AnnotationToolbar` floating top-left. Click-to-place with crosshair cursor. Markers merged into SROverlay extraMarkers pipeline. `N` cycles modes, Escape exits. (3) Weekly gap tracking — `detectWeeklyGaps()` + `checkGapFills()` in gaps.js (15 tests). `useWeeklyBars` hook fetches 1yr weekly bars. `GapOverlay` renders unfilled gaps as price line pairs. Toggle: `gaps`. `1Week` added to Alpaca timeframe map. New constants: gap/annotation/replay colors. New CSS vars: `--replay-color`, `--replay-active-bg`. Added to TopNav, BottomNav, CommandPalette, keyboard shortcuts (R/N). 352/352 tests, build clean. |
+| 2026-03-19 | **Phase 12F batch 3: Volume profile.** New `src/utils/volumeProfile.js` — pure math: divides price range into 70 bins, distributes bar volume proportionally across overlapping bins, identifies POC (highest volume row) and Value Area (70% of total volume expanding outward from POC). Bull/bear split per bin (close vs open). New `src/primitives/VolumeProfilePrimitive.js` — lightweight-charts v5 `ISeriesPrimitive` implementation. Canvas-drawn horizontal bars from right edge leftward (width ∝ volume/POC). POC row amber, VA rows 35% opacity, outside VA 15%. `drawBackground()` so candles render on top. New `VolumeProfileOverlay.jsx` — React component following EMA/Bollinger pattern (attach/update/visibility). New VP color constants in `chart.js` (`VP_BULL_COLOR` blue, `VP_BEAR_COLOR` red, `VP_POC_COLOR` amber, opacity/width config). Store toggle `volProfile: false` (off by default, power-user feature). All 4 presets updated. Sidebar toggle "Vol Profile". 21 new tests (edge cases, POC detection, VA coverage, volume distribution, signal shape). 373/373 tests, build clean, ESLint 0 errors. |
+| 2026-03-18 | **Phase 15D: Mobile layout optimization.** Full mobile UX assessment → 6 fixes. (1) **Mobile fullscreen fixed** — `useDoubleTap` hook for touch double-tap detection (300ms window), exit pill always visible on mobile ("Tap to exit"). (2) **Status bar killed on mobile** — 28px reclaimed. Connection status dot (green/amber/red/neutral, pulse on active) integrated into BottomNav hamburger button. (3) **Price merged into TopNav** — PriceDisplay (compact) + ConfluenceBar + DayTypeBanner now render in TopNav center on mobile. Entire sub-header row eliminated (~50px reclaimed). Desktop sub-header unchanged. (4) **Inline tab labels** — RSI/MACD tab bar replaced with inline pills inside chart container (9px, positioned top-left). No separate row = 0px overhead. (5) **Long-press price clamping** — ignores volume zone (bottom 18%) and negative/NaN prices. (6) **Swipe-down dismiss** — swipe down >30px on sub-indicator area hides both RSI + MACD. Total: ~78px reclaimed. Chart gets 582px on iPhone 14 (69% of screen, up from 504px / 60%). TopNav now passes `bars`, `byDay`, `confluence`, `dayType` props. 337/337 tests, build clean, ESLint 0 errors. |
+| 2026-03-19 | **Phase 12F batch 4: Alert sets per preset.** Alerts now persist per-preset in localStorage (`cheechart-alerts-{presetId}`). Switching presets saves current alerts under old preset and loads new preset's alerts. Save-as copies alerts to new preset. Delete cleans up associated alert set. AlertsPanel shows active preset name. `validateAlert()` added for localStorage deserialization safety. `INDICATOR_KEYS` in validate.js updated (was missing rsiDiv, emaCross, gaps, volProfile). 23 new tests (13 validateAlert + 10 alert store preset switching). 396/396 tests, build clean. |
+| 2026-03-19 | **Phase 12F batch 5: Backup & restore + preset share links.** Versioned JSON envelope (`cheechart: true`, `version: 1`) with all user data (presets, alerts, journal, watchlist, annotations, preferences). Export triggers browser download. Import via file picker or drag-drop with preview summary and confirm. Merge strategy per section (presets: new UUIDs on collision, journal: by ID, watchlist: union dedup, symbolUsage: max-wins). Settings modal "Data" tab with export/import/reset. Command palette "Export Backup" / "Import Backup" commands. After import, page reloads to rehydrate all stores. Preset share links: compact base64url-encoded preset configs (`?share=...`). Indicator bitfield maps 12 toggles to single chars. Security: 5MB file size gate, magic marker + version check, every field through validators, `__proto__`/`constructor`/`prototype` key rejection, array caps, no eval/innerHTML, first-char sanity check. New validators: `validateAnnotation()`, `validatePreferences()`, `validateBackupEnvelope()`. 76 new tests (56 backup + 20 validator). 472/472 tests, build clean, ESLint 0 errors. |
+| 2026-03-19 | **Polish batch: code quality + build config.** 6 open items resolved: (1) `IndicatorTabView` memoized with `React.memo` + `useMemo` for inline tab labels — prevents mini chart remounts on parent re-render. (2) ATRGauge hardcoded colors extracted to `ATR_GAUGE_COLORS` per-theme constant in `constants/chart.js`. (3) `classifyDayType` hex colors extracted to `DAY_TYPE_COLORS` constant in `constants/chart.js`. (4) `indicators.js` input validation — new `validateBars(bars, minLen, fields)` helper validates array type + numeric field presence (first/last bar spot-check) across all 7 public functions (`ema`, `vwapWithBands`, `atr`, `relativeVolume`, `rsi`, `macd`, `bollingerBands`). (5) Vite hidden sourcemaps (`build.sourcemap: 'hidden'`) — Sentry can ingest sourcemaps for stack trace deobfuscation without exposing them to end users. (6) `engines: { node: ">=20" }` added to package.json. All documentation synced (CLAUDE.md, tasks.md, indicators.md, project.md, security.md). 472/472 tests, build clean, ESLint 0 errors. |
+| 2026-03-19 | **Accessibility + CI polish.** (1) Focus traps — new `useFocusTrap` hook (`src/hooks/useFocusTrap.js`) traps Tab/Shift+Tab within modal containers. Wired into CommandPalette and SettingsModal via ref on `role="dialog"` element. Restores previous focus on close. (2) CI test coverage — installed `@vitest/coverage-v8` (v3.x matching vitest 3.x). Added coverage config to `vite.config.js` (`v8` provider, `text` + `text-summary` + `json-summary` reporters). CI now runs `npx vitest run --coverage`. Also fixed `@testing-library/dom` missing from explicit devDeps. Coverage: utils 94%, stores 67%. Full documentation sync across all docs. 472/472 tests, build clean, ESLint 0 errors. 2 open items remain (localStorage migration, SW precache). |

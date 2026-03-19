@@ -16,7 +16,7 @@
  *   - Panes: chart.addPane() for RSI/MACD subcharts
  */
 
-import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
+import { useEffect, useRef, useMemo, forwardRef, useImperativeHandle } from 'react'
 import { createChart, CandlestickSeries, HistogramSeries, CrosshairMode, LineStyle } from 'lightweight-charts'
 import { useViewportPersistence } from '../../hooks/useViewportPersistence'
 import { useChartStore } from '../../store/useChartStore'
@@ -28,11 +28,9 @@ import {
   VOLUME_UP_COLOR,
   VOLUME_DOWN_COLOR,
   CANDLE_COLORS,
+  RVOL_AMBER,
+  RVOL_HOT,
 } from '../../constants/chart'
-
-// RVOL highlight colors — amber for ≥1.5x, hot red for ≥2x
-const RVOL_AMBER = '#f59e0bcc'  // amber semi-transparent
-const RVOL_HOT   = '#ef4444cc'  // red semi-transparent
 
 export const CandlestickChart = forwardRef(function CandlestickChart(
   { bars, children, theme = 'dark', dataUpdatedAt, showRvol = false },
@@ -50,6 +48,13 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
   const symbol    = useChartStore((s) => s.selectedSymbol)
   const timeframe = useChartStore((s) => s.selectedTimeframe)
   const shouldFit = useViewportPersistence(symbol, timeframe, dataUpdatedAt)
+
+  // Memoize RVOL lookup map — only recalculates when bars or showRvol changes
+  const rvolMap = useMemo(() => {
+    if (!showRvol || !bars || !bars.length) return null
+    const { series: rvolSeries } = relativeVolume(bars)
+    return new Map(rvolSeries.map((r) => [r.time, r.rvol]))
+  }, [bars, showRvol])
 
   // Init chart on mount
   useEffect(() => {
@@ -113,6 +118,7 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
         barSpacing:     8,
         minBarSpacing:  2,
         rightOffset:    5,
+        fixRightEdge:   true,
         shiftVisibleRangeOnNewBar: true,
         allowShiftVisibleRangeOnWhitespaceReplacement: true,
         // Axis tick marks in ET — TickMarkType: 0=Year 1=Month 2=Day 3=Time
@@ -206,13 +212,6 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
     const prev = prevBarsRef.current
     const last = bars[bars.length - 1]
 
-    // Build RVOL lookup when enabled — maps time → rvol value for highlighting
-    let rvolMap = null
-    if (showRvol) {
-      const { series: rvolSeries } = relativeVolume(bars)
-      rvolMap = new Map(rvolSeries.map((r) => [r.time, r.rvol]))
-    }
-
     const makeVolBar = (bar) => {
       const baseColor = bar.close >= bar.open ? VOLUME_UP_COLOR : VOLUME_DOWN_COLOR
       if (!rvolMap) return { time: bar.time, value: bar.volume, color: baseColor }
@@ -279,7 +278,7 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
 
     prevBarsRef.current = bars
     if (shouldFit && !isPrepend) chartRef.current.timeScale().fitContent()
-  }, [bars, shouldFit, showRvol])
+  }, [bars, shouldFit, rvolMap])
 
   // Expose chart instance to parent for overlays
   useImperativeHandle(ref, () => ({
