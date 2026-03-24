@@ -11,6 +11,8 @@ import { PHASES } from '../../constants/roadmap'
 import { useIsMobile } from '../../hooks/useMediaQuery'
 
 const STORAGE_KEY = 'cheechart-roadmap-done'
+const BEGINNER_KEY = 'cheechart-roadmap-beginner'
+const BEGINNER_PHASES = new Set(['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'])
 
 function loadDone() {
   try {
@@ -217,6 +219,17 @@ export function RoadmapPage() {
   const [done, setDone] = useState(loadDone)
   const [activeId, setActiveId] = useState(null)
   const [search, setSearch] = useState('')
+  const [beginnerOnly, setBeginnerOnly] = useState(() => {
+    try { return localStorage.getItem(BEGINNER_KEY) === 'true' } catch { return false }
+  })
+
+  const toggleBeginner = useCallback(() => {
+    setBeginnerOnly((prev) => {
+      const next = !prev
+      try { localStorage.setItem(BEGINNER_KEY, String(next)) } catch { /* */ }
+      return next
+    })
+  }, [])
 
   const toggleDone = useCallback((id) => {
     setDone((prev) => {
@@ -244,11 +257,12 @@ export function RoadmapPage() {
     }
   }
 
-  // Filter phases by search
+  // Filter phases by search + beginner mode
   const filteredPhases = useMemo(() => {
-    if (!search.trim()) return PHASES
+    let phases = beginnerOnly ? PHASES.filter((p) => BEGINNER_PHASES.has(p.id)) : PHASES
+    if (!search.trim()) return phases
     const q = search.trim().toLowerCase()
-    return PHASES.map((phase) => ({
+    return phases.map((phase) => ({
       ...phase,
       nodes: phase.nodes.filter(
         (n) =>
@@ -258,7 +272,18 @@ export function RoadmapPage() {
           n.phase.toLowerCase().includes(q)
       ),
     })).filter((p) => p.nodes.length > 0)
-  }, [search])
+  }, [search, beginnerOnly])
+
+  // Per-phase completion for mastered badges
+  const phaseCompletion = useMemo(() => {
+    const map = {}
+    for (const phase of PHASES) {
+      const total = phase.nodes.length
+      const completed = phase.nodes.filter((n) => done.has(n.id)).length
+      map[phase.id] = { total, completed, mastered: total > 0 && completed === total }
+    }
+    return map
+  }, [done])
 
   const pct = TOTAL_NODES > 0 ? Math.round((done.size / TOTAL_NODES) * 100) : 0
   const panelOpen = activeNode !== null
@@ -315,8 +340,8 @@ export function RoadmapPage() {
             </p>
             <div className="flex justify-center gap-8 mt-5">
               {[
-                { num: '16', lbl: 'Phases' },
-                { num: '86', lbl: 'Topics' },
+                { num: beginnerOnly ? '8' : '16', lbl: 'Phases' },
+                { num: beginnerOnly ? String(PHASES.filter((p) => BEGINNER_PHASES.has(p.id)).reduce((s, p) => s + p.nodes.length, 0)) : '86', lbl: 'Topics' },
                 { num: '500+', lbl: 'Concepts' },
               ].map(({ num, lbl }) => (
                 <div key={lbl} className="text-center">
@@ -324,6 +349,22 @@ export function RoadmapPage() {
                   <div className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{lbl}</div>
                 </div>
               ))}
+            </div>
+
+            {/* Beginner path toggle */}
+            <div className="flex justify-center mt-4">
+              <button
+                type="button"
+                onClick={toggleBeginner}
+                className="text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 rounded-full border transition-colors"
+                style={{
+                  color: beginnerOnly ? 'var(--bg-surface)' : 'var(--accent)',
+                  borderColor: 'var(--accent-dim)',
+                  backgroundColor: beginnerOnly ? 'var(--accent)' : 'color-mix(in srgb, var(--accent) 8%, transparent)',
+                }}
+              >
+                {beginnerOnly ? 'Showing Beginner Path (1–8)' : 'Show Beginner Path'}
+              </button>
             </div>
           </div>
 
@@ -371,6 +412,18 @@ export function RoadmapPage() {
                   style={{ color: 'var(--text-muted)' }}>
                   {phase.label}
                 </span>
+                {phase.est && (
+                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded border shrink-0"
+                    style={{ color: 'var(--text-muted)', borderColor: 'var(--border-base)', backgroundColor: 'var(--bg-hover)' }}>
+                    ~{phase.est}
+                  </span>
+                )}
+                {phaseCompletion[phase.id]?.mastered && (
+                  <span className="text-[9px] font-mono font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0"
+                    style={{ color: phase.color, backgroundColor: phase.bg }}>
+                    Mastered
+                  </span>
+                )}
                 <div className="flex-1 h-px" style={{ backgroundColor: 'var(--border-base)' }} />
               </div>
 
@@ -404,6 +457,15 @@ export function RoadmapPage() {
               You are not trying to predict the market. You are building a systematic edge,
               protecting your capital, and executing with discipline. Every great trader was
               once a beginner who refused to quit.
+            </p>
+          </div>
+
+          {/* Disclaimer */}
+          <div className="text-center pb-6">
+            <p className="text-[10px] leading-relaxed max-w-lg mx-auto" style={{ color: 'var(--text-muted)', opacity: 0.6 }}>
+              Not financial advice. Past performance does not guarantee future results.
+              Trading involves substantial risk of loss and is not suitable for every investor.
+              Only trade with capital you can afford to lose.
             </p>
           </div>
         </div>

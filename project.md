@@ -478,6 +478,14 @@ Component state (useState — local only):
 | `src/components/ui/Logo.jsx` | Boogaloo font logo with BETA badge |
 | `src/components/ui/OnboardingTour.jsx` | 4-step tooltip tour (Day Type → ATR → Presets → Cmd+K), auto on first visit + manual restart via Help menu |
 
+### Standalone Pages (separate Vite entry points)
+| File | Purpose |
+|---|---|
+| `roadmap.html` | `/roadmap` HTML entry — own OG/SEO meta tags |
+| `src/roadmap-main.jsx` | Roadmap JS entry — minimal shell (theme, back link, no stores/query) |
+| `src/components/pages/RoadmapPage.jsx` | Interactive learning tracker — 16 phases, 86 topics, progress tracking, beginner filter, mastered badges |
+| `src/constants/roadmap.js` | Roadmap data — phases, nodes, concepts, resources, tips, estimated times |
+
 ### Docs
 | File | Purpose |
 |---|---|
@@ -521,6 +529,8 @@ Component state (useState — local only):
 - [x] Phase 14C: Chart interaction UX — kinetic scrolling, magnet crosshair, scroll/scale handling
 - [x] Process hardening — husky + lint-staged, GitHub Actions CI, shared SYMBOL_RE
 - [x] Comprehensive audits — security (rate limiting, SSRF, input validation), ESLint, timezone tests, dead code cleanup
+- [x] Trading Roadmap page — standalone `/roadmap`, 16 phases, 86 topics, progress tracking, detail panel
+- [x] Roadmap enhancements — beginner path filter (Phases 1–8), estimated time per phase, mastered badges, footer disclaimer, content accuracy fixes (T+1 settlement, sourced loss stats, ICT/SMC balance note)
 
 ### Upcoming
 - [ ] Phase 12F: Future differentiators — screener, trade replay, annotations, gap tracking, cloud sync

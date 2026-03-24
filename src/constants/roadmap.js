@@ -8,14 +8,14 @@ export const PHASES = [
   // PHASE 1: FOUNDATION & MINDSET
   // ─────────────────────────────────────────────
   {
-    id: 'p1', label: 'Phase 1 — Foundation & Mindset', num: '01',
+    id: 'p1', label: 'Phase 1 — Foundation & Mindset', num: '01', est: '2–3 weeks',
     color: '#2a7a50', light: '#d1fae5', bg: 'rgba(42,122,80,0.09)', check: '#2a7a50',
     nodes: [
       {
         id: 'why-fail', title: 'Why Most Traders Fail', sub: 'The brutal honest truth before you start',
         phase: 'Foundation', diff: 1,
-        summary: 'Before learning a single chart pattern, you must understand the statistical reality: 70–90% of retail traders lose money. The reasons are predictable and avoidable — but only if you face them head-on from day one.',
-        concepts: ['The 90/90/90 rule: 90% of traders lose 90% of money in 90 days','Undercapitalization and unrealistic return expectations','Overtrading: too many trades, too large positions','Chasing losses and revenge trading','Lack of a written trading plan','Treating trading as gambling vs a business','No edge — random entries with inconsistent exits','Ignoring transaction costs and slippage','Poor psychological framework under live P&L stress','Not backtesting or forward testing before going live','Copying others without understanding the underlying logic','Survivorship bias: only hearing success stories'],
+        summary: 'Before learning a single chart pattern, you must understand the statistical reality: 70–90% of retail traders lose money (per ESMA, FINRA, and 2025 studies). The reasons are predictable and avoidable — but only if you face them head-on from day one.',
+        concepts: ['The 70–90% loss reality: documented across multiple regulators and studies (ESMA, FINRA, CFTC)','Undercapitalization and unrealistic return expectations','Overtrading: too many trades, too large positions','Chasing losses and revenge trading','Lack of a written trading plan','Treating trading as gambling vs a business','No edge — random entries with inconsistent exits','Ignoring transaction costs and slippage','Poor psychological framework under live P&L stress','Not backtesting or forward testing before going live','Copying others without understanding the underlying logic','Survivorship bias: only hearing success stories'],
         resources: [{type:'Book',name:'Trading in the Zone — Mark Douglas'},{type:'Book',name:'The Psychology of Trading — Brett Steenbarger'},{type:'Video',name:'Why Retail Traders Lose — SMB Capital (YouTube)'},{type:'Article',name:'ESMA Report: CFD Trader Profitability Study'},{type:'Podcast',name:'Chat With Traders — episode archive'}],
         tip: 'Write down your three biggest psychological weaknesses before you trade a single dollar. Awareness is the first edge.'
       },
@@ -65,14 +65,14 @@ export const PHASES = [
   // PHASE 2: MARKET INFRASTRUCTURE
   // ─────────────────────────────────────────────
   {
-    id: 'p2', label: 'Phase 2 — Market Infrastructure', num: '02',
+    id: 'p2', label: 'Phase 2 — Market Infrastructure', num: '02', est: '2–3 weeks',
     color: '#1d6fa4', light: '#dbeafe', bg: 'rgba(29,111,164,0.09)', check: '#1d6fa4',
     nodes: [
       {
         id: 'exchange-mechanics', title: 'Exchange Mechanics', sub: 'How orders become trades',
         phase: 'Infrastructure', diff: 2,
         summary: 'Markets are systems for matching buyers and sellers. Understanding how orders are processed, routed, and executed gives you insight that most retail traders completely skip.',
-        concepts: ['NYSE vs NASDAQ: auction vs electronic market model','CME, CBOE, ICE: futures and options exchanges','Central Limit Order Book (CLOB): how bids and asks queue','Price priority vs time priority in order matching','Pre-open auction and price discovery','Continuous trading session vs call auction','Dark pools: ATS and off-exchange trading','Payment for order flow (PFOF) and retail trade routing','Clearinghouses: DTCC, CME Clearing — counterparty risk removal','T+1 and T+2 settlement: what happens after the trade','Short interest: borrowing, locate requirements, recalls','Stock halts: news pending, circuit breakers, regulatory'],
+        concepts: ['NYSE vs NASDAQ: auction vs electronic market model','CME, CBOE, ICE: futures and options exchanges','Central Limit Order Book (CLOB): how bids and asks queue','Price priority vs time priority in order matching','Pre-open auction and price discovery','Continuous trading session vs call auction','Dark pools: ATS and off-exchange trading','Payment for order flow (PFOF) and retail trade routing','Clearinghouses: DTCC, CME Clearing — counterparty risk removal','T+1 settlement (US equities/bonds since May 2024) — what happens after the trade','Short interest: borrowing, locate requirements, recalls','Stock halts: news pending, circuit breakers, regulatory'],
         resources: [{type:'Book',name:'Flash Boys — Michael Lewis'},{type:'Paper',name:'SEC Market Structure White Papers'},{type:'Video',name:'How the Stock Market Actually Works — Patrick Boyle'},{type:'Article',name:'FINRA: Understanding Markets'}],
         tip: 'Your trade doesn\'t just go to one exchange. Understanding routing helps explain why execution quality varies across brokers.'
       },
@@ -114,7 +114,7 @@ export const PHASES = [
   // PHASE 3: READING PRICE & VOLUME
   // ─────────────────────────────────────────────
   {
-    id: 'p3', label: 'Phase 3 — Reading Price & Volume', num: '03',
+    id: 'p3', label: 'Phase 3 — Reading Price & Volume', num: '03', est: '3–4 weeks',
     color: '#6b42c8', light: '#ede9fe', bg: 'rgba(107,66,200,0.09)', check: '#6b42c8',
     nodes: [
       {
@@ -163,7 +163,7 @@ export const PHASES = [
   // PHASE 4: MARKET STRUCTURE
   // ─────────────────────────────────────────────
   {
-    id: 'p4', label: 'Phase 4 — Market Structure', num: '04',
+    id: 'p4', label: 'Phase 4 — Market Structure', num: '04', est: '2–3 weeks',
     color: '#2d8a6b', light: '#ccfbf1', bg: 'rgba(45,138,107,0.09)', check: '#2d8a6b',
     nodes: [
       {
@@ -212,7 +212,7 @@ export const PHASES = [
   // PHASE 5: TECHNICAL ANALYSIS — CLASSICAL
   // ─────────────────────────────────────────────
   {
-    id: 'p5', label: 'Phase 5 — Technical Analysis: Classical', num: '05',
+    id: 'p5', label: 'Phase 5 — Technical Analysis: Classical', num: '05', est: '4–6 weeks',
     color: '#b84a2a', light: '#fee2d4', bg: 'rgba(184,74,42,0.09)', check: '#b84a2a',
     nodes: [
       {
@@ -285,7 +285,7 @@ export const PHASES = [
   // PHASE 6: TECHNICAL ANALYSIS — ADVANCED
   // ─────────────────────────────────────────────
   {
-    id: 'p6', label: 'Phase 6 — Technical Analysis: Advanced', num: '06',
+    id: 'p6', label: 'Phase 6 — Technical Analysis: Advanced', num: '06', est: '4–6 weeks',
     color: '#c07a10', light: '#fef3c7', bg: 'rgba(192,122,16,0.09)', check: '#c07a10',
     nodes: [
       {
@@ -308,7 +308,7 @@ export const PHASES = [
         id: 'ict-smc', title: 'ICT / Smart Money Concepts', sub: 'Order blocks, FVG, liquidity sweeps, displacement',
         phase: 'Advanced TA', diff: 4,
         summary: 'Smart Money Concepts (SMC) and ICT (Inner Circle Trader) methodology focuses on how institutional participants manipulate price to fill large orders. It provides a framework for reading liquidity hunts, order blocks, and displacement moves.',
-        concepts: ['Order blocks: last down candle before up move (bullish OB) and vice versa','Fair Value Gaps (FVG): three-candle imbalance, price returns to fill','Liquidity: where retail stop orders cluster (equal highs/lows, trend lines)','Liquidity sweep: price temporarily breaks levels to trigger stops, then reverses','Premium vs Discount arrays: buy in discount, sell in premium','Optimal Trade Entry (OTE): 61.8–79% retracement of displacement','Market Structure Shift (MSS): same as Change of Character','PD Arrays: Order Blocks, FVG, Breaker Blocks, Mitigation Blocks','Session analysis: Asian, London, New York kill zones','Killzone trading: high-probability institutional time windows','Judas swing: false move at session open to mislead retail','Displacement: large, impulsive move away from a zone'],
+        concepts: ['Order blocks: last down candle before up move (bullish OB) and vice versa','Fair Value Gaps (FVG): three-candle imbalance, price returns to fill','Liquidity: where retail stop orders cluster (equal highs/lows, trend lines)','Liquidity sweep: price temporarily breaks levels to trigger stops, then reverses','Premium vs Discount arrays: buy in discount, sell in premium','Optimal Trade Entry (OTE): 61.8–79% retracement of displacement','Market Structure Shift (MSS): same as Change of Character','PD Arrays: Order Blocks, FVG, Breaker Blocks, Mitigation Blocks','Session analysis: Asian, London, New York kill zones','Killzone trading: high-probability institutional time windows','Judas swing: false move at session open to mislead retail','Displacement: large, impulsive move away from a zone','Important: core ideas overlap heavily with traditional price action — treat as a framework, not secret institutional code. Always backtest'],
         resources: [{type:'Video',name:'ICT Mentorship — Michael J. Huddleston (YouTube - free)'},{type:'Video',name:'Smart Money Concepts Guide — The Trading Geek'},{type:'Book',name:'Inner Circle Trader: Official Core Content'}],
         tip: 'SMC works best when you combine Order Block + FVG + liquidity sweep — all three agreeing. A single factor is not enough confirmation.'
       },
@@ -342,7 +342,7 @@ export const PHASES = [
   // PHASE 7: ORDER FLOW & MICROSTRUCTURE
   // ─────────────────────────────────────────────
   {
-    id: 'p7', label: 'Phase 7 — Order Flow & Market Microstructure', num: '07',
+    id: 'p7', label: 'Phase 7 — Order Flow & Market Microstructure', num: '07', est: '3–4 weeks',
     color: '#1a6fa4', light: '#e0f2fe', bg: 'rgba(26,111,164,0.09)', check: '#1a6fa4',
     nodes: [
       {
@@ -383,7 +383,7 @@ export const PHASES = [
   // PHASE 8: FUNDAMENTAL ANALYSIS — EQUITIES
   // ─────────────────────────────────────────────
   {
-    id: 'p8', label: 'Phase 8 — Fundamental Analysis: Equities', num: '08',
+    id: 'p8', label: 'Phase 8 — Fundamental Analysis: Equities', num: '08', est: '3–4 weeks',
     color: '#a03070', light: '#fce7f3', bg: 'rgba(160,48,112,0.09)', check: '#a03070',
     nodes: [
       {
@@ -432,7 +432,7 @@ export const PHASES = [
   // PHASE 9: FUNDAMENTAL ANALYSIS — MACRO
   // ─────────────────────────────────────────────
   {
-    id: 'p9', label: 'Phase 9 — Fundamental Analysis: Macro', num: '09',
+    id: 'p9', label: 'Phase 9 — Fundamental Analysis: Macro', num: '09', est: '3–4 weeks',
     color: '#5a3ec8', light: '#ede9fe', bg: 'rgba(90,62,200,0.09)', check: '#5a3ec8',
     nodes: [
       {
@@ -481,7 +481,7 @@ export const PHASES = [
   // PHASE 10: RISK MANAGEMENT
   // ─────────────────────────────────────────────
   {
-    id: 'p10', label: 'Phase 10 — Risk Management', num: '10',
+    id: 'p10', label: 'Phase 10 — Risk Management', num: '10', est: '3–4 weeks',
     color: '#b84a2a', light: '#fee2d4', bg: 'rgba(184,74,42,0.12)', check: '#b84a2a',
     nodes: [
       {
@@ -538,7 +538,7 @@ export const PHASES = [
   // PHASE 11: TRADING PSYCHOLOGY
   // ─────────────────────────────────────────────
   {
-    id: 'p11', label: 'Phase 11 — Trading Psychology', num: '11',
+    id: 'p11', label: 'Phase 11 — Trading Psychology', num: '11', est: '3–4 weeks',
     color: '#c07a10', light: '#fef3c7', bg: 'rgba(192,122,16,0.12)', check: '#c07a10',
     nodes: [
       {
@@ -587,7 +587,7 @@ export const PHASES = [
   // PHASE 12: TRADING STYLES DEEP DIVE
   // ─────────────────────────────────────────────
   {
-    id: 'p12', label: 'Phase 12 — Trading Styles Deep Dive', num: '12',
+    id: 'p12', label: 'Phase 12 — Trading Styles Deep Dive', num: '12', est: '4–6 weeks',
     color: '#2a7a50', light: '#d1fae5', bg: 'rgba(42,122,80,0.09)', check: '#2a7a50',
     nodes: [
       {
@@ -644,7 +644,7 @@ export const PHASES = [
   // PHASE 13: MARKETS DEEP DIVE
   // ─────────────────────────────────────────────
   {
-    id: 'p13', label: 'Phase 13 — Markets Deep Dive', num: '13',
+    id: 'p13', label: 'Phase 13 — Markets Deep Dive', num: '13', est: '3–4 weeks',
     color: '#1d6fa4', light: '#dbeafe', bg: 'rgba(29,111,164,0.09)', check: '#1d6fa4',
     nodes: [
       {
@@ -685,7 +685,7 @@ export const PHASES = [
   // PHASE 14: OPTIONS TRADING
   // ─────────────────────────────────────────────
   {
-    id: 'p14', label: 'Phase 14 — Options Trading', num: '14',
+    id: 'p14', label: 'Phase 14 — Options Trading', num: '14', est: '4–6 weeks',
     color: '#6b42c8', light: '#ede9fe', bg: 'rgba(107,66,200,0.09)', check: '#6b42c8',
     nodes: [
       {
@@ -742,7 +742,7 @@ export const PHASES = [
   // PHASE 15: STRATEGY DEVELOPMENT & SYSTEMS
   // ─────────────────────────────────────────────
   {
-    id: 'p15', label: 'Phase 15 — Strategy Development & Systems', num: '15',
+    id: 'p15', label: 'Phase 15 — Strategy Development & Systems', num: '15', est: '4–6 weeks',
     color: '#2d8a6b', light: '#ccfbf1', bg: 'rgba(45,138,107,0.09)', check: '#2d8a6b',
     nodes: [
       {
@@ -791,7 +791,7 @@ export const PHASES = [
   // PHASE 16: MASTERY & PROFESSIONAL
   // ─────────────────────────────────────────────
   {
-    id: 'p16', label: 'Phase 16 — Mastery & Professional', num: '16',
+    id: 'p16', label: 'Phase 16 — Mastery & Professional', num: '16', est: 'Ongoing',
     color: '#5a3ec8', light: '#ede9fe', bg: 'rgba(90,62,200,0.12)', check: '#5a3ec8',
     nodes: [
       {

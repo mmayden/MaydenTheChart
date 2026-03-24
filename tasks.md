@@ -61,7 +61,7 @@
 
 ## ✅ Completed Phases — Archive
 
-### Trading Roadmap Page (2026-03-24)
+### Trading Roadmap Page + Enhancements (2026-03-24)
 - Standalone page at `/roadmap` — separate Vite entry point (`roadmap.html` + `src/roadmap-main.jsx`)
 - Full-page interactive learning tracker: 16 phases, 86 topics, 500+ concepts
 - Independent of chart app — no stores, no TanStack Query, no chart code loaded
@@ -72,6 +72,13 @@
 - Linked from TopNav Help menu + BottomNav "More" menu
 - Vercel rewrite: `/roadmap` → `/roadmap.html` (before SPA catch-all)
 - Data extracted from standalone HTML into `src/constants/roadmap.js` ES module
+- **Enhancement: Beginner Path filter** — toggle filters to Phases 1–8, persisted to localStorage
+- **Enhancement: Estimated time per phase** — displayed in phase headers (~2–6 weeks per phase)
+- **Enhancement: "Mastered" badge** — appears on phase header when all nodes in phase are completed
+- **Enhancement: Footer disclaimer** — "Not financial advice" legal disclaimer at page bottom
+- **Content fix:** T+1 settlement updated (US equities since May 2024, was T+1/T+2)
+- **Content fix:** 70–90% loss stat sourced with "per ESMA, FINRA, and 2025 studies"
+- **Content fix:** ICT/SMC balance note added — "core ideas overlap with traditional price action, always backtest"
 
 ### Mobile-First Overhaul (M1–M5) (2026-03-18)
 - **M1:** Safe areas (`env(safe-area-inset-*)`), `100dvh` with fallback, `useMediaQuery`/`useIsMobile`/`useIsLandscape` hooks, `viewport-fit=cover`

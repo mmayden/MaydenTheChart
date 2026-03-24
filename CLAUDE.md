@@ -63,7 +63,7 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - ErrorBoundary shows raw error messages only in `import.meta.env.DEV`
 - Service worker `CACHE_NAME` is auto-versioned at build time (Vite plugin in `vite.config.js`)
 - Bearer token in `ws-auth.js` is NOT a real secret (ships in client bundle) — rate limiting is the real gate
-- All localStorage keys use `cheechart-` prefix (`cheechart-theme`, `cheechart-accent`, `cheechart-symbol`, `cheechart-roadmap-done`, etc.)
+- All localStorage keys use `cheechart-` prefix (`cheechart-theme`, `cheechart-accent`, `cheechart-symbol`, `cheechart-roadmap-done`, `cheechart-roadmap-beginner`, etc.)
 
 ## Observability
 
@@ -101,7 +101,9 @@ URL state sync via query params only (?s=QQQ&tf=5m&p=full&panel=backtest).
 The roadmap page is fully independent — no chart code, no TanStack Query, no stores.
 It shares only CSS (`index.css`), theme variables, and font preloads. Linked from
 TopNav Help menu and BottomNav "More" menu. Vercel rewrite routes `/roadmap` to
-`/roadmap.html` before the SPA catch-all.
+`/roadmap.html` before the SPA catch-all. Features: beginner path filter (Phases 1–8
+toggle, persisted), estimated time per phase, "Mastered" badge on 100% phase completion,
+legal disclaimer footer. Content peer-reviewed for accuracy (95%+ verified).
 
 **Right panel system:** `activePanel` in useChartStore controls which panel is shown.
 Values: `null | 'alerts' | 'backtest' | 'journal' | 'watchlist'`. Same panel = close,
@@ -303,8 +305,8 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 ### Standalone Pages (separate Vite entry points)
 - Roadmap HTML entry: `roadmap.html` — `/roadmap` route, own OG/SEO meta tags
 - Roadmap JS entry: `src/roadmap-main.jsx` — minimal shell (theme, back link, no stores/query)
-- Roadmap component: `src/components/pages/RoadmapPage.jsx` — 16-phase interactive learning tracker with progress persistence
-- Roadmap data (86 topics): `src/constants/roadmap.js` — phases, nodes, concepts, resources, tips
+- Roadmap component: `src/components/pages/RoadmapPage.jsx` — 16-phase interactive learning tracker with progress persistence, beginner filter, mastered badges
+- Roadmap data (86 topics): `src/constants/roadmap.js` — phases, nodes, concepts, resources, tips, estimated times per phase
 
 ### UI Components
 - Preset selector UI: `src/components/ui/PresetSelector.jsx`
@@ -349,7 +351,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Shared validation patterns (SYMBOL_RE): `src/constants/patterns.js`
 - Default preset definitions: `src/constants/presets.js`
 - Accent color presets (per-theme): `src/constants/accents.js`
-- Trading roadmap data (16 phases, 86 topics): `src/constants/roadmap.js`
+- Trading roadmap data (16 phases, 86 topics, est. times): `src/constants/roadmap.js`
 
 ### Tooling
 - ESLint config (flat): `eslint.config.js`
