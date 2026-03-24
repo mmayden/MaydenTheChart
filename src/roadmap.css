@@ -1,0 +1,169 @@
+@import "tailwindcss";
+
+@theme {
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+/* ── Self-hosted fonts ─────────────────────────────────────────────────── */
+
+@font-face {
+  font-family: 'Boogaloo';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/boogaloo-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/inter-800.woff2') format('woff2');
+}
+
+/* ── Global resets ─────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  -webkit-user-drag: none;
+}
+
+html {
+  touch-action: manipulation;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Scrollbar styling ───────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #111111;
+}
+::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+/* ── Roadmap color scheme (fixed dark — independent from main app) ───── */
+
+:root {
+  --bg-base:      #0a0a0a;
+  --bg-surface:   #0d1117;
+  --border:       #1f2937;
+  --border-base:  #1f2937;
+  --border-mid:   #374151;
+  --text-primary: #f3f4f6;
+  --text-secondary: #d1d5db;
+  --text-muted:   #6b7280;
+  --hover-bg:     #1f2937;
+  --accent:       #60a5fa;
+  --accent-dim:   #172554;
+  --btn-primary:  #2563eb;
+  --btn-primary-hover: #3b82f6;
+  --input-bg:     #0a0a0a;
+  --focus-ring:   #3b82f6;
+
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left, 0px);
+  --safe-right:  env(safe-area-inset-right, 0px);
+}
+
+html, body, #root {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+}
+
+/* ── Semantic utility classes (subset needed by roadmap) ─────────────── */
+
+.border-theme          { border-color: var(--border); }
+.border-theme-mid      { border-color: var(--border-mid); }
+.text-theme            { color: var(--text-primary); }
+.text-theme-muted      { color: var(--text-muted); }
+.bg-theme-surface      { background-color: var(--bg-surface); }
+.text-accent           { color: var(--accent); }
+.border-accent         { border-color: var(--accent); }
+.bg-accent-dim         { background-color: var(--accent-dim); }
+.bg-input              { background-color: var(--input-bg); }
+
+.hover\:bg-theme-hover:hover     { background-color: var(--hover-bg); }
+.hover\:text-theme:hover         { color: var(--text-primary); }
+.hover\:border-theme-mid:hover   { border-color: var(--border-mid); }
+
+.focus\:border-accent:focus { border-color: var(--accent); }
+
+/* ── Safe viewport height (dvh with fallback) ───────────────────────── */
+
+.h-screen-safe {
+  height: 100vh;
+}
+@supports (height: 100dvh) {
+  .h-screen-safe { height: 100dvh; }
+}
+
+.pt-safe { padding-top:    var(--safe-top); }
+.pb-safe { padding-bottom: var(--safe-bottom); }
+.pl-safe { padding-left:   var(--safe-left); }
+.pr-safe { padding-right:  var(--safe-right); }
+
+/* ── Keyboard focus ring ─────────────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Roadmap-specific styles ─────────────────────────────────────────── */
+
+.roadmap-detail {
+  position: absolute;
+  inset: 0;
+  padding: 24px 22px 48px;
+}
+.roadmap-section-title {
+  font-size: 10px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-base);
+}
+.roadmap-node:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ── Touch targets ───────────────────────────────────────────────────── */
+
+@media (pointer: coarse) {
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

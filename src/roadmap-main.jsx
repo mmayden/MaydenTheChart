@@ -1,49 +1,18 @@
 /**
  * roadmap-main.jsx — Entry point for the standalone /roadmap page.
  *
- * Separate Vite entry point — shares CSS and constants with the main app
- * but loads independently (no chart code, no TanStack Query, no stores).
+ * Separate Vite entry point with its own CSS — fully independent from
+ * the main chart app (no chart code, no TanStack Query, no stores, no shared theme).
  */
 
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RoadmapPage } from './components/pages/RoadmapPage'
-import './index.css'
-
-// Apply theme from localStorage (shared with main app)
-const theme = (() => {
-  try { return localStorage.getItem('cheechart-theme') ?? 'dark' } catch { return 'dark' }
-})()
-
-// Apply accent from localStorage (shared with main app)
-function applyAccent() {
-  try {
-    const id = localStorage.getItem('cheechart-accent')
-    if (!id) return
-    // Dynamic import to avoid bundling accent constants unless needed
-    import('./constants/accents').then(({ ACCENT_LOOKUP }) => {
-      const colors = ACCENT_LOOKUP[theme]?.[id]
-      if (colors) {
-        const root = document.documentElement
-        root.style.setProperty('--accent', colors.accent)
-        root.style.setProperty('--accent-dim', colors.dim)
-        root.style.setProperty('--btn-primary', colors.btn)
-        root.style.setProperty('--btn-primary-hover', colors.btnHover)
-        root.style.setProperty('--focus-ring', colors.ring)
-      }
-    })
-  } catch { /* no accent */ }
-}
-
-applyAccent()
+import './roadmap.css'
 
 function RoadmapApp() {
   return (
-    <div
-      data-theme={theme}
-      className="flex flex-col h-screen-safe overflow-hidden font-mono pt-safe"
-      style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}
-    >
+    <div className="flex flex-col h-screen-safe overflow-hidden font-mono pt-safe">
       {/* Header */}
       <nav
         className="flex items-center gap-3 px-4 pl-safe pr-safe border-b border-theme shrink-0 h-11"
