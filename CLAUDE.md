@@ -63,7 +63,7 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - ErrorBoundary shows raw error messages only in `import.meta.env.DEV`
 - Service worker `CACHE_NAME` is auto-versioned at build time (Vite plugin in `vite.config.js`)
 - Bearer token in `ws-auth.js` is NOT a real secret (ships in client bundle) — rate limiting is the real gate
-- All localStorage keys use `cheechart-` prefix (`cheechart-theme`, `cheechart-accent`, `cheechart-symbol`, etc.)
+- All localStorage keys use `cheechart-` prefix (`cheechart-theme`, `cheechart-accent`, `cheechart-symbol`, `cheechart-roadmap-done`, etc.)
 
 ## Observability
 
@@ -88,12 +88,20 @@ toast notifications instead of silent failures. ErrorBoundary provides reset/rel
 
 ## Architecture
 
-Single-page app. Chart is always visible. Tools live in slide-out right panels.
+Single-page chart terminal at `/`. Educational roadmap at `/roadmap` (separate Vite entry).
+Tools live in slide-out right panels. No router within the chart app.
 URL state sync via query params only (?s=QQQ&tf=5m&p=full&panel=backtest).
 
 ```
-TopNav → Sidebar (left) → Chart (center) → RightPanel (right, one at a time)
+/ (index.html)        → TopNav → Sidebar (left) → Chart (center) → RightPanel (right)
+/roadmap (roadmap.html) → Standalone page — back link to /, shared CSS/theme
 ```
+
+**Multi-page build:** Vite builds two HTML entry points (`index.html` + `roadmap.html`).
+The roadmap page is fully independent — no chart code, no TanStack Query, no stores.
+It shares only CSS (`index.css`), theme variables, and font preloads. Linked from
+TopNav Help menu and BottomNav "More" menu. Vercel rewrite routes `/roadmap` to
+`/roadmap.html` before the SPA catch-all.
 
 **Right panel system:** `activePanel` in useChartStore controls which panel is shown.
 Values: `null | 'alerts' | 'backtest' | 'journal' | 'watchlist'`. Same panel = close,
@@ -292,6 +300,12 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Journal panel: `src/components/panels/JournalPanel.jsx`
 - Watchlist panel: `src/components/panels/WatchlistPanel.jsx`
 
+### Standalone Pages (separate Vite entry points)
+- Roadmap HTML entry: `roadmap.html` — `/roadmap` route, own OG/SEO meta tags
+- Roadmap JS entry: `src/roadmap-main.jsx` — minimal shell (theme, back link, no stores/query)
+- Roadmap component: `src/components/pages/RoadmapPage.jsx` — 16-phase interactive learning tracker with progress persistence
+- Roadmap data (86 topics): `src/constants/roadmap.js` — phases, nodes, concepts, resources, tips
+
 ### UI Components
 - Preset selector UI: `src/components/ui/PresetSelector.jsx`
 - Default preset definitions: `src/constants/presets.js`
@@ -335,12 +349,13 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Shared validation patterns (SYMBOL_RE): `src/constants/patterns.js`
 - Default preset definitions: `src/constants/presets.js`
 - Accent color presets (per-theme): `src/constants/accents.js`
+- Trading roadmap data (16 phases, 86 topics): `src/constants/roadmap.js`
 
 ### Tooling
 - ESLint config (flat): `eslint.config.js`
 - Pre-commit hooks: `.husky/pre-commit` → `lint-staged` (ESLint on staged files)
 - CI pipeline: `.github/workflows/ci.yml` — lint + test + build on push/PR
-- Vite config + SW versioning plugin: `vite.config.js`
+- Vite config + SW versioning plugin + MPA input (index + roadmap): `vite.config.js`
 - PostCSS config (`@tailwindcss/postcss`): `postcss.config.js`
 - Tailwind theme tokens: `src/index.css` `@theme` block (no `tailwind.config.js` — TW4)
 - OG image generator: `scripts/generate-og-image.js` — outputs `public/og-image.png` (requires sharp devDep)

@@ -149,6 +149,20 @@ export function TopNav() {
         </>
       )}
 
+      {/* Learning roadmap link */}
+      <a
+        href="/roadmap"
+        className="flex items-center gap-1.5 px-2 h-7 rounded hover:bg-theme-hover transition-colors touch-target text-xs font-medium"
+        style={{ color: 'var(--accent)' }}
+        title="Trading Roadmap"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+        </svg>
+        {!isMobile && <span>Learn</span>}
+      </a>
+
       {/* Command palette trigger */}
       <button
         data-tour="cmd-k"
@@ -181,6 +195,16 @@ export function TopNav() {
             className="absolute right-0 mt-1 w-36 rounded-lg border border-theme-mid shadow-xl py-1 z-50"
             style={{ backgroundColor: 'var(--bg-surface)' }}
           >
+            <a
+              href="/roadmap"
+              className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-theme hover:bg-theme-hover transition-colors text-left"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 17l6-6 4 4 8-8" />
+                <path d="M14 7h7v7" />
+              </svg>
+              Trading Roadmap
+            </a>
             <button
               onClick={() => { setHelpOpen(false); startTour() }}
               className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-theme hover:bg-theme-hover transition-colors text-left"

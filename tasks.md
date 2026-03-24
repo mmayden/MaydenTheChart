@@ -61,6 +61,18 @@
 
 ## ✅ Completed Phases — Archive
 
+### Trading Roadmap Page (2026-03-24)
+- Standalone page at `/roadmap` — separate Vite entry point (`roadmap.html` + `src/roadmap-main.jsx`)
+- Full-page interactive learning tracker: 16 phases, 86 topics, 500+ concepts
+- Independent of chart app — no stores, no TanStack Query, no chart code loaded
+- Shares CSS theme system (3 themes + accent colors) and font preloads
+- Progress tracking via localStorage (`cheechart-roadmap-done`) with checkboxes and progress bar
+- Detail panel: desktop side panel (380px) / mobile bottom sheet overlay
+- Search across topics, concepts, and resources
+- Linked from TopNav Help menu + BottomNav "More" menu
+- Vercel rewrite: `/roadmap` → `/roadmap.html` (before SPA catch-all)
+- Data extracted from standalone HTML into `src/constants/roadmap.js` ES module
+
 ### Mobile-First Overhaul (M1–M5) (2026-03-18)
 - **M1:** Safe areas (`env(safe-area-inset-*)`), `100dvh` with fallback, `useMediaQuery`/`useIsMobile`/`useIsLandscape` hooks, `viewport-fit=cover`
 - **M2:** BottomNav (mobile-only): thumb-zone timeframe pills + panel toggles + sidebar hamburger. TopNav slimmed to `h-9` with compact PriceDisplay. StatusBar mobile-optimized (dot+label only)

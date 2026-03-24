@@ -170,6 +170,13 @@ export function BottomNav() {
                 {label}
               </button>
             ))}
+            {/* Roadmap — separate page */}
+            <a
+              href="/roadmap"
+              className="flex items-center gap-2 w-full px-3 py-2.5 text-xs font-mono text-theme-muted hover:text-theme hover:bg-theme-hover transition-colors text-left touch-target"
+            >
+              Roadmap
+            </a>
           </div>
         )}
       </div>

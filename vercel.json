@@ -10,6 +10,7 @@
     { "source": "/manifest.json", "destination": "/manifest.json" },
     { "source": "/icons/(.*)", "destination": "/icons/$1" },
     { "source": "/fonts/(.*)", "destination": "/fonts/$1" },
+    { "source": "/roadmap", "destination": "/roadmap.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
@@ -33,6 +34,12 @@
     },
     {
       "source": "/",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, s-maxage=60, stale-while-revalidate=300" }
+      ]
+    },
+    {
+      "source": "/roadmap",
       "headers": [
         { "key": "Cache-Control", "value": "public, s-maxage=60, stale-while-revalidate=300" }
       ]

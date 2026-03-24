@@ -623,3 +623,24 @@ body,
     animation: none;
   }
 }
+
+/* ── Roadmap page ────────────────────────────────────────────────────────── */
+.roadmap-detail {
+  position: absolute;
+  inset: 0;
+  padding: 24px 22px 48px;
+}
+.roadmap-section-title {
+  font-size: 10px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-base);
+}
+.roadmap-node:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
