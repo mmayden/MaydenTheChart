@@ -206,7 +206,7 @@
 
 ### Phase 11 — Polish + Mobile + Security (2026-03-15)
 - **11A:** localStorage schema validation (29 tests), API error sanitization, code splitting (501KB → 303KB main)
-- **11B:** CSS theme refactor (eliminated 33 `!important`), touch targets 44px+, swipe gestures, chart snapshot
+- **11B:** CSS theme refactor (eliminated 33 `!important`), touch targets 44px+, chart snapshot
 - **11C:** PWA manifest + service worker + icons, onboarding tour (4-step tooltip)
 - Per-panel icon colors (3 themes), nav hover micro-animations (CSS keyframes)
 

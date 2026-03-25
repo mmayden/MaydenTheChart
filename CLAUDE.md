@@ -326,7 +326,6 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Daily bars hook: `src/hooks/useDailyBars.js`
 - MTF signals: `src/hooks/useMTFSignals.js`
 - Watchlist quotes: `src/hooks/useWatchlistQuotes.js`
-- Swipe gestures (touch devices): `src/hooks/useSwipeGesture.js`
 - Media queries (reactive): `src/hooks/useMediaQuery.js` — `useIsMobile()`, `useIsTablet()`, `useIsLandscape()`
 - Pull-to-refresh (mobile): `src/hooks/usePullToRefresh.js` — touch gesture, threshold-based trigger
 
