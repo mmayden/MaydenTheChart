@@ -9,15 +9,45 @@
  */
 
 import { useState, useRef, useEffect } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
 import { useChartStore } from '../../store/useChartStore'
 import { usePresetsStore } from '../../store/usePresetsStore'
 import { useAlertsStore } from '../../store/useAlertsStore'
 import { TIMEFRAME_ORDER, TIMEFRAME_CONFIG } from '../../constants/chart'
 
+const PANEL_BUTTONS = [
+  {
+    id: 'watchlist',
+    label: 'Watchlist',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" />
+        <line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" />
+      </svg>
+    ),
+  },
+  {
+    id: 'backtest',
+    label: 'Backtest',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+      </svg>
+    ),
+  },
+  {
+    id: 'journal',
+    label: 'Journal',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
+      </svg>
+    ),
+  },
+]
+
 export function BottomNav() {
   const selectedTimeframe = useChartStore((s) => s.selectedTimeframe)
-  const selectedSymbol    = useChartStore((s) => s.selectedSymbol)
   const setTimeframe      = useChartStore((s) => s.setTimeframe)
   const activePanel       = useChartStore((s) => s.activePanel)
   const setActivePanel    = useChartStore((s) => s.setActivePanel)
@@ -25,7 +55,6 @@ export function BottomNav() {
   const markModified      = usePresetsStore((s) => s.markModified)
   const alerts            = useAlertsStore((s) => s.alerts)
   const activeCount       = alerts.filter((a) => !a.triggered).length
-  const queryClient       = useQueryClient()
 
   const [tfOpen, setTfOpen] = useState(false)
   const tfRef = useRef(null)
@@ -43,7 +72,6 @@ export function BottomNav() {
   function handleTimeframe(tf) {
     setTimeframe(tf)
     markModified()
-    queryClient.invalidateQueries({ queryKey: ['bars', selectedSymbol, tf] })
     setTfOpen(false)
   }
 
@@ -112,7 +140,7 @@ export function BottomNav() {
       {/* Spacer */}
       <div className="flex-1" />
 
-      {/* Alerts bell */}
+      {/* Alerts bell (separate due to badge) */}
       <button
         onClick={() => setActivePanel('alerts')}
         className="relative flex items-center justify-center w-10 h-10 rounded shrink-0 touch-target"
@@ -135,59 +163,22 @@ export function BottomNav() {
         )}
       </button>
 
-      {/* Watchlist */}
-      <button
-        onClick={() => setActivePanel('watchlist')}
-        className="flex items-center justify-center w-10 h-10 rounded shrink-0 touch-target"
-        style={{
-          color: 'var(--watchlist-color)',
-          backgroundColor: activePanel === 'watchlist' ? 'var(--watchlist-active-bg)' : undefined,
-        }}
-        aria-label="Watchlist"
-        aria-pressed={activePanel === 'watchlist'}
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="8" y1="6" x2="21" y2="6" />
-          <line x1="8" y1="12" x2="21" y2="12" />
-          <line x1="8" y1="18" x2="21" y2="18" />
-          <line x1="3" y1="6" x2="3.01" y2="6" />
-          <line x1="3" y1="12" x2="3.01" y2="12" />
-          <line x1="3" y1="18" x2="3.01" y2="18" />
-        </svg>
-      </button>
-
-      {/* Backtest */}
-      <button
-        onClick={() => setActivePanel('backtest')}
-        className="flex items-center justify-center w-10 h-10 rounded shrink-0 touch-target"
-        style={{
-          color: 'var(--backtest-color)',
-          backgroundColor: activePanel === 'backtest' ? 'var(--backtest-active-bg)' : undefined,
-        }}
-        aria-label="Backtest"
-        aria-pressed={activePanel === 'backtest'}
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-        </svg>
-      </button>
-
-      {/* Journal */}
-      <button
-        onClick={() => setActivePanel('journal')}
-        className="flex items-center justify-center w-10 h-10 rounded shrink-0 touch-target"
-        style={{
-          color: 'var(--journal-color)',
-          backgroundColor: activePanel === 'journal' ? 'var(--journal-active-bg)' : undefined,
-        }}
-        aria-label="Journal"
-        aria-pressed={activePanel === 'journal'}
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
-        </svg>
-      </button>
+      {/* Panel buttons */}
+      {PANEL_BUTTONS.map(({ id, label, icon }) => (
+        <button
+          key={id}
+          onClick={() => setActivePanel(id)}
+          className="flex items-center justify-center w-10 h-10 rounded shrink-0 touch-target"
+          style={{
+            color: `var(--${id}-color)`,
+            backgroundColor: activePanel === id ? `var(--${id}-active-bg)` : undefined,
+          }}
+          aria-label={label}
+          aria-pressed={activePanel === id}
+        >
+          {icon}
+        </button>
+      ))}
     </nav>
   )
 }

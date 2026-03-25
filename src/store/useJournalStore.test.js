@@ -3,8 +3,7 @@
  *
  * Tests verify:
  *   - CRUD operations (add, update, remove)
- *   - Stats computation (win rate, totals)
- *   - Edge cases (empty store, breakeven entries)
+ *   - Edge cases (empty store)
  */
 
 import { describe, it, expect, beforeEach } from 'vitest'
@@ -63,28 +62,5 @@ describe('useJournalStore', () => {
     const entries = useJournalStore.getState().entries
     expect(entries).toHaveLength(1)
     expect(entries[0].symbol).toBe('SPY')
-  })
-
-  it('getStats returns null when empty', () => {
-    expect(useJournalStore.getState().getStats()).toBeNull()
-  })
-
-  it('getStats computes correct win rate', () => {
-    addSample({ result: 'win' })
-    addSample({ result: 'win' })
-    addSample({ result: 'loss' })
-    addSample({ result: 'breakeven' })
-    const stats = useJournalStore.getState().getStats()
-    expect(stats.totalTrades).toBe(4)
-    expect(stats.wins).toBe(2)
-    expect(stats.losses).toBe(1)
-    expect(stats.breakeven).toBe(1)
-    expect(stats.winRate).toBe(50)
-  })
-
-  it('getRecentEntries respects limit', () => {
-    for (let i = 0; i < 5; i++) addSample()
-    const recent = useJournalStore.getState().getRecentEntries(3)
-    expect(recent).toHaveLength(3)
   })
 })

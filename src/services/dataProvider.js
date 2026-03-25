@@ -22,21 +22,11 @@ import {
 } from './providers/alpaca'
 import { log } from '../utils/logger'
 
-// ─── Active provider ─────────────────────────────────────────────────────────
-// To add a new provider:
+// ─── Data fetching ──────────────────────────────────────────────────────────
+// Currently uses Alpaca. To swap providers:
 //   1. Create src/services/providers/{name}.js with adapter functions
-//   2. Import and wire it here (swap alpacaNormalizeBars / alpacaGetTimeframe)
+//   2. Import and wire its normalize/timeframe functions below
 //   3. Update serverless proxies (api/bars.js, api/snapshot.js)
-const ACTIVE_PROVIDER = 'alpaca'
-
-/**
- * Get provider name.
- */
-export function getProviderName() {
-  return ACTIVE_PROVIDER
-}
-
-// ─── Data fetching (synchronous provider for REST — no dynamic import needed) ─
 
 /**
  * Fetch historical OHLCV bars for a symbol.

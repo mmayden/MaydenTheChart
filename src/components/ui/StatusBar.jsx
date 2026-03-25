@@ -7,6 +7,7 @@ import { useMemo } from 'react'
 import { useChartStore } from '../../store/useChartStore'
 import { useJournalStore } from '../../store/useJournalStore'
 import { useIsMobile } from '../../hooks/useMediaQuery'
+import { getTodayKey } from '../../utils/timezone'
 
 /** Map market + WS state to visual properties. */
 function getConnectionStatus(isMarketOpen, wsStatus) {
@@ -33,7 +34,7 @@ export function StatusBar({ lastUpdated }) {
 
   // Today's session stats from journal
   const sessionStats = useMemo(() => {
-    const today = new Date().toISOString().slice(0, 10)
+    const today = getTodayKey()
     const todayEntries = entries.filter((e) => e.date?.startsWith(today) && e.result)
     if (todayEntries.length === 0) return null
     const wins = todayEntries.filter((e) => e.result === 'win').length

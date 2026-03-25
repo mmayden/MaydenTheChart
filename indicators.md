@@ -30,6 +30,7 @@ with historical bar slices. No duplicate math, ever.
 - `vwapWithBands()` returns `{ vwap, band1Upper, band1Lower, band2Upper, band2Lower, signal }` — multiple band series instead of a single `series` key. This is intentional because the chart needs 5 separate line series.
 - `macd()` returns `{ macd, signalLine, histogram, signal }` — three chart series instead of one.
 - `detectEMACrosses()` and `getDailyRangeStatus()` are helper functions that do not follow the contract (they are not standalone indicators).
+- `detectRSIDivergences()` was removed (2026-03-25) — dead code, never imported by components. RSI divergence chart markers are a Phase 12F future feature.
 
 ---
 

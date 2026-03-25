@@ -19,18 +19,24 @@ import { useQueryClient } from '@tanstack/react-query'
 import { fetchBars } from '../services/dataProvider'
 import { useChartStore } from '../store/useChartStore'
 import { TIMEFRAME_CONFIG } from '../constants/chart'
+import { getTodayKey } from '../utils/timezone'
 import { log } from '../utils/logger'
 
 const SCROLL_THRESHOLD = 50  // trigger fetch when < 50 bars before left edge
 
 export function useInfiniteHistory(chart, bars) {
   const queryClient = useQueryClient()
-  const isFetchingRef = useRef(false)
-  const prevKeyRef    = useRef(null)
+  const isFetchingRef   = useRef(false)
+  const hasMoreRef      = useRef(true)
+  const prevKeyRef      = useRef(null)
+  const barsRef         = useRef(bars)
   const [isLoadingHistory, setIsLoadingHistory] = useState(false)
 
   const symbol    = useChartStore((s) => s.selectedSymbol)
   const timeframe = useChartStore((s) => s.selectedTimeframe)
+
+  // Keep bars ref current without triggering callback recreation
+  useEffect(() => { barsRef.current = bars }, [bars])
 
   // Reset on symbol/timeframe change
   useEffect(() => {
@@ -38,30 +44,31 @@ export function useInfiniteHistory(chart, bars) {
     if (prevKeyRef.current !== key) {
       prevKeyRef.current = key
       isFetchingRef.current = false
+      hasMoreRef.current = true
     }
   }, [symbol, timeframe])
 
   const fetchOlderBars = useCallback(async () => {
-    if (isFetchingRef.current) return
-    if (!bars?.length) return
+    if (isFetchingRef.current || !hasMoreRef.current) return
+    const currentBars = barsRef.current
+    if (!currentBars?.length) return
 
     const config = TIMEFRAME_CONFIG[timeframe]
     if (!config) return
 
     // Respect maxBars cap (0 = unlimited)
-    if (config.maxBars > 0 && bars.length >= config.maxBars) return
+    if (config.maxBars > 0 && currentBars.length >= config.maxBars) return
 
     isFetchingRef.current = true
     setIsLoadingHistory(true)
 
     try {
       // Oldest bar's time is our "end" for the older page
-      const oldestTime = bars[0].time
+      const oldestTime = currentBars[0].time
       const endDate = new Date(oldestTime * 1000)
 
       // Calculate how far back to fetch based on pageSize and timeframe
       const pageSizeBars = config.pageSize || 390
-      // Rough estimate: multiply pageSize by bar interval to get lookback
       const barIntervalMs = config.lookbackMs / config.limit
       const lookbackMs = pageSizeBars * barIntervalMs
       const startDate = new Date(endDate.getTime() - lookbackMs)
@@ -75,29 +82,24 @@ export function useInfiniteHistory(chart, bars) {
       )
 
       if (!olderBars?.length) {
-        // No more history available — stop trying
-        isFetchingRef.current = true // leave locked to prevent retries
+        hasMoreRef.current = false
         return
       }
 
       // Deduplicate: only keep bars older than our current oldest
       const newBars = olderBars.filter((b) => b.time < oldestTime)
       if (!newBars.length) {
-        isFetchingRef.current = true
+        hasMoreRef.current = false
         return
       }
 
       // Update TanStack Query cache — prepend older bars
-      const todayKey = new Date().toISOString().slice(0, 10)
+      const todayKey = getTodayKey()
       const queryKey = ['bars', symbol, timeframe, todayKey]
 
       queryClient.setQueryData(queryKey, (prev) => {
         if (!prev?.length) return prev
         let merged = [...newBars, ...prev]
-        // Enforce maxBars cap by trimming from the end (newest) — but that
-        // would lose live data. Instead, trim oldest if we exceed cap.
-        // Actually, we should NOT trim since the user is scrolling back to
-        // see history. The cap just prevents fetching more.
         if (config.maxBars > 0 && merged.length > config.maxBars) {
           merged = merged.slice(merged.length - config.maxBars)
         }
@@ -112,7 +114,7 @@ export function useInfiniteHistory(chart, bars) {
         isFetchingRef.current = false
       }, 500)
     }
-  }, [bars, symbol, timeframe, queryClient])
+  }, [symbol, timeframe, queryClient])
 
   // Subscribe to visible range changes on the chart's timeScale
   useEffect(() => {

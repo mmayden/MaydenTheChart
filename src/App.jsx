@@ -267,7 +267,7 @@ export default function App() {
                   <MTFStrip />
                 </div>
               )}
-              <div className={isMobile ? 'ml-auto shrink-0' : 'ml-auto shrink-0'}>
+              <div className="ml-auto shrink-0">
                 <DayTypeBanner dayType={dayType} />
               </div>
             </div>
@@ -352,7 +352,7 @@ export default function App() {
                 />
                 <SROverlay candleSeries={candleSeries} bars={stableBars} visible={showSr} />
                 <BollingerOverlay chart={chart} bars={stableBars} visible={showBollinger} />
-                <CrosshairLegend chart={chart} bars={stableBars} theme={theme} />
+                <CrosshairLegend chart={chart} bars={stableBars} />
               </>
             )}
           </div>

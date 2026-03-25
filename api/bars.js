@@ -1,11 +1,7 @@
 /**
  * Vercel Serverless Function — /api/bars
  *
- * Proxies bar requests through the configured data provider so API keys
- * never reach the browser. Currently supports Alpaca (default).
- *
- * Provider selection: DATA_PROVIDER env var (default: 'alpaca').
- * Future providers will add their own handler functions below.
+ * Proxies bar requests through Alpaca so API keys never reach the browser.
  *
  * Query params:
  *   symbol    - e.g. 'QQQ'
@@ -15,56 +11,17 @@
  *   limit     - max bars (default 1000)
  */
 
-/**
- * Simple in-memory rate limiter (best-effort per serverless instance).
- */
-const rateLimitMap = new Map()
-const RATE_LIMIT_WINDOW = 60_000 // 1 minute
-const RATE_LIMIT_MAX = 60        // 60 requests per IP per minute
-const RATE_LIMIT_MAX_ENTRIES = 10_000
-let lastCleanup = 0
+import { createRateLimiter, preamble, ALLOWED_DATA_HOSTS, SYMBOL_RE, getAlpacaConfig } from './_utils.js'
 
-function isRateLimited(ip) {
-  const now = Date.now()
-  // Periodic cleanup — purge expired entries every 2 minutes (or if map is oversized)
-  if (now - lastCleanup > 120_000 || rateLimitMap.size > RATE_LIMIT_MAX_ENTRIES) {
-    for (const [key, val] of rateLimitMap) {
-      if (now - val.start > RATE_LIMIT_WINDOW) rateLimitMap.delete(key)
-    }
-    lastCleanup = now
-  }
-  const entry = rateLimitMap.get(ip)
-  if (!entry || now - entry.start > RATE_LIMIT_WINDOW) {
-    rateLimitMap.set(ip, { start: now, count: 1 })
-    return false
-  }
-  entry.count++
-  if (entry.count > RATE_LIMIT_MAX) return true
-  return false
-}
+const isRateLimited = createRateLimiter(60) // 60 req/min per IP
 
-/** SSRF guard — only allow known Alpaca data hosts. */
-const ALLOWED_DATA_HOSTS = new Set(['data.alpaca.markets'])
-
-/** Generate a short request ID for log correlation. */
-function requestId() {
-  return crypto.randomUUID().slice(0, 8)
-}
+const VALID_TIMEFRAMES = ['1Min', '5Min', '15Min', '30Min', '1Hour', '4Hour', '1Day', '1Week', '1Month']
+const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{1,3})?(Z|[+-]\d{2}:\d{2})?)?$/
 
 export default async function handler(req, res) {
-  const rid = requestId()
-  res.setHeader('x-request-id', rid)
-
-  // Only allow GET
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' })
-  }
-
-  // Rate limit by IP
-  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown'
-  if (isRateLimited(ip)) {
-    return res.status(429).json({ error: 'Too many requests — try again later' })
-  }
+  const ctx = preamble(req, res, isRateLimited)
+  if (!ctx) return
+  const { rid } = ctx
 
   const { symbol, timeframe, start, end, limit = '1000' } = req.query
 
@@ -73,8 +30,7 @@ export default async function handler(req, res) {
   }
 
   // Input validation
-  const VALID_TIMEFRAMES = ['1Min', '5Min', '15Min', '30Min', '1Hour', '4Hour', '1Day', '1Week', '1Month']
-  if (!/^[A-Z]{1,10}(\.[A-Z]{1,2})?$/.test(symbol)) {
+  if (!SYMBOL_RE.test(symbol)) {
     return res.status(400).json({ error: 'Invalid symbol — must be 1-10 uppercase letters (optional .X or .XX suffix)' })
   }
   if (!VALID_TIMEFRAMES.includes(timeframe)) {
@@ -84,23 +40,19 @@ export default async function handler(req, res) {
   if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 10000) {
     return res.status(400).json({ error: 'Invalid limit — must be an integer between 1 and 10000' })
   }
-  const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{1,3})?(Z|[+-]\d{2}:\d{2})?)?$/
-  if (start && !ISO_DATE_RE.test(start)) {
-    return res.status(400).json({ error: 'Invalid start — must be ISO 8601 format (YYYY-MM-DD or YYYY-MM-DDThh:mm:ss)' })
+  if (!ISO_DATE_RE.test(start)) {
+    return res.status(400).json({ error: 'Invalid start — must be ISO 8601 format' })
   }
-  if (end && !ISO_DATE_RE.test(end)) {
-    return res.status(400).json({ error: 'Invalid end — must be ISO 8601 format (YYYY-MM-DD or YYYY-MM-DDThh:mm:ss)' })
+  if (!ISO_DATE_RE.test(end)) {
+    return res.status(400).json({ error: 'Invalid end — must be ISO 8601 format' })
   }
 
-  const apiKey = process.env.ALPACA_API_KEY
-  const secretKey = process.env.ALPACA_SECRET_KEY
-  const dataUrl = process.env.ALPACA_DATA_URL || 'https://data.alpaca.markets/v2'
+  const { apiKey, secretKey, dataUrl } = getAlpacaConfig()
 
-  // SSRF guard — reject misconfigured data URLs (exact hostname match)
+  // SSRF guard — reject misconfigured data URLs
   if (!ALLOWED_DATA_HOSTS.has(new URL(dataUrl).hostname)) {
     return res.status(500).json({ error: 'Server misconfigured' })
   }
-
   if (!apiKey || !secretKey) {
     return res.status(500).json({ error: 'Server misconfigured — missing Alpaca credentials' })
   }
@@ -114,7 +66,7 @@ export default async function handler(req, res) {
 
     let allBars = []
     let pageToken = null
-    const MAX_PAGES = 10 // safety cap to avoid runaway loops
+    const MAX_PAGES = 10
 
     for (let page = 0; page < MAX_PAGES; page++) {
       const params = new URLSearchParams({
@@ -132,7 +84,6 @@ export default async function handler(req, res) {
       if (!response.ok) {
         const text = await response.text()
         console.error(`[bars] rid=${rid} Alpaca API error:`, response.status, text)
-        // Generic error to client — never leak upstream status codes or details
         const clientStatus = response.status === 404 ? 404 : 502
         const clientMsg = response.status === 404
           ? 'Symbol not found or no data available'
@@ -148,7 +99,6 @@ export default async function handler(req, res) {
       if (!pageToken) break
     }
 
-    // Cache for 30 seconds — data doesn't change that fast
     res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60')
     return res.status(200).json({ bars: allBars })
   } catch (err) {

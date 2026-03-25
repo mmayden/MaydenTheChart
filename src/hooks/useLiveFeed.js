@@ -14,6 +14,7 @@ import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { createSocket } from '../services/websocket'
 import { useChartStore } from '../store/useChartStore'
+import { getTodayKey } from '../utils/timezone'
 
 /** Timeframe durations in seconds, for bar aggregation bucketing. */
 const TF_SECONDS = {
@@ -66,7 +67,7 @@ export function useLiveFeed() {
       if (!tfSecs) return
 
       const bucketTime = getBucketTime(bar.time, tfSecs)
-      const todayKey = new Date().toISOString().slice(0, 10)
+      const todayKey = getTodayKey()
       const queryKey = ['bars', selectedSymbol, selectedTimeframe, todayKey]
 
       queryClient.setQueryData(queryKey, (prev) => {
@@ -134,10 +135,4 @@ export function useLiveFeed() {
       clearInterval(marketCheckId)
     }
   }, [queryClient, selectedSymbol])
-
-  const wsStatus = useChartStore((s) => s.wsStatus)
-  const isMarketOpen = useChartStore((s) => s.isMarketOpen)
-
-  return { wsStatus, isMarketOpen }
 }
-

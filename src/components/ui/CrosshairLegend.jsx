@@ -6,14 +6,11 @@
  * Close is colored green/red based on candle direction.
  *
  * Performance: Updates DOM directly via ref — no React re-renders on mouse move.
- *
- * Props:
- *   chart      — lightweight-charts IChartApi instance
- *   bars       — array of { time, open, high, low, close, volume } bar objects
- *   theme      — 'dark' | 'lumpia' | 'terminal'
+ * CSS variable colors are cached and refreshed only on theme change.
  */
 
 import { useEffect, useRef } from 'react'
+import { useChartStore } from '../../store/useChartStore'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -46,9 +43,22 @@ function formatTimeET(unixSeconds) {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export function CrosshairLegend({ chart, bars, theme: _theme = 'dark' }) {
+export function CrosshairLegend({ chart, bars }) {
   const legendRef  = useRef(null)
   const barsMapRef = useRef(new Map())
+  const colorsRef  = useRef({ bull: '#22c55e', bear: '#ef4444', dim: '#9ca3af' })
+
+  const theme = useChartStore((s) => s.theme)
+
+  // Cache CSS variable colors — refresh only on theme change
+  useEffect(() => {
+    const styles = getComputedStyle(document.documentElement)
+    colorsRef.current = {
+      bull: styles.getPropertyValue('--color-bull').trim() || '#22c55e',
+      bear: styles.getPropertyValue('--color-bear').trim() || '#ef4444',
+      dim:  styles.getPropertyValue('--text-muted').trim() || '#9ca3af',
+    }
+  }, [theme])
 
   // Build time→bar lookup Map when bars change (O(1) per crosshair move)
   useEffect(() => {
@@ -74,10 +84,10 @@ export function CrosshairLegend({ chart, bars, theme: _theme = 'dark' }) {
         return
       }
 
-      const bullish   = bar.close >= bar.open
-      const styles    = getComputedStyle(document.documentElement)
-      const closeClr  = bullish ? (styles.getPropertyValue('--color-bull').trim() || '#22c55e') : (styles.getPropertyValue('--color-bear').trim() || '#ef4444')
-      const dimColor  = styles.getPropertyValue('--text-muted').trim() || '#9ca3af'
+      const bullish  = bar.close >= bar.open
+      const colors   = colorsRef.current
+      const closeClr = bullish ? colors.bull : colors.bear
+      const dimColor = colors.dim
 
       el.style.opacity = '1'
       el.textContent = ''

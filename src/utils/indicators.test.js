@@ -19,7 +19,6 @@ import {
   rsi,
   macd,
   bollingerBands,
-  detectRSIDivergences,
 } from './indicators'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -780,41 +779,4 @@ describe('signal contract', () => {
     })
   })
 
-  // ─── RSI Divergence Detection ─────────────────────────────────────────────
-
-  describe('detectRSIDivergences', () => {
-    it('returns empty on insufficient data', () => {
-      const result = detectRSIDivergences([], [], 5)
-      expect(result).toHaveLength(0)
-    })
-
-    it('returns empty when no divergences exist', () => {
-      // Flat price and RSI — no divergence possible
-      const closes = Array.from({ length: 50 }, () => 400)
-      const bars = makeBars(closes)
-      const rsiSeries = bars.map((b) => ({ time: b.time, value: 50 }))
-      const result = detectRSIDivergences(bars, rsiSeries, 3)
-      expect(result).toHaveLength(0)
-    })
-
-    it('returns array of objects with time and type', () => {
-      // Create a bearish divergence: price makes higher high, RSI makes lower high
-      const closes = Array.from({ length: 60 }, (_, i) => {
-        if (i < 20) return 400 + i
-        if (i < 30) return 420 - (i - 20)
-        if (i < 50) return 410 + (i - 30) * 1.5
-        return 440 - (i - 50)
-      })
-      const bars = makeBars(closes)
-      const rsiResult = rsi(bars, 14)
-      const result = detectRSIDivergences(bars, rsiResult.series, 5)
-      // Should return array (may or may not find divergences depending on exact values)
-      expect(Array.isArray(result)).toBe(true)
-      result.forEach((d) => {
-        expect(d).toHaveProperty('time')
-        expect(d).toHaveProperty('type')
-        expect(['bullish', 'bearish']).toContain(d.type)
-      })
-    })
-  })
 })

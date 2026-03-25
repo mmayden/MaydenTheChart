@@ -24,18 +24,6 @@ export function ToastContainer() {
 
   return (
     <>
-      {/* keyframes injected once */}
-      <style>{`
-        @keyframes toast-slide-in {
-          from { transform: translateX(100%); opacity: 0; }
-          to   { transform: translateX(0);    opacity: 1; }
-        }
-        @keyframes toast-fade-out {
-          from { opacity: 1; }
-          to   { opacity: 0; transform: translateX(40%); }
-        }
-      `}</style>
-
       <div
         style={{
           position: 'fixed',

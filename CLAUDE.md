@@ -60,7 +60,7 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - `ALPACA_DATA_URL` must be validated against `ALLOWED_DATA_HOSTS` via `new URL().hostname` exact match (SSRF guard)
 - All user input from URL params, forms, and localStorage must be regex-validated before use
 - `SYMBOL_RE` lives in `src/constants/patterns.js` — single source of truth for client-side symbol validation
-  (server-side `api/*.js` files keep inline copies for zero-import serverless deploys — keep in sync)
+  (server-side uses `api/_utils.js` shared module — `SYMBOL_RE` exported there too)
 - API errors must never leak upstream status codes, URLs, or stack traces to clients
 - ErrorBoundary shows raw error messages only in `import.meta.env.DEV`
 - Service worker `CACHE_NAME` is auto-versioned at build time (Vite plugin in `vite.config.js`)
@@ -92,6 +92,10 @@ Breadcrumbs track user navigation (symbol/timeframe changes).
 - `src/utils/logger.js` — imports `getSentry()` (not `@sentry/react`), resolves Sentry lazily at each error/breadcrumb call
 - `src/main.jsx` — `initSentry().then(() => reportWebVitals())` — chained async, non-blocking
 - **Rule:** Never static-import `@sentry/react` anywhere except inside `sentry.js`'s dynamic import
+
+**API shared utils:** `api/_utils.js` (not deployed as endpoint — `_` prefix) exports
+`createRateLimiter(max)`, `requestId()`, `getClientIp()`, `preamble()`, `ALLOWED_DATA_HOSTS`,
+`SYMBOL_RE`, `getAlpacaConfig()`. All three handlers (`bars.js`, `snapshot.js`, `ws-auth.js`) import from it.
 
 **API request IDs:** All serverless functions (`api/*.js`) generate a short `x-request-id`
 header on every response. Server-side `console.error` logs include `rid=<id>` for
@@ -312,7 +316,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Toast store: `src/store/useToastStore.js`
 
 ### Data Layer (provider-abstracted)
-- Provider interface: `src/services/dataProvider.js` — `fetchBars()`, `fetchSnapshot()`, `getProviderName()`
+- Provider interface: `src/services/dataProvider.js` — `fetchBars()`, `fetchSnapshot()`
 - Alpaca adapter: `src/services/providers/alpaca.js` — normalization, timeframe mapping, WS protocol
 - WebSocket manager: `src/services/websocket.js` — connection lifecycle, reconnect (provider-agnostic shell)
 - Query client config: `src/services/queryClient.js` — staleTime 30s, refetchOnWindowFocus 'always', retry 1
@@ -361,7 +365,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 
 ### Utilities
 - Structured logger: `src/utils/logger.js` — level-gated (`debug`/`info`/`warn`/`error`), lazy Sentry forwarding via `getSentry()`
-- Shared timezone utils: `src/utils/timezone.js`
+- Shared timezone utils + `getTodayKey()`: `src/utils/timezone.js`
 - localStorage schema validation: `src/utils/validate.js`
 - Chart snapshot capture + export (confluence watermark): `src/utils/snapshot.js`
 
@@ -424,21 +428,13 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Open Graph meta tags required in `index.html` for social sharing previews
 - Error tracking via Sentry free tier (5K errors/month, session replay)
 
-## Known issues (from 2026-03-18 deep assessment, updated 2026-03-25)
-
-### High — RESOLVED
-- ~~`BottomSheet` CSS missing `safe-area-inset-bottom`~~ — fixed: `padding-bottom: env(safe-area-inset-bottom)` added
-- ~~`usePullToRefresh.js` dependency array~~ — fixed: replaced state deps with refs, effect now stable
-- ~~Preset switching crashes~~ — fixed (2026-03-24): overlay effects wrapped in try/catch + `disposedRef`, mini chart crosshair handlers read live ref, CandlestickChart prepend null guard added
-- ~~Preset switching flicker/zoom issues~~ — fixed (2026-03-25): batched `applyPreset` into single `setState`, LevelOverlay create-once pattern, callback ref for chart detection, `stableBars` transition guard, mini charts always-mounted
-- ~~API request IDs use `Math.random()`~~ — fixed (2026-03-24): switched to `crypto.randomUUID()`
-- ~~No explicit fetch timeout on API proxy calls~~ — fixed (2026-03-24): `AbortSignal.timeout(10_000)` on all upstream fetches
-- ~~Security headers not reaching root path~~ — fixed (2026-03-24): `/(.*)`  → `/:path*` in vercel.json
-
-### Medium — RESOLVED
-- ~~`CandlestickChart.jsx`: `relativeVolume(bars)` not in `useMemo`~~ — fixed (2026-03-24): memoized, RVOL constants moved to `chart.js`
-- ~~Sentry imported unconditionally (~50-100KB)~~ — fixed (2026-03-24): dynamic import, logger uses lazy `getSentry()`
+## Known issues (updated 2026-03-25)
 
 ### Medium — address when touching related code
 - Zero test coverage on mobile components (BottomNav, BottomSheet, useMediaQuery, usePullToRefresh)
 - No localStorage schema migration system — new fields on journal/presets silently lost on old data
+- `setTheme()` mutates DOM inside store action — ideally a `useEffect` in App.jsx
+- WatchlistPanel manages localStorage directly instead of a Zustand store (pattern divergence)
+- SettingsModal uses raw inline styles throughout instead of CSS variables / Tailwind
+- RoadmapPage: `div[role=checkbox]` missing `tabIndex` + keyboard handler for accessibility
+- Duplicate indicator computation: confluence in App.jsx recomputes EMA×3/VWAP/RSI/MACD that overlays also compute independently

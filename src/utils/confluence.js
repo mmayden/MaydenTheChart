@@ -175,19 +175,16 @@ export function confluenceScore({
 
   // Max possible points per side: sum of (weight * 3) for each factor
   const maxPoints = totalWeight * 3
-  const bullPct = (bullPoints / maxPoints) * 100
-  const bearPct = (bearPoints / maxPoints) * 100
 
-  // Dominant bias
+  // Dominant bias — requires 20% edge to declare directional
   let bias = 'neutral'
-  let dominantPct = Math.max(bullPct, bearPct)
   if (bullPoints > bearPoints * 1.2) bias = 'bull'
   else if (bearPoints > bullPoints * 1.2) bias = 'bear'
 
   // Score = how aligned the signals are (0-100)
   // High score = strong consensus. Low score = mixed/conflicting.
   const alignment = Math.abs(bullPoints - bearPoints)
-  const score = Math.round(Math.min(100, (alignment / maxPoints) * 100 + dominantPct * 0.3))
+  const score = Math.round(Math.min(100, (alignment / maxPoints) * 100))
 
   // Level thresholds
   let level = 'weak'

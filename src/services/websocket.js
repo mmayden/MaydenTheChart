@@ -143,6 +143,3 @@ export function createSocket({ onBar, onStatus, getSymbol }) {
 
   return { connect, disconnect }
 }
-
-// Backward compat — old name still works during migration
-export { createSocket as createAlpacaSocket }

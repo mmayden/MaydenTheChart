@@ -262,18 +262,23 @@ export function relativeVolume(bars, period = RVOL_PERIOD, threshold = RVOL_THRE
 
   const series = []
 
+  // Sliding window sum — O(n) instead of O(n×period)
+  let volSum = 0
+  for (let i = 0; i < period; i++) volSum += bars[i].volume
+
   for (let i = period; i < bars.length; i++) {
-    const window   = bars.slice(i - period, i)
-    const avgVol   = window.reduce((s, b) => s + b.volume, 0) / period
+    const avgVol   = volSum / period
     const rvol     = avgVol > 0 ? bars[i].volume / avgVol : 0
-    const highlight = rvol >= threshold
 
     series.push({
       time:      bars[i].time,
       value:     bars[i].volume,
-      rvol:      parseFloat(rvol.toFixed(2)),
-      highlight,
+      rvol,
+      highlight: rvol >= threshold,
     })
+
+    // Slide the window: drop oldest, add current
+    volSum += bars[i].volume - bars[i - period].volume
   }
 
   const last      = series[series.length - 1]
@@ -318,7 +323,7 @@ export function rsi(bars, period = RSI_PERIOD) {
 
   const firstRS  = avgLoss === 0 ? Infinity : avgGain / avgLoss
   const firstRsi = 100 - 100 / (1 + firstRS)
-  series.push({ time: bars[period].time, value: parseFloat(firstRsi.toFixed(2)) })
+  series.push({ time: bars[period].time, value: firstRsi })
 
   // Wilder's smoothing for remaining bars
   for (let i = period + 1; i < bars.length; i++) {
@@ -331,7 +336,7 @@ export function rsi(bars, period = RSI_PERIOD) {
 
     const rs      = avgLoss === 0 ? Infinity : avgGain / avgLoss
     const rsiVal  = 100 - 100 / (1 + rs)
-    series.push({ time: bars[i].time, value: parseFloat(rsiVal.toFixed(2)) })
+    series.push({ time: bars[i].time, value: rsiVal })
   }
 
   const lastRsi  = series[series.length - 1].value
@@ -375,7 +380,7 @@ export function macd(bars, fastPeriod = MACD_FAST, slowPeriod = MACD_SLOW, signa
   const slowMap   = new Map(slowEma.map((p) => [p.time, p.value]))
   const macdLine  = fastEma
     .filter((p) => slowMap.has(p.time))
-    .map((p) => ({ time: p.time, value: parseFloat((p.value - slowMap.get(p.time)).toFixed(4)) }))
+    .map((p) => ({ time: p.time, value: p.value - slowMap.get(p.time) }))
 
   if (macdLine.length < signalPeriod) return empty
 
@@ -389,7 +394,7 @@ export function macd(bars, fastPeriod = MACD_FAST, slowPeriod = MACD_SLOW, signa
     .filter((p) => signalMap.has(p.time))
     .map((p) => ({
       time:  p.time,
-      value: parseFloat((p.value - signalMap.get(p.time)).toFixed(4)),
+      value: p.value - signalMap.get(p.time),
     }))
 
   // Signal object — based on histogram direction
@@ -432,11 +437,23 @@ export function bollingerBands(bars, period = 20, multiplier = 2) {
   const upper  = []
   const lower  = []
 
+  // Sliding window — maintain running sum and sum-of-squares for O(n)
+  let closeSum   = 0
+  let closeSqSum = 0
+  for (let i = 0; i < period; i++) {
+    closeSum   += bars[i].close
+    closeSqSum += bars[i].close * bars[i].close
+  }
+
   for (let i = period - 1; i < bars.length; i++) {
-    const window = bars.slice(i - period + 1, i + 1)
-    const sma    = window.reduce((s, b) => s + b.close, 0) / period
-    const variance = window.reduce((s, b) => s + (b.close - sma) ** 2, 0) / period
-    const stdDev   = Math.sqrt(variance)
+    if (i > period - 1) {
+      // Slide: add new bar, drop oldest
+      closeSum   += bars[i].close - bars[i - period].close
+      closeSqSum += bars[i].close * bars[i].close - bars[i - period].close * bars[i - period].close
+    }
+    const sma      = closeSum / period
+    const variance = closeSqSum / period - sma * sma
+    const stdDev   = Math.sqrt(Math.max(variance, 0))
 
     middle.push({ time: bars[i].time, value: sma })
     upper.push({ time: bars[i].time, value: sma + multiplier * stdDev })
@@ -460,73 +477,3 @@ export function bollingerBands(bars, period = 20, multiplier = 2) {
   return { middle, upper, lower, signal: { value: lastMid, bias, strength } }
 }
 
-// ─── RSI Divergence Detection ────────────────────────────────────────────────
-
-/**
- * Detect RSI divergences against price.
- *
- * Bullish divergence:  price makes lower low, RSI makes higher low
- * Bearish divergence:  price makes higher high, RSI makes lower high
- *
- * @param {Array<{time, close, high, low}>} bars
- * @param {Array<{time, value}>} rsiSeries
- * @param {number} lookback - how many bars to compare swing points (default 5)
- * @returns {Array<{time, type: 'bullish'|'bearish'}>}
- */
-export function detectRSIDivergences(bars, rsiSeries, lookback = 5) {
-  const divergences = []
-  if (!bars?.length || !rsiSeries?.length || rsiSeries.length < lookback * 3) return divergences
-
-  const rsiMap = new Map(rsiSeries.map((p) => [p.time, p.value]))
-
-  // Find swing lows and highs in both price and RSI
-  for (let i = lookback * 2; i < bars.length - 1; i++) {
-    const rsiVal = rsiMap.get(bars[i].time)
-    if (rsiVal == null) continue
-
-    // Check for swing low in price (potential bullish divergence)
-    const isSwingLow = bars[i].low <= Math.min(...bars.slice(i - lookback, i).map((b) => b.low))
-      && bars[i].low < Math.min(...bars.slice(i + 1, Math.min(i + 3, bars.length)).map((b) => b.low))
-
-    if (isSwingLow) {
-      // Look back for a previous swing low
-      for (let j = i - lookback; j >= Math.max(0, i - lookback * 4); j--) {
-        const prevRsi = rsiMap.get(bars[j].time)
-        if (prevRsi == null) continue
-
-        const isPrevSwingLow = bars[j].low <= Math.min(
-          ...bars.slice(Math.max(0, j - lookback), j).map((b) => b.low),
-          ...bars.slice(j + 1, Math.min(j + 3, bars.length)).map((b) => b.low)
-        )
-
-        if (isPrevSwingLow && bars[i].low < bars[j].low && rsiVal > prevRsi) {
-          divergences.push({ time: bars[i].time, type: 'bullish' })
-          break
-        }
-      }
-    }
-
-    // Check for swing high (potential bearish divergence)
-    const isSwingHigh = bars[i].high >= Math.max(...bars.slice(i - lookback, i).map((b) => b.high))
-      && bars[i].high > Math.max(...bars.slice(i + 1, Math.min(i + 3, bars.length)).map((b) => b.high))
-
-    if (isSwingHigh) {
-      for (let j = i - lookback; j >= Math.max(0, i - lookback * 4); j--) {
-        const prevRsi = rsiMap.get(bars[j].time)
-        if (prevRsi == null) continue
-
-        const isPrevSwingHigh = bars[j].high >= Math.max(
-          ...bars.slice(Math.max(0, j - lookback), j).map((b) => b.high),
-          ...bars.slice(j + 1, Math.min(j + 3, bars.length)).map((b) => b.high)
-        )
-
-        if (isPrevSwingHigh && bars[i].high > bars[j].high && rsiVal < prevRsi) {
-          divergences.push({ time: bars[i].time, type: 'bearish' })
-          break
-        }
-      }
-    }
-  }
-
-  return divergences
-}

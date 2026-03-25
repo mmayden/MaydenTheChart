@@ -12,32 +12,22 @@
 - 🔲 Chart annotations — notes/arrows on chart, saved per symbol
 - 🔲 Weekly gap tracking panel
 - 🔲 Volume profile (horizontal bars)
-- 🔲 RSI divergence chart markers (math exists)
+- 🔲 RSI divergence chart markers (wire up with proper sliding-window algorithm)
 - 🔲 Alert sets per preset
 - 🔲 Cloud sync / preset export
 - 🔲 4hr EMA cross annotations
 
 ---
 
-## 📌 Assessment Findings — Priority Fixes (2026-03-18)
-
-> From comprehensive deep-dive audit across mobile, architecture, security, performance, and CSS.
-
-### High Priority
-- ✅ BottomSheet missing `safe-area-inset-bottom` — fixed: added `padding-bottom: env(safe-area-inset-bottom)` to `.bottom-sheet` CSS
-- ✅ `usePullToRefresh` dependency array — fixed: replaced state deps with refs (`pullProgressRef`, `isRefreshingRef`, `onRefreshRef`), effect now stable on `[threshold, handleRefresh]`
+## 📌 Assessment Findings — Outstanding Items
 
 ### Medium Priority
-- ✅ RVOL calculation memoized in CandlestickChart — `useMemo` wraps `relativeVolume(bars)` (2026-03-24)
-- ✅ Sentry dynamic-imported — `@sentry/react` only loaded when `VITE_SENTRY_DSN` is set, logger uses lazy `getSentry()` (2026-03-24)
 - 🔲 No mobile component tests — BottomNav, BottomSheet, useMediaQuery, usePullToRefresh have zero test coverage
 - 🔲 No localStorage schema migration system — adding new fields to journal/presets silently drops old entries' data
-
-### Low Priority
-- ✅ API request IDs use `Math.random()` — switched to `crypto.randomUUID()` (2026-03-24)
-- ✅ No explicit fetch timeout on API proxy calls — added `AbortSignal.timeout(10_000)` (2026-03-24)
-- ✅ RVOL_AMBER/RVOL_HOT moved to `constants/chart.js` (2026-03-24)
 - 🔲 `setTheme()` mutates DOM inside store action — ideally a `useEffect` in App.jsx
+- 🔲 WatchlistPanel manages localStorage directly instead of a Zustand store (pattern divergence)
+- 🔲 SettingsModal uses raw inline styles throughout instead of CSS variables / Tailwind
+- 🔲 RoadmapPage: `div[role=checkbox]` missing `tabIndex` + keyboard handler for accessibility
 
 ---
 
@@ -60,6 +50,21 @@
 ---
 
 ## ✅ Completed Phases — Archive
+
+### Code Quality Assessment & Cleanup (2026-03-25)
+- **indicators.js:** Removed dead `detectRSIDivergences` (O(n²), never imported by any component). Optimized RVOL and Bollinger Bands from O(n×period) to O(n) with sliding window sums. Removed unnecessary per-bar `parseFloat(toFixed())` on RSI/MACD series.
+- **API layer:** Extracted shared `api/_utils.js` — `createRateLimiter()`, `requestId()`, `getClientIp()`, `preamble()`, `ALLOWED_DATA_HOSTS`, `SYMBOL_RE`, `getAlpacaConfig()`. Eliminated ~60 lines of copy-pasted code across `bars.js`, `snapshot.js`, `ws-auth.js`.
+- **CrosshairLegend:** Cached `getComputedStyle` CSS variable reads in refs (was calling on every mousemove at 60fps). Colors refresh only on theme change.
+- **useInfiniteHistory:** Removed `bars` from `useCallback` deps (was causing chart subscription teardown/resubscribe on every live tick). Replaced permanent `isFetchingRef` lock with `hasMoreRef` that resets on symbol/timeframe change.
+- **useLiveFeed:** Removed unused `wsStatus`/`isMarketOpen` store subscriptions that caused unnecessary App re-renders (return value was discarded).
+- **timezone.js:** Module-level `DateTimeFormat` singletons (was re-instantiating on every call). Added shared `getTodayKey()` util, deduplicated across 4 hooks + StatusBar.
+- **Dead code removal:** `lumpia-*` localStorage migration (7 references), `createAlpacaSocket` alias, `getProviderName()`, unused `getStats()`/`getRecentEntries()` from journal store (+ fixed array mutation bug in `getRecentEntries`).
+- **BottomNav:** Extracted 4 copy-pasted panel buttons to a `PANEL_BUTTONS` data array + `.map()`. Removed direct `queryClient.invalidateQueries` (wrong layer — store handles this).
+- **CSS:** Removed stale roadmap rules from `index.css` (conflicted with `roadmap.css`). Added missing `--bg-hover` to `roadmap.css`. Removed unused `@theme` indicator color tokens (`--color-ema-*`, `--color-vwap`, `--color-level`, `--color-orb`, `--color-terminal-*`). Moved toast keyframes from inline `<style>` to `index.css`, removed dead `toast-fade-out`.
+- **confluence.js:** Fixed phantom score on neutral input — removed `dominantPct * 0.3` bonus that gave 15 points to genuinely neutral setups.
+- **index.html:** Fixed `<title>` from "Beta Cheechart" to "Cheechart — Day Trading Terminal" (matches OG tags, Google indexing).
+- **App.jsx:** Removed identical-branch ternary, removed unused `theme` prop from CrosshairLegend.
+- **292 tests passing, 0 lint errors, build successful.**
 
 ### Roadmap Visual Overhaul (2026-03-25)
 - **Color scheme:** deep indigo base (`#0c0915`) with teal/orange/rose accents — replaced cold blue/black monotone

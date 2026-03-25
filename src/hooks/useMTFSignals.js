@@ -13,6 +13,7 @@ import { useQueries } from '@tanstack/react-query'
 import { fetchBars } from '../services/dataProvider'
 import { useChartStore } from '../store/useChartStore'
 import { ema } from '../utils/indicators'
+import { getTodayKey } from '../utils/timezone'
 
 const MTF_TIMEFRAMES = [
   { key: '5Min',  label: '5m',  lookbackMs: 5 * 24 * 60 * 60 * 1000,  limit: 500 },
@@ -52,7 +53,7 @@ function classifyEMAAlignment(bars) {
 
 export function useMTFSignals() {
   const symbol = useChartStore((s) => s.selectedSymbol)
-  const todayKey = new Date().toISOString().slice(0, 10)
+  const todayKey = getTodayKey()
 
   const queries = useQueries({
     queries: MTF_TIMEFRAMES.map((tf) => ({

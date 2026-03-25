@@ -24,7 +24,7 @@ function saveEntries(entries) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)) } catch { /* storage unavailable */ }
 }
 
-export const useJournalStore = create((set, get) => ({
+export const useJournalStore = create((set) => ({
   entries: loadEntries(),
 
   addEntry: (entry) => {
@@ -55,30 +55,5 @@ export const useJournalStore = create((set, get) => ({
       saveEntries(next)
       return { entries: next }
     })
-  },
-
-  /** Get entries sorted by date descending. */
-  getRecentEntries: (limit = 50) => {
-    return get().entries
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
-      .slice(0, limit)
-  },
-
-  /** Get performance stats from journal entries. */
-  getStats: () => {
-    const entries = get().entries.filter((e) => e.result)
-    if (entries.length === 0) return null
-
-    const wins   = entries.filter((e) => e.result === 'win')
-    const losses = entries.filter((e) => e.result === 'loss')
-    const winRate = entries.length > 0 ? (wins.length / entries.length) * 100 : 0
-
-    return {
-      totalTrades: entries.length,
-      wins: wins.length,
-      losses: losses.length,
-      breakeven: entries.length - wins.length - losses.length,
-      winRate: parseFloat(winRate.toFixed(1)),
-    }
   },
 }))

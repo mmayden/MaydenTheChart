@@ -15,6 +15,7 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import { fetchBars } from '../services/dataProvider'
 import { useChartStore } from '../store/useChartStore'
 import { TIMEFRAME_CONFIG } from '../constants/chart'
+import { getTodayKey } from '../utils/timezone'
 
 export function useBars() {
   const symbol    = useChartStore((s) => s.selectedSymbol)
@@ -24,7 +25,7 @@ export function useBars() {
   const config = TIMEFRAME_CONFIG[timeframe]
 
   // Include today's date so the cache invalidates at day boundaries.
-  const todayKey = new Date().toISOString().slice(0, 10)
+  const todayKey = getTodayKey()
 
   return useQuery({
     queryKey: ['bars', symbol, timeframe, todayKey],
