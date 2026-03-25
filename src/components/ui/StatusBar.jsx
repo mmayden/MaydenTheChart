@@ -77,14 +77,14 @@ export function StatusBar({ lastUpdated }) {
         </div>
       )}
 
-      {/* Ko-fi donate link — desktop only */}
+      {/* Donate link — desktop only */}
       {!isMobile && (
         <a
-          href="https://ko-fi.com/cheechart"
+          href="https://buy.stripe.com/8x23cx2ER3G1gCmaznaVa00"
           target="_blank"
           rel="noopener noreferrer"
           className="ml-auto flex items-center gap-1 text-theme-muted hover:text-bear transition-colors shrink-0"
-          aria-label="Support Cheechart on Ko-fi"
+          aria-label="Support Cheechart"
           title="Support Cheechart"
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

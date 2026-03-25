@@ -334,7 +334,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Error boundary: `src/components/ui/ErrorBoundary.jsx`
 - Logo: `src/components/ui/Logo.jsx`
 - Toast notifications: `src/components/ui/ToastContainer.jsx`
-- Status bar (WS/polling + session stats + Ko-fi link): `src/components/ui/StatusBar.jsx`
+- Status bar (WS/polling + session stats + Stripe donate link): `src/components/ui/StatusBar.jsx`
 - Welcome banner (first-visit, dismissible): `src/components/ui/WelcomeBanner.jsx`
 - ATR gauge: `src/components/ui/ATRGauge.jsx`
 - Day type banner: `src/components/ui/DayTypeBanner.jsx`

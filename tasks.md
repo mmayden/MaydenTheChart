@@ -150,7 +150,7 @@
 ### Phase 13A — Traction Readiness (2026-03-17)
 - Enhanced chart snapshots: watermark includes confluence score + day type (`NVDA 5m · Confluence 85 Bull · Trend Day — Bullish · cheechart.space`)
 - First-visit welcome banner: dismissible, localStorage-gated ("Free charting — unlimited indicators, no signup, no ads")
-- Ko-fi donate link: heart icon in StatusBar with external link
+- Stripe donate link: heart icon in StatusBar with external link
 - OG image: branded 1200x630 PNG with candlestick chart + confluence badge, `summary_large_image` Twitter card
 - Codebase cleanup: removed 3 dead shim files, standardized localStorage keys to `cheechart-*` prefix with migration
 
