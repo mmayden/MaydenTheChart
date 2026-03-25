@@ -12,9 +12,12 @@
  *
  * All output is prefixed with [tag] for easy filtering in devtools / Vercel logs.
  * Errors are forwarded to Sentry when available (via captureException).
+ *
+ * Sentry is resolved lazily via getSentry() — no static import of @sentry/react,
+ * so this module doesn't pull in the ~50-100KB Sentry bundle.
  */
 
-import * as Sentry from '@sentry/react'
+import { getSentry } from '../services/sentry'
 
 const IS_DEV = import.meta.env.DEV
 
@@ -31,8 +34,8 @@ function fmt(tag) {
 
 function sentryCapture(tag, message, extra) {
   try {
-    const client = Sentry.getClient?.()
-    if (!client) return
+    const Sentry = getSentry()
+    if (!Sentry?.getClient?.()) return
     if (extra instanceof Error) {
       Sentry.captureException(extra, { tags: { component: tag }, extra: { message } })
     } else {
@@ -72,7 +75,8 @@ export const log = {
   /** Add a Sentry breadcrumb for user actions / state changes. No-op if Sentry not loaded. */
   breadcrumb(category, message, data) {
     try {
-      if (!Sentry.getClient?.()) return
+      const Sentry = getSentry()
+      if (!Sentry?.getClient?.()) return
       Sentry.addBreadcrumb({ category, message, data, level: 'info' })
     } catch {
       // no-op

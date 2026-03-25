@@ -16,9 +16,8 @@ import App from './App'
 import './index.css'
 
 // Initialize Sentry error tracking (no-op if VITE_SENTRY_DSN is not set)
-initSentry()
-// Report web vitals (LCP, CLS, INP, etc.) to Sentry after first paint
-reportWebVitals()
+// Dynamic import — @sentry/react only loaded when DSN is configured
+initSentry().then(() => reportWebVitals())
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

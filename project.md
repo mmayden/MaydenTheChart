@@ -365,8 +365,8 @@ Component state (useState — local only):
 | `src/services/providers/alpaca.js` | Alpaca adapter — bar normalization, timeframe mapping, WS protocol |
 | `src/services/queryClient.js` | TanStack Query client config + default options |
 | `src/services/websocket.js` | Provider-agnostic WebSocket manager — connection lifecycle, reconnect with exponential backoff |
-| `src/services/sentry.js` | Sentry error tracking + web vitals — conditional init via `VITE_SENTRY_DSN`, `browserTracingIntegration`, `reportWebVitals()` |
-| `src/utils/logger.js` | Structured logger — level-gated (debug/info/warn/error), `[tag]` prefixes, auto Sentry forwarding via `captureException` |
+| `src/services/sentry.js` | Sentry (dynamic import) — async `initSentry()`, `getSentry()` lazy accessor, `reportWebVitals()`. `@sentry/react` only loaded when `VITE_SENTRY_DSN` is set. |
+| `src/utils/logger.js` | Structured logger — level-gated (debug/info/warn/error), `[tag]` prefixes, lazy Sentry forwarding via `getSentry()` (no static `@sentry/react` import) |
 | `api/bars.js` | Vercel serverless proxy — provider-routed (currently Alpaca, keys server-only, pagination) |
 | `api/ws-auth.js` | Vercel serverless function — returns WS credentials, protected by bearer token |
 | `api/snapshot.js` | Vercel serverless proxy — provider-routed snapshots for watchlist live prices |
@@ -419,7 +419,7 @@ Component state (useState — local only):
 ### App Shell
 | File | Purpose |
 |---|---|
-| `src/main.jsx` | App entry: ErrorBoundary, QueryClientProvider, Sentry init, web vitals reporting, SW registration |
+| `src/main.jsx` | App entry: ErrorBoundary, QueryClientProvider, async Sentry init → web vitals chain, SW registration |
 | `src/App.jsx` | Single-page shell: TopNav + Sidebar + Chart + Right Panel + overlays |
 | `src/constants/chart.js` | All colors, periods, timeframe configs, symbol suggestions |
 | `src/constants/presets.js` | Default preset definitions (Clean, Full, Scalp, Swing) |
@@ -502,7 +502,7 @@ Component state (useState — local only):
 
 ## Current Status
 
-**298/298 tests passing, build clean, ESLint 0 errors, 0 vulnerabilities. Main bundle 148KB + 161KB lightweight-charts + 92KB motion + 69KB vendor-api + 183KB shared-react (lazy chunks incl. web-vitals 5.6KB). Roadmap page: 139KB JS + 33KB CSS (standalone, own color scheme). Stack: React 19 + Vite 8 + Zustand 5 + Tailwind 4. Mobile-first overhaul (M1–M5) complete. Security hardening complete (CSP, COOP/CORP, fetch timeouts, CI audit, Dependabot). Chart stability fix for preset switching crashes deployed.**
+**298/298 tests passing, build clean, ESLint 0 errors, 0 vulnerabilities. Main bundle 146KB + 161KB lightweight-charts + 92KB motion + 69KB vendor-api + 183KB shared-react (lazy chunks incl. web-vitals 5.6KB). Sentry is now a separate lazy chunk (~50-100KB, only loaded when VITE_SENTRY_DSN is set). Roadmap page: 139KB JS + 33KB CSS (standalone, own color scheme). Stack: React 19 + Vite 8 + Zustand 5 + Tailwind 4. Mobile-first overhaul (M1–M5) complete. Security hardening complete (CSP, COOP/CORP, fetch timeouts, CI audit, Dependabot). Chart stability fix for preset switching crashes deployed. RVOL computation memoized, all chart constants centralized.**
 
 ### Completed
 - [x] Phases 1–4: Core chart, indicators, levels, S/R detection, ATR gauge, day type
@@ -604,3 +604,4 @@ Component state (useState — local only):
 | 2026-03-24 | **Roadmap CSS decoupling.** Created `src/roadmap.css` — standalone stylesheet with fixed dark color scheme. Roadmap no longer imports `index.css` or inherits the main app's theme system (dark/terminal/lumpia). Removed theme/accent syncing from `roadmap-main.jsx`. Documentation synced across CLAUDE.md, project.md, tasks.md, security.md, memory files. All 87 documented files verified present on disk. 298/298 tests, build clean. |
 | 2026-03-24 | **Security hardening.** Ran pentester.com scan (score 33/100, 12 low + 4 info findings). Fixed Vercel header routing (`/(.*)`  → `/:path*` — root path wasn't getting security headers). CSP hardened: `base-uri 'self'`, `form-action 'self'`, `object-src 'none'`, `upgrade-insecure-requests`. Added `Cross-Origin-Opener-Policy` + `Cross-Origin-Resource-Policy` (Spectre mitigations). Expanded `Permissions-Policy` to 14 disabled APIs. Added `X-XSS-Protection: 0`. API endpoints: `AbortSignal.timeout(10_000)` on all upstream fetches, `crypto.randomUUID()` for request IDs. CI: added `npm audit --audit-level=high` + `lockfile-lint`. Dependabot config for weekly npm + GH Actions updates. Timezone fix: `toETTime()` normalizes ICU hour 24 → 0. 298/298 tests, build clean. |
 | 2026-03-24 | **Chart stability fix.** Investigated preset switching crashes via deep audit of overlay system. Root cause: three structural issues. (1) Overlay effect bodies (EMA, VWAP, Bollinger, Level) called `addSeries()`/`setData()` without try/catch — uncaught errors during concurrent teardown. Added `disposedRef` flag + try/catch to all creation/update code. (2) RSI/MACD mini chart crosshair handlers captured `miniChart` by value in closure — stale ref caused TypeError during unmount. Fixed to read `chartRef.current` live. (3) CandlestickChart prepend path missing `?.` on `chartRef.current` — null ref during concurrent scroll-back + preset switch. 298/298 tests, build clean. |
+| 2026-03-24 | **Performance + modularity fixes.** (1) RVOL memoization — `relativeVolume(bars)` wrapped in `useMemo` in CandlestickChart, only recalculates when `bars` or `showRvol` changes (was recalculating every render). (2) RVOL constants centralized — `RVOL_AMBER`/`RVOL_HOT` moved from hardcoded locals in CandlestickChart to `src/constants/chart.js` (single source of truth). (3) Sentry dynamic import — `@sentry/react` (~50-100KB) now loaded via `await import()` only when `VITE_SENTRY_DSN` is set. `sentry.js` exports `getSentry()` lazy accessor. `logger.js` imports `getSentry()` instead of static `@sentry/react` — eliminates Sentry from the main bundle for users without it configured. `main.jsx` chains `initSentry().then(() => reportWebVitals())`. All documentation updated. 298/298 tests, build clean. |

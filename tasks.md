@@ -28,15 +28,15 @@
 - ✅ `usePullToRefresh` dependency array — fixed: replaced state deps with refs (`pullProgressRef`, `isRefreshingRef`, `onRefreshRef`), effect now stable on `[threshold, handleRefresh]`
 
 ### Medium Priority
-- 🔲 RVOL calculation not memoized in CandlestickChart — `relativeVolume(bars)` recalculates every render (wrap in `useMemo`)
-- 🔲 Sentry bundled unconditionally — ~50-100KB loaded even when `VITE_SENTRY_DSN` unset (dynamic import instead)
+- ✅ RVOL calculation memoized in CandlestickChart — `useMemo` wraps `relativeVolume(bars)` (2026-03-24)
+- ✅ Sentry dynamic-imported — `@sentry/react` only loaded when `VITE_SENTRY_DSN` is set, logger uses lazy `getSentry()` (2026-03-24)
 - 🔲 No mobile component tests — BottomNav, BottomSheet, useMediaQuery, usePullToRefresh have zero test coverage
 - 🔲 No localStorage schema migration system — adding new fields to journal/presets silently drops old entries' data
 
 ### Low Priority
 - ✅ API request IDs use `Math.random()` — switched to `crypto.randomUUID()` (2026-03-24)
 - ✅ No explicit fetch timeout on API proxy calls — added `AbortSignal.timeout(10_000)` (2026-03-24)
-- 🔲 RVOL_AMBER/RVOL_HOT hardcoded in CandlestickChart — should be in `constants/chart.js`
+- ✅ RVOL_AMBER/RVOL_HOT moved to `constants/chart.js` (2026-03-24)
 - 🔲 `setTheme()` mutates DOM inside store action — ideally a `useEffect` in App.jsx
 
 ---

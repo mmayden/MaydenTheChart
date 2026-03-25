@@ -78,11 +78,20 @@ Dev builds get all levels; production gets warn + error only. Errors are auto-fo
 to Sentry via `captureException`. Use `log.breadcrumb(category, message, data)` to add
 Sentry breadcrumbs for user actions (symbol change, timeframe switch, etc.).
 
-**Sentry:** Conditional on `VITE_SENTRY_DSN`. Captures: unhandled errors (global),
-ErrorBoundary crashes (explicit `captureException`), data fetch failures (via logger),
-WebSocket errors (via logger). Includes `browserTracingIntegration` for performance
-monitoring and web vitals (LCP, CLS, INP, FID, TTFB) via `web-vitals` library.
+**Sentry (dynamic import):** `@sentry/react` (~50-100KB) is loaded via `await import()`
+only when `VITE_SENTRY_DSN` is set. The module is cached in `_Sentry` and exposed via
+`getSentry()` for lazy access by `logger.js`. This keeps the main bundle lean for users
+without Sentry configured. Captures: unhandled errors (global), ErrorBoundary crashes
+(via logger `captureException`), data fetch failures (via logger), WebSocket errors
+(via logger). Includes `browserTracingIntegration` for performance monitoring and web
+vitals (LCP, CLS, INP, FID, TTFB) via `web-vitals` library (also dynamic import).
 Breadcrumbs track user navigation (symbol/timeframe changes).
+
+**Sentry integration pattern:**
+- `src/services/sentry.js` — `initSentry()` (async, dynamic import), `getSentry()` (lazy accessor), `reportWebVitals()`
+- `src/utils/logger.js` — imports `getSentry()` (not `@sentry/react`), resolves Sentry lazily at each error/breadcrumb call
+- `src/main.jsx` — `initSentry().then(() => reportWebVitals())` — chained async, non-blocking
+- **Rule:** Never static-import `@sentry/react` anywhere except inside `sentry.js`'s dynamic import
 
 **API request IDs:** All serverless functions (`api/*.js`) generate a short `x-request-id`
 header on every response. Server-side `console.error` logs include `rid=<id>` for
@@ -332,7 +341,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Onboarding tour (first-visit + manual restart via Help menu): `src/components/ui/OnboardingTour.jsx`
 
 ### Utilities
-- Structured logger: `src/utils/logger.js` — level-gated (`debug`/`info`/`warn`/`error`), auto-forwards errors to Sentry
+- Structured logger: `src/utils/logger.js` — level-gated (`debug`/`info`/`warn`/`error`), lazy Sentry forwarding via `getSentry()`
 - Shared timezone utils: `src/utils/timezone.js`
 - localStorage schema validation: `src/utils/validate.js`
 - Chart snapshot capture + export (confluence watermark): `src/utils/snapshot.js`
@@ -340,7 +349,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 ### Services
 - Data provider: `src/services/dataProvider.js` — provider-abstracted data fetching
 - Alpaca provider adapter: `src/services/providers/alpaca.js`
-- Sentry error tracking + web vitals: `src/services/sentry.js`
+- Sentry (dynamic import): `src/services/sentry.js` — async `initSentry()`, `getSentry()` lazy accessor, `reportWebVitals()`
 
 ### PWA & SEO
 - Manifest: `public/manifest.json`
@@ -353,6 +362,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 ### Constants
 - Chart constants (all indicator/chart colors + timeframes): `src/constants/chart.js`
   - EMA colors, VWAP colors, level colors (PDH/PDL gold, ODC slate, ORB indigo), volume colors, chart bg/grid
+  - RVOL highlight colors (`RVOL_AMBER` ≥1.5x, `RVOL_HOT` ≥2.0x) — used by memoized RVOL map in CandlestickChart
   - Candle colors per theme (`CANDLE_COLORS`), RSI colors, MACD colors, S/R colors (red resistance, green support)
   - Bollinger colors, confluence/signal colors, alert sound config
   - Timeframe config (lookback, page size, max bars), symbol suggestions
@@ -405,8 +415,10 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - ~~No explicit fetch timeout on API proxy calls~~ — fixed (2026-03-24): `AbortSignal.timeout(10_000)` on all upstream fetches
 - ~~Security headers not reaching root path~~ — fixed (2026-03-24): `/(.*)`  → `/:path*` in vercel.json
 
+### Medium — RESOLVED
+- ~~`CandlestickChart.jsx`: `relativeVolume(bars)` not in `useMemo`~~ — fixed (2026-03-24): memoized, RVOL constants moved to `chart.js`
+- ~~Sentry imported unconditionally (~50-100KB)~~ — fixed (2026-03-24): dynamic import, logger uses lazy `getSentry()`
+
 ### Medium — address when touching related code
-- `CandlestickChart.jsx`: `relativeVolume(bars)` not wrapped in `useMemo` — recalculates every render
-- `src/services/sentry.js`: Sentry imported unconditionally (~50-100KB) — should dynamic import
 - Zero test coverage on mobile components (BottomNav, BottomSheet, useMediaQuery, usePullToRefresh)
 - No localStorage schema migration system — new fields on journal/presets silently lost on old data

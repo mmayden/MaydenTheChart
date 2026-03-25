@@ -322,11 +322,12 @@ RVOL < 1.0 → below average volume, treat breakouts with caution
 ### Rendering
 - **RVOL toggle OFF** (default): volume bars colored by candle direction — green (close ≥ open), red (close < open), semi-transparent
 - **RVOL toggle ON**: volume bars highlight when relative volume exceeds threshold:
-  - ≥1.5x average → amber (`#f59e0bcc`) — notable institutional volume
-  - ≥2.0x average → red (`#ef4444cc`) — extreme volume spike
+  - ≥1.5x average → amber (`RVOL_AMBER` from `chart.js`) — notable institutional volume
+  - ≥2.0x average → red (`RVOL_HOT` from `chart.js`) — extreme volume spike
   - Below threshold → normal candle-direction coloring
 - RVOL toggle is in the sidebar `IndicatorToggle` and managed by presets (Full preset enables it)
-- `CandlestickChart.jsx` builds an RVOL lookup map and applies colors per bar when toggle is on
+- `CandlestickChart.jsx` builds a memoized RVOL lookup map (`useMemo` on `[bars, showRvol]`) and applies colors per bar when toggle is on
+- RVOL highlight colors (`RVOL_AMBER`, `RVOL_HOT`) are centralized in `src/constants/chart.js` — never hardcoded in component files
 
 ### Code signature
 ```js

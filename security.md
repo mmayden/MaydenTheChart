@@ -120,7 +120,8 @@ Legacy `lumpia-*` keys are read on startup for migration, then cleaned up on wri
 `src/components/ui/ErrorBoundary.jsx` wraps the entire app:
 - **Production:** shows generic error message + reload button
 - **Development:** shows raw error message + stack trace
-- Errors are explicitly captured to Sentry via `log.error()` (auto `captureException`)
+- Errors are captured to Sentry via `log.error()` → lazy `getSentry()` → `captureException`
+- Sentry is dynamically imported (~50-100KB) — only loaded when `VITE_SENTRY_DSN` is set
 - Component stack trace added as Sentry breadcrumb for debugging context
 
 ### URL Parameter Validation

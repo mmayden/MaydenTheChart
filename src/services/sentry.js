@@ -3,13 +3,25 @@
  *
  * Activated by setting VITE_SENTRY_DSN in environment.
  * Does nothing if the variable is absent (safe for local dev).
+ *
+ * Dynamic import: @sentry/react (~50-100KB) is only loaded when DSN is set,
+ * keeping the main bundle lean for users without Sentry configured.
  */
 
-import * as Sentry from '@sentry/react'
+/** @type {typeof import('@sentry/react') | null} */
+let _Sentry = null
 
-export function initSentry() {
+/** Resolved Sentry module (or null). Used by logger.js. */
+export function getSentry() {
+  return _Sentry
+}
+
+export async function initSentry() {
   const dsn = import.meta.env.VITE_SENTRY_DSN
   if (!dsn) return
+
+  const Sentry = await import('@sentry/react')
+  _Sentry = Sentry
 
   Sentry.init({
     dsn,
@@ -34,12 +46,12 @@ export function initSentry() {
  * or Sentry is not active.
  */
 export async function reportWebVitals() {
-  if (!Sentry.getClient?.()) return
+  if (!_Sentry?.getClient?.()) return
 
   try {
     const { onLCP, onFID, onCLS, onTTFB, onINP } = await import('web-vitals')
     const send = (metric) => {
-      Sentry.setMeasurement(metric.name, metric.value, metric.name === 'CLS' ? '' : 'millisecond')
+      _Sentry.setMeasurement(metric.name, metric.value, metric.name === 'CLS' ? '' : 'millisecond')
     }
     onLCP(send)
     onFID(send)
