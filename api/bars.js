@@ -48,7 +48,7 @@ const ALLOWED_DATA_HOSTS = new Set(['data.alpaca.markets'])
 
 /** Generate a short request ID for log correlation. */
 function requestId() {
-  return Math.random().toString(36).slice(2, 10)
+  return crypto.randomUUID().slice(0, 8)
 }
 
 export default async function handler(req, res) {
@@ -127,7 +127,7 @@ export default async function handler(req, res) {
       })
       if (pageToken) params.set('page_token', pageToken)
 
-      const response = await fetch(`${baseUrl}?${params}`, { headers })
+      const response = await fetch(`${baseUrl}?${params}`, { headers, signal: AbortSignal.timeout(10_000) })
 
       if (!response.ok) {
         const text = await response.text()

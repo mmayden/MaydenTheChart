@@ -52,7 +52,7 @@ function isRateLimited(ip) {
 
 /** Generate a short request ID for log correlation. */
 function requestId() {
-  return Math.random().toString(36).slice(2, 10)
+  return crypto.randomUUID().slice(0, 8)
 }
 
 export default async function handler(req, res) {

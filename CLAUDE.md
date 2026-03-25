@@ -27,7 +27,7 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - TanStack Query v5, Zustand v5, Axios, Tailwind CSS 4 (`@tailwindcss/postcss`), Vitest v3
 - ESLint 9 + eslint-plugin-react-hooks (flat config, `eslint.config.js`)
 - Husky 9 + lint-staged — pre-commit hooks run ESLint on staged files
-- GitHub Actions CI — lint + test + build on every push/PR to `main`
+- GitHub Actions CI — lint + test + audit + lockfile-lint + build on every push/PR to `main`
 - JavaScript (not TypeScript — tests provide sufficient coverage at current scale)
 - `feed: 'iex'` required on all Alpaca data fetches (free tier)
 - **No react-router-dom** — single-page app, panel-based architecture
@@ -55,6 +55,8 @@ The live chart and the backtester share identical math. Never duplicate indicato
 
 ## Security rules
 - All API endpoints must have rate limiting (in-memory per-instance, IP-based, TTL cleanup every 2min, 10K entry cap)
+- All upstream `fetch()` calls must use `AbortSignal.timeout(10_000)` — never rely on Vercel's 30s hard limit
+- Request IDs use `crypto.randomUUID()` — never `Math.random()` for any ID generation
 - `ALPACA_DATA_URL` must be validated against `ALLOWED_DATA_HOSTS` via `new URL().hostname` exact match (SSRF guard)
 - All user input from URL params, forms, and localStorage must be regex-validated before use
 - `SYMBOL_RE` lives in `src/constants/patterns.js` — single source of truth for client-side symbol validation
@@ -64,6 +66,9 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - Service worker `CACHE_NAME` is auto-versioned at build time (Vite plugin in `vite.config.js`)
 - Bearer token in `ws-auth.js` is NOT a real secret (ships in client bundle) — rate limiting is the real gate
 - All localStorage keys use `cheechart-` prefix (`cheechart-theme`, `cheechart-accent`, `cheechart-symbol`, `cheechart-roadmap-done`, `cheechart-roadmap-beginner`, etc.)
+- CSP includes `base-uri 'self'`, `form-action 'self'`, `object-src 'none'`, `upgrade-insecure-requests`
+- Cross-origin isolation: `Cross-Origin-Opener-Policy: same-origin` + `Cross-Origin-Resource-Policy: same-origin`
+- Dependabot auto-updates npm + GitHub Actions deps weekly (`.github/dependabot.yml`)
 
 ## Observability
 
@@ -94,14 +99,16 @@ URL state sync via query params only (?s=QQQ&tf=5m&p=full&panel=backtest).
 
 ```
 / (index.html)        → TopNav → Sidebar (left) → Chart (center) → RightPanel (right)
-/roadmap (roadmap.html) → Standalone page — back link to /, shared CSS/theme
+/roadmap (roadmap.html) → Standalone page — back link to /, own CSS (roadmap.css)
 ```
 
 **Multi-page build:** Vite builds two HTML entry points (`index.html` + `roadmap.html`).
-The roadmap page is fully independent — no chart code, no TanStack Query, no stores.
-It shares only CSS (`index.css`), theme variables, and font preloads. Linked from
-TopNav Help menu and BottomNav "More" menu. Vercel rewrite routes `/roadmap` to
-`/roadmap.html` before the SPA catch-all. Features: beginner path filter (Phases 1–8
+The roadmap page is fully independent — no chart code, no TanStack Query, no stores,
+and its own standalone CSS (`roadmap.css`) with a fixed dark color scheme. It does NOT
+inherit the main app's theme system (dark/terminal/lumpia) — the roadmap always renders
+with its own colors regardless of chart app settings. Shares only self-hosted fonts.
+Linked from TopNav Help menu and BottomNav "More" menu. Vercel rewrite routes `/roadmap`
+to `/roadmap.html` before the SPA catch-all. Features: beginner path filter (Phases 1–8
 toggle, persisted), estimated time per phase, "Mastered" badge on 100% phase completion,
 legal disclaimer footer. Content peer-reviewed for accuracy (95%+ verified).
 
@@ -304,7 +311,8 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 
 ### Standalone Pages (separate Vite entry points)
 - Roadmap HTML entry: `roadmap.html` — `/roadmap` route, own OG/SEO meta tags
-- Roadmap JS entry: `src/roadmap-main.jsx` — minimal shell (theme, back link, no stores/query)
+- Roadmap JS entry: `src/roadmap-main.jsx` — minimal shell (back link, no stores/query/theme sync)
+- Roadmap CSS: `src/roadmap.css` — standalone stylesheet with fixed dark color scheme (not shared with main app)
 - Roadmap component: `src/components/pages/RoadmapPage.jsx` — 16-phase interactive learning tracker with progress persistence, beginner filter, mastered badges
 - Roadmap data (86 topics): `src/constants/roadmap.js` — phases, nodes, concepts, resources, tips, estimated times per phase
 
@@ -373,7 +381,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 
 ## Developer workflow
 - **Pre-commit:** `husky` + `lint-staged` runs `eslint --max-warnings=0` on staged `src/` and `api/` files
-- **CI:** GitHub Actions runs `npm run lint` → `npx vitest run` → `npm run build` on every push/PR to `main`
+- **CI:** GitHub Actions runs `npm run lint` → `npx vitest run` → `npm audit --audit-level=high` → `lockfile-lint` → `npm run build` on every push/PR to `main`
 - **Scripts:** `npm run lint` (check), `npm run lint:fix` (auto-fix), `npm test` (watch), `npx vitest run` (single-run)
 - **Quality gate:** No ESLint warnings allowed in commits (enforced by lint-staged `--max-warnings=0`)
 

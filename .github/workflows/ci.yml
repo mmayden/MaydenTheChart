@@ -25,5 +25,11 @@ jobs:
       - name: Test
         run: npx vitest run
 
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+
+      - name: Validate lockfile integrity
+        run: npx lockfile-lint --path package-lock.json --type npm --allowed-hosts npm --validate-https
+
       - name: Build
         run: npm run build

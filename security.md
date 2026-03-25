@@ -1,6 +1,6 @@
 # Security Standards — Cheechart
 
-> Current as of Mobile Overhaul M1–M5 (2026-03-18). Security is non-negotiable.
+> Current as of 2026-03-24. Security is non-negotiable.
 
 ---
 
@@ -83,14 +83,12 @@ All API endpoints generate a short `x-request-id` header on every response.
 Server-side error logs include `rid=<id>` for tracing failures in Vercel function logs
 without exposing internal details to the client.
 
-> **Known improvement:** Request IDs currently use `Math.random().toString(36)` —
-> not cryptographically secure. Low risk (log correlation only), but should migrate
-> to `crypto.randomUUID()` for better entropy.
+Request IDs use `crypto.randomUUID()` for proper entropy (v4 UUID, truncated to 8 chars).
 
 ### Fetch Timeouts
-> **Known gap:** API proxy fetch calls to Alpaca have no explicit timeout.
-> They rely on Vercel's 30s hard limit. Should add `AbortSignal.timeout(10000)`
-> for faster failure on network issues.
+All upstream `fetch()` calls use `AbortSignal.timeout(10_000)` — requests to Alpaca
+abort after 10 seconds instead of hanging until Vercel's 30s hard limit. Aborted
+requests return `500` with a generic error message.
 
 ### Error Sanitization
 API error responses **never** leak:
@@ -134,20 +132,35 @@ against regex patterns and allowlists before applying to state.
 default-src 'self';
 script-src 'self';
 style-src 'self' 'unsafe-inline';
-connect-src 'self' wss://stream.data.alpaca.markets;
+connect-src 'self' https://stream.data.alpaca.markets wss://stream.data.alpaca.markets;
 font-src 'self';
 img-src 'self' data: blob:;
 worker-src 'self';
 manifest-src 'self';
 frame-ancestors 'none';
+base-uri 'self';
+form-action 'self';
+object-src 'none';
+upgrade-insecure-requests;
 ```
 
-### Additional Headers
+- `base-uri 'self'` — prevents `<base>` tag injection that could redirect all relative URLs
+- `form-action 'self'` — blocks form submissions to external domains
+- `object-src 'none'` — disables `<object>`, `<embed>`, `<applet>` (legacy XSS vectors)
+- `upgrade-insecure-requests` — auto-upgrades HTTP → HTTPS (belt-and-suspenders with HSTS)
+
+### Security Headers
 - `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`
 - `X-Frame-Options: DENY`
 - `X-Content-Type-Options: nosniff`
 - `Referrer-Policy: strict-origin-when-cross-origin`
-- `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+- `X-XSS-Protection: 0` (modern best practice — disable legacy browser XSS filter, rely on CSP)
+- `Cross-Origin-Opener-Policy: same-origin` — prevents cross-origin window manipulation (Spectre mitigation)
+- `Cross-Origin-Resource-Policy: same-origin` — blocks cross-origin resource embedding (Spectre mitigation)
+- `Permissions-Policy: camera=(), microphone=(), geolocation=(), accelerometer=(), gyroscope=(), magnetometer=(), usb=(), bluetooth=(), serial=(), hid=(), ambient-light-sensor=(), autoplay=(), payment=(), interest-cohort=()`
+
+> Headers are served via `/:path*` pattern in vercel.json to ensure they apply to all
+> routes including root `/`. The `/(.*)`  regex pattern was found to miss the root path.
 
 ---
 
@@ -175,8 +188,11 @@ on all staged `src/**/*.{js,jsx}` and `api/**/*.js` files. Commits with ESLint
 errors or warnings are rejected automatically.
 
 ### CI Pipeline (GitHub Actions)
-Every push/PR to `main` runs lint → test → build. Failed CI blocks merge.
-Config: `.github/workflows/ci.yml`
+Every push/PR to `main` runs lint → test → audit → lockfile check → build.
+Failed CI blocks merge. Config: `.github/workflows/ci.yml`
+
+- `npm audit --audit-level=high` — fails CI on high/critical dependency vulnerabilities
+- `lockfile-lint` — validates `package-lock.json` integrity (all packages from npmjs.org, HTTPS only)
 
 ### Manual Security Check
 ```bash
@@ -208,6 +224,13 @@ npm outdated            # See what needs updating
 
 Never proceed with critical/high vulnerabilities without understanding the impact.
 
+### Automated Updates
+**Dependabot** (`.github/dependabot.yml`) opens PRs weekly for:
+- npm dependencies (max 5 open PRs)
+- GitHub Actions versions (max 3 open PRs)
+
+PRs are labeled `dependencies` / `ci` and must pass CI before merge.
+
 ---
 
 ## Threat Model Summary
@@ -222,3 +245,7 @@ Never proceed with critical/high vulnerabilities without understanding the impac
 | Clickjacking | X-Frame-Options DENY, frame-ancestors none |
 | Error information leak | Sanitized API errors, ErrorBoundary in prod |
 | Stale cached code | SW auto-versioned at build time, immutable asset hashes |
+| Spectre side-channel | COOP + CORP headers isolate cross-origin resources |
+| Supply chain attack | npm audit in CI, lockfile-lint, Dependabot auto-updates |
+| Base tag injection | CSP `base-uri 'self'` blocks external base URLs |
+| Slow upstream DoS | 10s fetch timeout via AbortSignal on all API proxies |
