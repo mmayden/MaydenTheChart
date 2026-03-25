@@ -2,10 +2,10 @@
  * BottomNav — Mobile-only bottom navigation bar.
  *
  * Layout:
- *   [☰ Sidebar] [1m 5m 15m 1h 4h 1D] [🔔 Alerts] [📋 Watchlist] [••• More]
+ *   [☰ Sidebar] [5m ▾] [🔔 Alerts] [📋 Watchlist] [📊 Backtest] [📓 Journal]
  *
  * Hidden on md+ (desktop). Fixed to bottom with safe-area clearance.
- * Timeframe pills are horizontally scrollable. Panel toggles reuse store actions.
+ * Timeframe is a single dropdown button. All panels are direct buttons (no "more" menu).
  */
 
 import { useState, useRef, useEffect } from 'react'
@@ -14,11 +14,6 @@ import { useChartStore } from '../../store/useChartStore'
 import { usePresetsStore } from '../../store/usePresetsStore'
 import { useAlertsStore } from '../../store/useAlertsStore'
 import { TIMEFRAME_ORDER, TIMEFRAME_CONFIG } from '../../constants/chart'
-
-const MORE_PANELS = [
-  { id: 'backtest', label: 'Backtest' },
-  { id: 'journal',  label: 'Journal' },
-]
 
 export function BottomNav() {
   const selectedTimeframe = useChartStore((s) => s.selectedTimeframe)
@@ -32,23 +27,24 @@ export function BottomNav() {
   const activeCount       = alerts.filter((a) => !a.triggered).length
   const queryClient       = useQueryClient()
 
-  const [moreOpen, setMoreOpen] = useState(false)
-  const moreRef = useRef(null)
+  const [tfOpen, setTfOpen] = useState(false)
+  const tfRef = useRef(null)
 
-  // Close "more" popover on outside tap
+  // Close timeframe popover on outside tap
   useEffect(() => {
-    if (!moreOpen) return
+    if (!tfOpen) return
     function handleTouch(e) {
-      if (moreRef.current && !moreRef.current.contains(e.target)) setMoreOpen(false)
+      if (tfRef.current && !tfRef.current.contains(e.target)) setTfOpen(false)
     }
     document.addEventListener('pointerdown', handleTouch)
     return () => document.removeEventListener('pointerdown', handleTouch)
-  }, [moreOpen])
+  }, [tfOpen])
 
   function handleTimeframe(tf) {
     setTimeframe(tf)
     markModified()
     queryClient.invalidateQueries({ queryKey: ['bars', selectedSymbol, tf] })
+    setTfOpen(false)
   }
 
   return (
@@ -70,28 +66,51 @@ export function BottomNav() {
         </svg>
       </button>
 
-      {/* Timeframe pills — horizontally scrollable */}
-      <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hide">
-        <div className="flex items-center gap-1 px-1">
-          {TIMEFRAME_ORDER.map((tf) => {
-            const active = tf === selectedTimeframe
-            return (
-              <button
-                key={tf}
-                onClick={() => handleTimeframe(tf)}
-                className={[
-                  'px-2.5 py-1.5 text-xs font-mono font-semibold rounded-md shrink-0 transition-colors touch-target',
-                  active
-                    ? 'text-accent bg-accent-dim border border-accent'
-                    : 'text-theme-muted bg-transparent border border-transparent',
-                ].join(' ')}
-              >
-                {TIMEFRAME_CONFIG[tf].label}
-              </button>
-            )
-          })}
-        </div>
+      {/* Timeframe dropdown */}
+      <div className="relative" ref={tfRef}>
+        <button
+          onClick={() => setTfOpen((o) => !o)}
+          className={[
+            'flex items-center gap-1 px-2.5 py-1.5 text-xs font-mono font-semibold rounded-md shrink-0 transition-colors touch-target',
+            'text-accent bg-accent-dim border border-accent',
+          ].join(' ')}
+          aria-label={`Timeframe: ${TIMEFRAME_CONFIG[selectedTimeframe].label}`}
+          aria-expanded={tfOpen}
+        >
+          {TIMEFRAME_CONFIG[selectedTimeframe].label}
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" className={`transition-transform ${tfOpen ? 'rotate-180' : ''}`}>
+            <path d="M2 4l3 3 3-3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+
+        {tfOpen && (
+          <div
+            className="absolute bottom-full left-0 mb-2 rounded-lg border border-theme-mid shadow-xl py-1 z-50"
+            style={{ backgroundColor: 'var(--bg-surface)' }}
+          >
+            {TIMEFRAME_ORDER.map((tf) => {
+              const active = tf === selectedTimeframe
+              return (
+                <button
+                  key={tf}
+                  onClick={() => handleTimeframe(tf)}
+                  className={[
+                    'flex items-center w-full px-4 py-2.5 text-xs font-mono font-semibold transition-colors text-left touch-target whitespace-nowrap',
+                    active
+                      ? 'text-accent bg-accent-dim'
+                      : 'text-theme hover:bg-theme-hover',
+                  ].join(' ')}
+                >
+                  {TIMEFRAME_CONFIG[tf].label}
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
+
+      {/* Spacer */}
+      <div className="flex-1" />
 
       {/* Alerts bell */}
       <button
@@ -137,49 +156,38 @@ export function BottomNav() {
         </svg>
       </button>
 
-      {/* More (Backtest + Journal) */}
-      <div className="relative" ref={moreRef}>
-        <button
-          onClick={() => setMoreOpen((o) => !o)}
-          className="flex items-center justify-center w-10 h-10 rounded shrink-0 touch-target"
-          style={{ color: 'var(--nav-icon)' }}
-          aria-label="More panels"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <circle cx="12" cy="5" r="2" />
-            <circle cx="12" cy="12" r="2" />
-            <circle cx="12" cy="19" r="2" />
-          </svg>
-        </button>
+      {/* Backtest */}
+      <button
+        onClick={() => setActivePanel('backtest')}
+        className="flex items-center justify-center w-10 h-10 rounded shrink-0 touch-target"
+        style={{
+          color: 'var(--backtest-color)',
+          backgroundColor: activePanel === 'backtest' ? 'var(--backtest-active-bg)' : undefined,
+        }}
+        aria-label="Backtest"
+        aria-pressed={activePanel === 'backtest'}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+        </svg>
+      </button>
 
-        {moreOpen && (
-          <div
-            className="absolute bottom-full right-0 mb-2 w-36 rounded-lg border border-theme-mid shadow-xl py-1 z-50"
-            style={{ backgroundColor: 'var(--bg-surface)' }}
-          >
-            {MORE_PANELS.map(({ id, label }) => (
-              <button
-                key={id}
-                onClick={() => { setActivePanel(id); setMoreOpen(false) }}
-                className={[
-                  'flex items-center gap-2 w-full px-3 py-2.5 text-xs font-mono transition-colors text-left touch-target',
-                  activePanel === id ? 'text-accent bg-accent-dim' : 'text-theme hover:bg-theme-hover',
-                ].join(' ')}
-                style={activePanel === id ? undefined : { color: `var(--${id}-color)` }}
-              >
-                {label}
-              </button>
-            ))}
-            {/* Roadmap — separate page */}
-            <a
-              href="/roadmap"
-              className="flex items-center gap-2 w-full px-3 py-2.5 text-xs font-mono text-theme-muted hover:text-theme hover:bg-theme-hover transition-colors text-left touch-target"
-            >
-              Roadmap
-            </a>
-          </div>
-        )}
-      </div>
+      {/* Journal */}
+      <button
+        onClick={() => setActivePanel('journal')}
+        className="flex items-center justify-center w-10 h-10 rounded shrink-0 touch-target"
+        style={{
+          color: 'var(--journal-color)',
+          backgroundColor: activePanel === 'journal' ? 'var(--journal-active-bg)' : undefined,
+        }}
+        aria-label="Journal"
+        aria-pressed={activePanel === 'journal'}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
+        </svg>
+      </button>
     </nav>
   )
 }

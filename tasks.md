@@ -101,7 +101,7 @@
 - Progress tracking via localStorage (`cheechart-roadmap-done`) with checkboxes and progress bar
 - Detail panel: desktop side panel (380px) / mobile bottom sheet overlay
 - Search across topics, concepts, and resources
-- Linked from TopNav "Learn" button + BottomNav "More" menu
+- Linked from TopNav "Learn" button
 - Vercel rewrite: `/roadmap` → `/roadmap.html` (before SPA catch-all)
 - Data extracted from standalone HTML into `src/constants/roadmap.js` ES module
 - **Enhancement: Beginner Path filter** — toggle filters to Phases 1–8, persisted to localStorage
@@ -114,7 +114,7 @@
 
 ### Mobile-First Overhaul (M1–M5) (2026-03-18)
 - **M1:** Safe areas (`env(safe-area-inset-*)`), `100dvh` with fallback, `useMediaQuery`/`useIsMobile`/`useIsLandscape` hooks, `viewport-fit=cover`
-- **M2:** BottomNav (mobile-only): thumb-zone timeframe pills + panel toggles + sidebar hamburger. TopNav slimmed to `h-9` with compact PriceDisplay. StatusBar mobile-optimized (dot+label only)
+- **M2:** BottomNav (mobile-only): timeframe dropdown button + all 4 panel buttons (no "more" menu) + sidebar hamburger. TopNav slimmed to `h-9` with compact PriceDisplay. StatusBar mobile-optimized (dot+label only)
 - **M3:** BottomSheet component (drag handle, snap points, velocity-based dismiss). RightPanel uses bottom sheet on mobile. Chart sub-header stacks into 2 rows on mobile. ConfluenceBar dropdown repositioned for mobile. Mini chart height 70px on mobile (was 90px)
 - **M4:** Responsive font scaling (`clamp()`). Landscape mode: `landscape-hide`/`landscape-compact` utilities, mini charts hidden, status bar hidden. Chart `contain: layout style`. Orientation change fires `cheechart:layout-resize`
 - **M5:** Pull-to-refresh hook (`usePullToRefresh`). Haptic feedback (`navigator.vibrate`) on alert triggers. PWA manifest: `orientation: any`, `categories`, shortcuts for QQQ/SPY/NVDA

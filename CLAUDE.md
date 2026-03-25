@@ -116,7 +116,7 @@ The roadmap page is fully independent — no chart code, no TanStack Query, no s
 and its own standalone CSS (`roadmap.css`) with a fixed dark color scheme. It does NOT
 inherit the main app's theme system (dark/terminal/lumpia) — the roadmap always renders
 with its own colors regardless of chart app settings. Shares only self-hosted fonts.
-Linked from TopNav "Learn" button and BottomNav "More" menu. Vercel rewrite routes `/roadmap`
+Linked from TopNav "Learn" button. Vercel rewrite routes `/roadmap`
 to `/roadmap.html` before the SPA catch-all. Features: beginner path filter (Phases 1–8
 toggle, persisted), estimated time per phase, "Mastered" badge on 100% phase completion,
 legal disclaimer footer. Content peer-reviewed for accuracy (95%+ verified).
@@ -246,8 +246,9 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - **Breakpoint strategy:** `useIsMobile()` (max-width 767px) is the primary gate. All mobile
   changes are gated behind this hook or `md:` Tailwind breakpoints. Desktop is zero-regression.
 - **Bottom navigation:** `BottomNav.jsx` (mobile only, `md:hidden`). Fixed bottom bar with
-  scrollable timeframe pills, panel toggles, sidebar hamburger. 48px + safe-area-bottom.
-  Translucent `backdrop-filter: blur(12px)`.
+  timeframe dropdown button (tap to select from all 6 TFs), all 4 panel toggle buttons
+  (Alerts, Watchlist, Backtest, Journal), sidebar hamburger. 48px + safe-area-bottom.
+  Translucent `backdrop-filter: blur(12px)`. No "more" menu — all actions are one tap away.
 - **Bottom sheets:** `BottomSheet.jsx` replaces full-screen panel overlays on mobile.
   Drag handle, snap points (50%/90%), velocity-based dismiss. GPU-accelerated (transform only).
   `RightPanel.jsx` conditionally renders `<BottomSheet>` when `useIsMobile()`.
@@ -271,7 +272,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Top navigation bar: `src/components/layout/TopNav.jsx`
 - Left sidebar (chart controls): `src/components/layout/Sidebar.jsx`
 - Right panel shell: `src/components/layout/RightPanel.jsx` (side panel desktop, bottom sheet mobile)
-- Bottom navigation (mobile only): `src/components/layout/BottomNav.jsx` — timeframe pills + panel toggles
+- Bottom navigation (mobile only): `src/components/layout/BottomNav.jsx` — timeframe dropdown + all 4 panel buttons
 - Bottom sheet (mobile panels): `src/components/ui/BottomSheet.jsx` — draggable, snap points, velocity dismiss
 - URL state sync: `src/hooks/useURLState.js`
 
