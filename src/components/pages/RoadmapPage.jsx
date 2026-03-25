@@ -291,23 +291,25 @@ export function RoadmapPage() {
     <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
       {/* Progress header */}
       <div
-        className="flex items-center gap-3 px-4 py-2 border-b border-theme shrink-0"
-        style={{ backgroundColor: 'var(--bg-surface)' }}
+        className="flex items-center gap-3 px-5 py-2.5 border-b border-theme shrink-0"
+        style={{ backgroundColor: 'var(--bg-base)' }}
       >
-        <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
-          <span className="text-accent">{done.size}</span> / {TOTAL_NODES} done
+        <span className="text-[11px] font-mono" style={{ color: 'var(--text-muted)' }}>
+          <span className="text-accent font-medium">{done.size}</span>
+          <span style={{ opacity: 0.5 }}> / </span>
+          {TOTAL_NODES} done
         </span>
-        <div className="w-24 h-1 rounded-full" style={{ backgroundColor: 'var(--bg-hover)' }}>
+        <div className="w-28 h-1.5 rounded-full" style={{ backgroundColor: 'var(--bg-hover)' }}>
           <div
-            className="h-1 rounded-full transition-all duration-300"
+            className="h-1.5 rounded-full transition-all duration-300"
             style={{ width: `${pct}%`, background: 'linear-gradient(90deg, var(--accent-dim), var(--accent))' }}
           />
         </div>
-        <span className="text-xs font-mono text-accent">{pct}%</span>
+        <span className="text-[11px] font-mono font-medium text-accent">{pct}%</span>
         {done.size > 0 && (
           <button
             onClick={resetProgress}
-            className="ml-auto text-[11px] px-2 py-0.5 rounded border border-theme-mid text-theme-muted hover:text-theme hover:bg-theme-hover transition-colors"
+            className="ml-auto text-[10px] font-mono px-2 py-0.5 rounded border border-theme-mid text-theme-muted hover:text-theme hover:bg-theme-hover transition-colors"
           >
             Reset
           </button>

@@ -61,6 +61,18 @@
 
 ## ✅ Completed Phases — Archive
 
+### Roadmap Header Redesign (2026-03-25)
+- Cleaner chevron back button with hover animation + accent color transition
+- "cheechart" branding right-aligned in header for identity
+- Progress bar: taller (`h-1.5`), darker bg (`--bg-base`) for visual separation
+- Active node glow style added in `roadmap.css`
+
+### Mobile BottomNav UX Overhaul (2026-03-25)
+- Replaced scrollable timeframe pills + "more" popover with compact timeframe dropdown + direct panel buttons
+- Layout: `[☰] [5m ▾] —spacer— [🔔] [📋] [📊] [📓]` — all actions one tap away
+- Backtest + Journal promoted from hidden "..." menu to always-visible icon buttons
+- Removed `MORE_PANELS` constant and `moreOpen` state
+
 ### Roadmap — Curated Beginner Path (2026-03-25)
 - **Beginner path redesigned:** Replaced naive "first 8 phases" filter with a curated selection: P1–P5 (foundations through classical TA) + P10 (Risk Management) + P11 (Trading Psychology). Inspired by roadmap.sh's curated path approach.
 - **Rationale:** Old path included advanced topics (Wyckoff, Elliott Wave, Order Flow, Footprint Charts) while excluding essentials (position sizing, stop losses, emotional discipline). New path prioritizes what keeps beginners from blowing up.
@@ -110,7 +122,7 @@
 - Linked from TopNav "Learn" button
 - Vercel rewrite: `/roadmap` → `/roadmap.html` (before SPA catch-all)
 - Data extracted from standalone HTML into `src/constants/roadmap.js` ES module
-- **Enhancement: Beginner Path filter** — toggle filters to Phases 1–8, persisted to localStorage
+- **Enhancement: Beginner Path filter** — curated selection (P1–P5 + P10 Risk Management + P11 Psychology), persisted to localStorage
 - **Enhancement: Estimated time per phase** — displayed in phase headers (~2–6 weeks per phase)
 - **Enhancement: "Mastered" badge** — appears on phase header when all nodes in phase are completed
 - **Enhancement: Footer disclaimer** — "Not financial advice" legal disclaimer at page bottom
