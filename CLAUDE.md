@@ -186,6 +186,10 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - CSS-only: nav hover keyframes, skeleton shimmer, settings gear spin+glow, mini chart labels (`.mini-chart-label`)
 - **Sidebar resize:** Emits `cheechart:layout-resize` event after transition;
   all chart instances call `chart.resize()` to match new container size.
+- **Mini chart lifecycle:** RSI/MACD mini charts are always mounted (never
+  conditionally rendered). Toggling uses CSS `height: 0` with transition instead
+  of mount/unmount. This avoids expensive `createChart()` lifecycle on preset switches.
+  `autoSize: true` + ResizeObserver handles redraw when container expands.
 - **Multi-pane sync:** RSI/MACD mini-charts are fully synced to the main chart:
   crosshair position (`subscribeCrosshairMove` → `setCrosshairPosition`) and
   visible time range (`subscribeVisibleLogicalRangeChange` → `setVisibleLogicalRange`).
@@ -197,9 +201,23 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
   visible time range to prevent viewport jump. Per-timeframe `pageSize` and `maxBars` caps in
   `TIMEFRAME_CONFIG`. "Loading..." pill appears at chart left edge during fetch.
 
+**Preset switching stability:**
+- `applyPreset()` uses a single `useChartStore.setState()` call (batched indicators +
+  timeframe) to avoid multi-wave re-render cascades.
+- **Transition guard:** App.jsx computes `stableBars = isPlaceholderData ? null : bars`.
+  Overlays receive `stableBars` so they skip updates when TanStack Query is serving
+  stale `keepPreviousData` during a timeframe switch. CandlestickChart still receives
+  `bars` (including placeholder) so the chart stays visible.
+- **Chart detection:** App.jsx uses a `useCallback` ref (not polling) to detect the
+  chart instance immediately after CandlestickChart mounts. No `setInterval` timing bugs.
+- **Overlay lifecycle pattern:** All overlays (EMA, VWAP, Bollinger, LevelOverlay) create
+  series once on mount via `chart.addSeries()` and update data imperatively via `setData()`.
+  Series are removed in the cleanup function. Price lines (PDH/PDL/ORB/S/R) are lightweight
+  and recreated on data change. Never create a LineSeries inside a data-update effect.
+
 **Level overlay system:**
 - **PDH/PDL** — gold dashed (`#eab308`), full-width price lines, labeled "PDH"/"PDL"
-- **ODC** — slate dashed (`#94a3b8`), LineSeries scoped to today's session only, labeled "ODC"
+- **ODC** — slate dashed (`#94a3b8`), LineSeries created once on mount, `setData()` on bar change, labeled "ODC"
 - **ORB** — indigo dotted (`#6366f1`), labeled "ORB H"/"ORB L", intraday only (`showORB` in TIMEFRAME_CONFIG)
 - **S/R** — red resistance (above price) / green support (below price), dotted, opacity scales with strength
   - Labels always show strength: "R ×1", "S ×2", etc.
@@ -212,17 +230,17 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Crosshair: magnet mode (`CrosshairMode.Magnet`) — snaps to nearest OHLC value for precision
 - Crosshair: dashed (`LineStyle.Dashed`), label bg `#1f2937`
 - Axis borders hidden (`borderVisible: false`) on both time and price scales
-- `barSpacing: 8`, `minBarSpacing: 2`, `rightOffset: 5` — proportional bars at every zoom level
+- `barSpacing: 10`, `minBarSpacing: 3`, `rightOffset: 5` — fatter candles, Webull-proportioned
 - `shiftVisibleRangeOnNewBar: true` — live bars scroll smoothly into view
 - Kinetic scroll: `kineticScroll: { touch: true, mouse: true }` — momentum/inertia on drag-release
 - Scroll handling: `vertTouchDrag: false` prevents accidental vertical scroll on mobile pan
 - Scale handling: `axisDoubleClickReset: true` — double-click axis to reset zoom
 - Right price scale: `alignLabels: true`, `scaleMargins: { top: 0.05, bottom: 0.05 }`
-- Volume: 55% alpha, `scaleMargins: { top: 0.82 }` — doesn't compete with candles
+- Volume: 60% alpha, `scaleMargins: { top: 0.75 }` — prominent but doesn't compete with candles
 - Mini charts (RSI/MACD): 90px desktop / 70px mobile, vertical grid hidden, horizontal dotted, no axis borders
 - Shared mini chart config: `src/components/ui/miniChartConfig.js`
 - Layout font: 11px, text `#9ca3af` for axis labels
-- CrosshairLegend: 10px font, 85% opaque bg, positioned (6,6)
+- CrosshairLegend: 11px font, 88% opaque bg, positioned (6,6)
 
 **Mobile architecture (M1–M5 overhaul):**
 - **Breakpoint strategy:** `useIsMobile()` (max-width 767px) is the primary gate. All mobile
@@ -405,12 +423,13 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Open Graph meta tags required in `index.html` for social sharing previews
 - Error tracking via Sentry free tier (5K errors/month, session replay)
 
-## Known issues (from 2026-03-18 deep assessment, updated 2026-03-24)
+## Known issues (from 2026-03-18 deep assessment, updated 2026-03-25)
 
 ### High — RESOLVED
 - ~~`BottomSheet` CSS missing `safe-area-inset-bottom`~~ — fixed: `padding-bottom: env(safe-area-inset-bottom)` added
 - ~~`usePullToRefresh.js` dependency array~~ — fixed: replaced state deps with refs, effect now stable
 - ~~Preset switching crashes~~ — fixed (2026-03-24): overlay effects wrapped in try/catch + `disposedRef`, mini chart crosshair handlers read live ref, CandlestickChart prepend null guard added
+- ~~Preset switching flicker/zoom issues~~ — fixed (2026-03-25): batched `applyPreset` into single `setState`, LevelOverlay create-once pattern, callback ref for chart detection, `stableBars` transition guard, mini charts always-mounted
 - ~~API request IDs use `Math.random()`~~ — fixed (2026-03-24): switched to `crypto.randomUUID()`
 - ~~No explicit fetch timeout on API proxy calls~~ — fixed (2026-03-24): `AbortSignal.timeout(10_000)` on all upstream fetches
 - ~~Security headers not reaching root path~~ — fixed (2026-03-24): `/(.*)`  → `/:path*` in vercel.json

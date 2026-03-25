@@ -79,8 +79,13 @@ export default function App() {
   const showSr            = useChartStore((s) => s.indicators.sr)
   const showBollinger     = useChartStore((s) => s.indicators.bollinger)
 
-  const { data: bars, isLoading, isError, error, dataUpdatedAt, refetch } = useBars()
+  const { data: bars, isLoading, isError, error, dataUpdatedAt, refetch, isPlaceholderData } = useBars()
   const { data: dailyBars } = useDailyBars()
+
+  // Transition guard: when TanStack Query is serving stale keepPreviousData
+  // (e.g. during a timeframe switch), overlays should not re-render with
+  // mismatched data. Only pass bars to overlays when data is fresh.
+  const stableBars = isPlaceholderData ? null : bars
 
   // Sync URL params with store
   useURLState()
@@ -170,23 +175,17 @@ export default function App() {
 
   const tfConfig = TIMEFRAME_CONFIG[selectedTimeframe]
 
-  // Chart instance detection (polls until found, then stops)
-  useEffect(() => {
-    function check() {
-      const c  = chartRef.current?.chart?.()
-      const cs = chartRef.current?.candleSeries?.()
-      if (c && cs) {
-        setChart(c)
-        setCandleSeries(cs)
-        return true
-      }
-      return false
+  // Detect chart instance via callback ref — called once after CandlestickChart mounts.
+  // Replaces the old setInterval polling approach for immediate, deterministic detection.
+  const chartCallbackRef = useCallback((handle) => {
+    if (!handle) return
+    chartRef.current = handle
+    const c  = handle.chart?.()
+    const cs = handle.candleSeries?.()
+    if (c && cs) {
+      setChart(c)
+      setCandleSeries(cs)
     }
-    if (check()) return // already available
-    const id = setInterval(() => {
-      if (check()) clearInterval(id)
-    }, 100)
-    return () => clearInterval(id)
   }, [])
 
   // Pre-compute groupBarsByDay once
@@ -340,32 +339,32 @@ export default function App() {
               </div>
             )}
 
-            <CandlestickChart ref={chartRef} bars={bars ?? []} theme={theme} dataUpdatedAt={dataUpdatedAt} showRvol={showRvol} />
+            <CandlestickChart ref={chartCallbackRef} bars={bars ?? []} theme={theme} dataUpdatedAt={dataUpdatedAt} showRvol={showRvol} />
 
-            {chart && candleSeries && bars && (
+            {chart && candleSeries && stableBars && (
               <>
-                <EMAOverlay chart={chart} bars={bars} visible={showEma} />
+                <EMAOverlay chart={chart} bars={stableBars} visible={showEma} />
                 {tfConfig.showVWAP && (
-                  <VWAPOverlay chart={chart} bars={bars} visible={showVwap} />
+                  <VWAPOverlay chart={chart} bars={stableBars} visible={showVwap} />
                 )}
                 <LevelOverlay
                   chart={chart}
                   candleSeries={candleSeries}
-                  bars={bars}
+                  bars={stableBars}
                   byDay={byDay}
                   showORB={tfConfig.showORB}
                   visible={showLevels}
                 />
-                <SROverlay candleSeries={candleSeries} bars={bars} visible={showSr} />
-                <BollingerOverlay chart={chart} bars={bars} visible={showBollinger} />
-                <CrosshairLegend chart={chart} bars={bars} theme={theme} />
+                <SROverlay candleSeries={candleSeries} bars={stableBars} visible={showSr} />
+                <BollingerOverlay chart={chart} bars={stableBars} visible={showBollinger} />
+                <CrosshairLegend chart={chart} bars={stableBars} theme={theme} />
               </>
             )}
           </div>
 
           {/* Indicator tab strip (RSI / MACD) — hidden in landscape mobile */}
           {!isMobileLandscape && (
-            <IndicatorTabView bars={bars} mainChart={chart} />
+            <IndicatorTabView bars={stableBars} mainChart={chart} />
           )}
 
           {/* Status bar — hidden in landscape mobile to maximize chart */}

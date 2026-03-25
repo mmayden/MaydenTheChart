@@ -1,6 +1,6 @@
 # Security Standards — Cheechart
 
-> Current as of 2026-03-24. Security is non-negotiable.
+> Current as of 2026-03-25. Security is non-negotiable.
 
 ---
 

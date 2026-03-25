@@ -61,6 +61,21 @@
 
 ## ✅ Completed Phases — Archive
 
+### Chart Stability — Preset Switch Smoothness (2026-03-25)
+- **Batched preset application:** `applyPreset()` now uses a single `useChartStore.setState()` call instead of two separate `setIndicators()` + `setTimeframe()` calls. Eliminates multi-wave re-render cascade.
+- **LevelOverlay rewrite:** ODC LineSeries now created once on mount (like EMA/VWAP/Bollinger) and updated imperatively via `setData()`. Was tearing down and rebuilding all series on every bar change.
+- **Callback ref for chart detection:** Replaced `setInterval` polling (100ms) in App.jsx with a `useCallback` ref that fires immediately when CandlestickChart mounts. Deterministic, no timing bugs.
+- **Transition guard (stableBars):** Overlays now receive `stableBars` (null during `isPlaceholderData`) instead of stale `keepPreviousData` bars. Prevents overlays from thrashing with mismatched timeframe data during transitions.
+- **Mini charts always mounted:** `IndicatorTabView` now always mounts RSI/MACD mini charts, toggling via `height: 0` with CSS transition instead of conditional rendering. Eliminates expensive `createChart()` mount/unmount cycles on preset switches.
+
+### Visual Polish — Webull-Level Chart Tuning (2026-03-25)
+- Background: `#0a0a0a` → `#0b1018` dark navy (richer than pure black)
+- EMA line width: 1px → 2px for all periods (was 2px only for EMA 200)
+- Volume opacity: 33% → 60% (hex `55` → `99`), height 18% → 25% of chart
+- Bar spacing: 8 → 10, min 2 → 3 (fatter candles)
+- CrosshairLegend: 10px → 11px font, roomier padding
+- App shell bg synced to chart bg across dark theme CSS vars
+
 ### Chart Stability — Preset Switch Crash Fix (2026-03-24)
 - Fixed overlay effect bodies (EMA, VWAP, Bollinger, Level) — wrapped all `addSeries()`/`setData()` in try/catch + `disposedRef` guard
 - Fixed RSI/MACD mini chart crosshair handler stale reference race — handlers now read `chartRef.current` (live ref) instead of stale closure capture
@@ -138,14 +153,16 @@
 - API request IDs: `x-request-id` header on all serverless responses, `rid=` in server-side error logs
 - Data fetch errors surfaced as toast notifications (no more silent failures)
 
-### Phase 14A — Chart Visual Overhaul (2026-03-17)
-- Webull-inspired chart refinements: bar spacing (`barSpacing: 8`, `minBarSpacing: 2`), `rightOffset: 5` breathing room
+### Phase 14A — Chart Visual Overhaul (2026-03-17, tuned 2026-03-25)
+- Webull-inspired chart refinements: bar spacing (`barSpacing: 10`, `minBarSpacing: 3`), `rightOffset: 5` breathing room
+- Dark navy bg (`#0b1018`) — richer than pure black, premium feel
+- EMA lines all 2px width (was 1px for 9/48)
 - Dotted grid lines, dashed crosshair (Webull-style), removed axis borders for cleaner edges
 - Price scale: `alignLabels`, 5% margins, subdued text color
-- Volume bars more transparent (55% opacity), mini charts taller (90px from 82px)
+- Volume bars 60% opacity, 25% chart height (`top: 0.75`) — visible, Webull-proportioned
 - Mini chart grid: vertical lines hidden, horizontal dotted, no axis borders
 - Sub-header: tighter layout, symbol-first price display with `tabular-nums`
-- CrosshairLegend: smaller font, tighter positioning, higher contrast background
+- CrosshairLegend: 11px font, 88% opaque bg, roomier padding
 
 ### Phase 13A — Traction Readiness (2026-03-17)
 - Enhanced chart snapshots: watermark includes confluence score + day type (`NVDA 5m · Confluence 85 Bull · Trend Day — Bullish · cheechart.space`)

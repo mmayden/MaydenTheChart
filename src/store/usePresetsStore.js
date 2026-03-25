@@ -69,14 +69,20 @@ export const usePresetsStore = create((set, get) => ({
   /**
    * Apply a preset — updates indicators + timeframe in useChartStore.
    * Does NOT change symbol (symbol floats freely).
+   *
+   * Uses a single batched Zustand set() call so React sees one state
+   * update instead of two, preventing a multi-wave re-render cascade
+   * that causes chart flicker/zoom issues during preset switches.
    */
   applyPreset: (id) => {
     const preset = get().presets[id]
     if (!preset) return
 
-    const chartStore = useChartStore.getState()
-    chartStore.setIndicators({ ...preset.indicators })
-    chartStore.setTimeframe(preset.timeframe)
+    // Batch indicator + timeframe into one atomic state update
+    useChartStore.setState({
+      indicators: { ...preset.indicators },
+      selectedTimeframe: preset.timeframe,
+    })
 
     set({ activePresetId: id })
     saveActiveId(id)
