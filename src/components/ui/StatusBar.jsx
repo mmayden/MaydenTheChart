@@ -80,7 +80,7 @@ export function StatusBar({ lastUpdated }) {
       {/* Donate link — desktop only */}
       {!isMobile && (
         <a
-          href="https://buy.stripe.com/8x23cx2ER3G1gCmaznaVa00"
+          href="https://donate.stripe.com/8x23cx2ER3G1gCmaznaVa00"
           target="_blank"
           rel="noopener noreferrer"
           className="ml-auto flex items-center gap-1 text-theme-muted hover:text-bear transition-colors shrink-0"
