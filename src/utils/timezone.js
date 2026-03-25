@@ -27,8 +27,9 @@ export function toETTime(unixSecs) {
   }).formatToParts(new Date(unixSecs * 1000))
   const hourPart   = parts.find((p) => p.type === 'hour')
   const minutePart = parts.find((p) => p.type === 'minute')
+  const h = hourPart ? Number(hourPart.value) : 0
   return {
-    hour:   hourPart   ? Number(hourPart.value)   : 0,
+    hour:   h === 24 ? 0 : h, // ICU returns 24 for midnight on some platforms
     minute: minutePart ? Number(minutePart.value) : 0,
   }
 }
