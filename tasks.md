@@ -86,7 +86,7 @@
 - Progress tracking via localStorage (`cheechart-roadmap-done`) with checkboxes and progress bar
 - Detail panel: desktop side panel (380px) / mobile bottom sheet overlay
 - Search across topics, concepts, and resources
-- Linked from TopNav Help menu + BottomNav "More" menu
+- Linked from TopNav "Learn" button + BottomNav "More" menu
 - Vercel rewrite: `/roadmap` → `/roadmap.html` (before SPA catch-all)
 - Data extracted from standalone HTML into `src/constants/roadmap.js` ES module
 - **Enhancement: Beginner Path filter** — toggle filters to Phases 1–8, persisted to localStorage

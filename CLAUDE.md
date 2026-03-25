@@ -116,7 +116,7 @@ The roadmap page is fully independent — no chart code, no TanStack Query, no s
 and its own standalone CSS (`roadmap.css`) with a fixed dark color scheme. It does NOT
 inherit the main app's theme system (dark/terminal/lumpia) — the roadmap always renders
 with its own colors regardless of chart app settings. Shares only self-hosted fonts.
-Linked from TopNav Help menu and BottomNav "More" menu. Vercel rewrite routes `/roadmap`
+Linked from TopNav "Learn" button and BottomNav "More" menu. Vercel rewrite routes `/roadmap`
 to `/roadmap.html` before the SPA catch-all. Features: beginner path filter (Phases 1–8
 toggle, persisted), estimated time per phase, "Mastered" badge on 100% phase completion,
 legal disclaimer footer. Content peer-reviewed for accuracy (95%+ verified).
@@ -334,7 +334,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Error boundary: `src/components/ui/ErrorBoundary.jsx`
 - Logo: `src/components/ui/Logo.jsx`
 - Toast notifications: `src/components/ui/ToastContainer.jsx`
-- Status bar (WS/polling + session stats + Stripe donate link): `src/components/ui/StatusBar.jsx`
+- Status bar (WS/polling + session stats + Stripe donate): `src/components/ui/StatusBar.jsx`
 - Welcome banner (first-visit, dismissible): `src/components/ui/WelcomeBanner.jsx`
 - ATR gauge: `src/components/ui/ATRGauge.jsx`
 - Day type banner: `src/components/ui/DayTypeBanner.jsx`
