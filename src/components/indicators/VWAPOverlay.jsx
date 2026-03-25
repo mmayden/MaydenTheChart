@@ -23,23 +23,28 @@ const SERIES_CONFIG = [
 
 export function VWAPOverlay({ chart, bars, visible = true }) {
   const seriesRef = useRef({})
+  const disposedRef = useRef(false)
 
   useEffect(() => {
     if (!chart) return
+    disposedRef.current = false
 
-    for (const cfg of SERIES_CONFIG) {
-      const series = chart.addSeries(LineSeries, {
-        color:          cfg.color,
-        lineWidth:      cfg.lineWidth,
-        lineStyle:      cfg.lineStyle,
-        priceLineVisible:     false,
-        lastValueVisible:     false,
-        crosshairMarkerVisible: false,
-      })
-      seriesRef.current[cfg.key] = series
-    }
+    try {
+      for (const cfg of SERIES_CONFIG) {
+        const series = chart.addSeries(LineSeries, {
+          color:          cfg.color,
+          lineWidth:      cfg.lineWidth,
+          lineStyle:      cfg.lineStyle,
+          priceLineVisible:     false,
+          lastValueVisible:     false,
+          crosshairMarkerVisible: false,
+        })
+        seriesRef.current[cfg.key] = series
+      }
+    } catch { /* chart may be mid-teardown */ }
 
     return () => {
+      disposedRef.current = true
       for (const cfg of SERIES_CONFIG) {
         if (seriesRef.current[cfg.key]) {
           try { chart.removeSeries(seriesRef.current[cfg.key]) } catch (_) {}
@@ -50,22 +55,26 @@ export function VWAPOverlay({ chart, bars, visible = true }) {
   }, [chart])
 
   useEffect(() => {
-    if (!bars || bars.length === 0) return
+    if (disposedRef.current || !bars || bars.length === 0) return
 
-    const result = vwapWithBands(bars)
-
-    for (const cfg of SERIES_CONFIG) {
-      const series = seriesRef.current[cfg.key]
-      if (!series) continue
-      series.setData(result[cfg.key] ?? [])
-    }
+    try {
+      const result = vwapWithBands(bars)
+      for (const cfg of SERIES_CONFIG) {
+        const series = seriesRef.current[cfg.key]
+        if (!series) continue
+        series.setData(result[cfg.key] ?? [])
+      }
+    } catch { /* series may have been removed */ }
   }, [bars])
 
   useEffect(() => {
-    for (const cfg of SERIES_CONFIG) {
-      const series = seriesRef.current[cfg.key]
-      if (series) series.applyOptions({ visible })
-    }
+    if (disposedRef.current) return
+    try {
+      for (const cfg of SERIES_CONFIG) {
+        const series = seriesRef.current[cfg.key]
+        if (series) series.applyOptions({ visible })
+      }
+    } catch { /* series may have been removed */ }
   }, [visible])
 
   return null

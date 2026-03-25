@@ -264,7 +264,7 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
     if (!didUpdate) {
       // Save visible time range before setData() if this is a scroll-back prepend
       const savedRange = isPrepend
-        ? chartRef.current.timeScale().getVisibleRange()
+        ? chartRef.current?.timeScale().getVisibleRange()
         : null
 
       candleRef.current.setData(bars)
@@ -273,12 +273,12 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
 
       // Restore viewport position after scroll-back prepend
       if (savedRange) {
-        chartRef.current.timeScale().setVisibleRange(savedRange)
+        chartRef.current?.timeScale().setVisibleRange(savedRange)
       }
     }
 
     prevBarsRef.current = bars
-    if (shouldFit && !isPrepend) chartRef.current.timeScale().fitContent()
+    if (shouldFit && !isPrepend) chartRef.current?.timeScale().fitContent()
   }, [bars, shouldFit, showRvol])
 
   // Expose chart instance to parent for overlays

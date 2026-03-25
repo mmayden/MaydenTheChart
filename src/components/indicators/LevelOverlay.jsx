@@ -39,77 +39,79 @@ export function LevelOverlay({ chart, candleSeries, bars, byDay: byDayProp = nul
       odcSeriesRef.current = null
     }
 
-    const byDay                 = byDayProp ?? groupBarsByDay(bars)
-    const { prevHigh, prevLow } = getPreviousLevels(bars, byDay)
-    const odc                   = getOpenOfDay(bars, byDay)
-    const orb                   = getORBZone(bars, 15, byDay)
+    try {
+      const byDay                 = byDayProp ?? groupBarsByDay(bars)
+      const { prevHigh, prevLow } = getPreviousLevels(bars, byDay)
+      const odc                   = getOpenOfDay(bars, byDay)
+      const orb                   = getORBZone(bars, 15, byDay)
 
-    const addLine = (price, options) => {
-      if (price == null || !visible) return
-      const line = candleSeries.createPriceLine({
-        price,
-        ...options,
-      })
-      linesRef.current.push({ line })
-    }
+      const addLine = (price, options) => {
+        if (price == null || !visible) return
+        const line = candleSeries.createPriceLine({
+          price,
+          ...options,
+        })
+        linesRef.current.push({ line })
+      }
 
-    // Previous Day High — gold dashed
-    if (prevHigh) {
-      addLine(prevHigh, {
-        color:         PREV_LEVEL_COLOR,
-        lineWidth:     1,
-        lineStyle:     2,   // dashed
-        axisLabelVisible: true,
-        title:         'PDH',
-      })
-    }
+      // Previous Day High — gold dashed
+      if (prevHigh) {
+        addLine(prevHigh, {
+          color:         PREV_LEVEL_COLOR,
+          lineWidth:     1,
+          lineStyle:     2,   // dashed
+          axisLabelVisible: true,
+          title:         'PDH',
+        })
+      }
 
-    // Previous Day Low — gold dashed
-    if (prevLow) {
-      addLine(prevLow, {
-        color:         PREV_LEVEL_COLOR,
-        lineWidth:     1,
-        lineStyle:     2,
-        axisLabelVisible: true,
-        title:         'PDL',
-      })
-    }
+      // Previous Day Low — gold dashed
+      if (prevLow) {
+        addLine(prevLow, {
+          color:         PREV_LEVEL_COLOR,
+          lineWidth:     1,
+          lineStyle:     2,
+          axisLabelVisible: true,
+          title:         'PDL',
+        })
+      }
 
-    // Open of Day Candle — amber dashed line scoped to today's session only
-    if (odc && chart && visible) {
-      const odcSeries = chart.addSeries(LineSeries, {
-        color:                  ODC_COLOR,
-        lineWidth:              1,
-        lineStyle:              2,   // dashed
-        priceLineVisible:       false,
-        lastValueVisible:       true,
-        crosshairMarkerVisible: false,
-        title:                  'ODC',
-      })
-      odcSeries.setData([
-        { time: odc.startTime, value: odc.price },
-        { time: odc.endTime,   value: odc.price },
-      ])
-      odcSeriesRef.current = odcSeries
-    }
+      // Open of Day Candle — amber dashed line scoped to today's session only
+      if (odc && chart && visible) {
+        const odcSeries = chart.addSeries(LineSeries, {
+          color:                  ODC_COLOR,
+          lineWidth:              1,
+          lineStyle:              2,   // dashed
+          priceLineVisible:       false,
+          lastValueVisible:       true,
+          crosshairMarkerVisible: false,
+          title:                  'ODC',
+        })
+        odcSeries.setData([
+          { time: odc.startTime, value: odc.price },
+          { time: odc.endTime,   value: odc.price },
+        ])
+        odcSeriesRef.current = odcSeries
+      }
 
-    // ORB zone — two lines for high and low (only intraday)
-    if (showORB && orb.valid) {
-      addLine(orb.orbHigh, {
-        color:         ORB_COLOR,
-        lineWidth:     1,
-        lineStyle:     1,   // dotted
-        axisLabelVisible: true,
-        title:         'ORB H',
-      })
-      addLine(orb.orbLow, {
-        color:         ORB_COLOR,
-        lineWidth:     1,
-        lineStyle:     1,
-        axisLabelVisible: true,
-        title:         'ORB L',
-      })
-    }
+      // ORB zone — two lines for high and low (only intraday)
+      if (showORB && orb.valid) {
+        addLine(orb.orbHigh, {
+          color:         ORB_COLOR,
+          lineWidth:     1,
+          lineStyle:     1,   // dotted
+          axisLabelVisible: true,
+          title:         'ORB H',
+        })
+        addLine(orb.orbLow, {
+          color:         ORB_COLOR,
+          lineWidth:     1,
+          lineStyle:     1,
+          axisLabelVisible: true,
+          title:         'ORB L',
+        })
+      }
+    } catch { /* chart/series may be mid-teardown during preset switch */ }
 
     return () => {
       for (const { line } of linesRef.current) {

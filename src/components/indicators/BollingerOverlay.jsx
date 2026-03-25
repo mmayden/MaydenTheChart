@@ -14,72 +14,78 @@ export function BollingerOverlay({ chart, bars, visible }) {
   const middleRef = useRef(null)
   const upperRef  = useRef(null)
   const lowerRef  = useRef(null)
+  const disposedRef = useRef(false)
 
   // Create series once when chart is available
   useEffect(() => {
     if (!chart) return
+    disposedRef.current = false
 
-    const middle = chart.addSeries(LineSeries, {
-      color: BOLLINGER_MIDDLE_COLOR,
-      lineWidth: 1,
-      lineStyle: 0,
-      priceLineVisible: false,
-      lastValueVisible: false,
-      crosshairMarkerVisible: false,
-      visible,
-    })
-    const upper = chart.addSeries(LineSeries, {
-      color: BOLLINGER_BAND_COLOR,
-      lineWidth: 1,
-      lineStyle: 2,
-      priceLineVisible: false,
-      lastValueVisible: false,
-      crosshairMarkerVisible: false,
-      visible,
-    })
-    const lower = chart.addSeries(LineSeries, {
-      color: BOLLINGER_BAND_COLOR,
-      lineWidth: 1,
-      lineStyle: 2,
-      priceLineVisible: false,
-      lastValueVisible: false,
-      crosshairMarkerVisible: false,
-      visible,
-    })
+    try {
+      const middle = chart.addSeries(LineSeries, {
+        color: BOLLINGER_MIDDLE_COLOR,
+        lineWidth: 1,
+        lineStyle: 0,
+        priceLineVisible: false,
+        lastValueVisible: false,
+        crosshairMarkerVisible: false,
+      })
+      const upper = chart.addSeries(LineSeries, {
+        color: BOLLINGER_BAND_COLOR,
+        lineWidth: 1,
+        lineStyle: 2,
+        priceLineVisible: false,
+        lastValueVisible: false,
+        crosshairMarkerVisible: false,
+      })
+      const lower = chart.addSeries(LineSeries, {
+        color: BOLLINGER_BAND_COLOR,
+        lineWidth: 1,
+        lineStyle: 2,
+        priceLineVisible: false,
+        lastValueVisible: false,
+        crosshairMarkerVisible: false,
+      })
 
-    middleRef.current = middle
-    upperRef.current  = upper
-    lowerRef.current  = lower
+      middleRef.current = middle
+      upperRef.current  = upper
+      lowerRef.current  = lower
+    } catch { /* chart may be mid-teardown */ }
 
     return () => {
+      disposedRef.current = true
       try {
-        chart.removeSeries(middle)
-        chart.removeSeries(upper)
-        chart.removeSeries(lower)
+        if (middleRef.current) chart.removeSeries(middleRef.current)
+        if (upperRef.current)  chart.removeSeries(upperRef.current)
+        if (lowerRef.current)  chart.removeSeries(lowerRef.current)
       } catch { /* chart may be destroyed */ }
       middleRef.current = null
       upperRef.current  = null
       lowerRef.current  = null
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chart])
 
   // Update data when bars change
   useEffect(() => {
-    if (!bars?.length) return
+    if (disposedRef.current || !bars?.length) return
     if (!middleRef.current || !upperRef.current || !lowerRef.current) return
 
-    const { middle, upper, lower } = bollingerBands(bars)
-    middleRef.current.setData(middle)
-    upperRef.current.setData(upper)
-    lowerRef.current.setData(lower)
+    try {
+      const { middle, upper, lower } = bollingerBands(bars)
+      middleRef.current.setData(middle)
+      upperRef.current.setData(upper)
+      lowerRef.current.setData(lower)
+    } catch { /* series may have been removed */ }
   }, [bars])
 
   // Toggle visibility without re-creating series
   useEffect(() => {
-    if (middleRef.current) middleRef.current.applyOptions({ visible })
-    if (upperRef.current)  upperRef.current.applyOptions({ visible })
-    if (lowerRef.current)  lowerRef.current.applyOptions({ visible })
+    if (disposedRef.current) return
+    try {
+      if (middleRef.current) middleRef.current.applyOptions({ visible })
+      if (upperRef.current)  upperRef.current.applyOptions({ visible })
+      if (lowerRef.current)  lowerRef.current.applyOptions({ visible })
+    } catch { /* series may have been removed */ }
   }, [visible])
 
   return null

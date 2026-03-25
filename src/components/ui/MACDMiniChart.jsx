@@ -50,42 +50,45 @@ export function MACDMiniChart({ bars, mainChart }) {
   // Sync crosshair from main chart → this mini chart
   useEffect(() => {
     if (!mainChart || !chartRef.current) return
-    const miniChart = chartRef.current
-    const miniLine  = seriesRef.current.macdLine
 
     const handler = (param) => {
-      if (!param.time || !miniLine) {
-        miniChart.clearCrosshairPosition()
-        return
-      }
-      miniChart.setCrosshairPosition(NaN, param.time, miniLine)
+      if (!chartRef.current) return // mini chart was removed
+      try {
+        if (!param.time || !seriesRef.current.macdLine) {
+          chartRef.current.clearCrosshairPosition()
+          return
+        }
+        chartRef.current.setCrosshairPosition(NaN, param.time, seriesRef.current.macdLine)
+      } catch { /* chart may be mid-teardown */ }
     }
 
     mainChart.subscribeCrosshairMove(handler)
-    return () => { mainChart.unsubscribeCrosshairMove(handler) }
+    return () => { try { mainChart.unsubscribeCrosshairMove(handler) } catch {} }
   }, [mainChart])
 
   // Sync visible time range from main chart → this mini chart
   useEffect(() => {
     if (!mainChart || !chartRef.current) return
-    const miniChart = chartRef.current
 
     const handler = (range) => {
-      if (range) {
-        miniChart.timeScale().setVisibleLogicalRange(range)
-      }
+      if (!chartRef.current || !range) return // mini chart was removed
+      try {
+        chartRef.current.timeScale().setVisibleLogicalRange(range)
+      } catch { /* chart may be mid-teardown */ }
     }
 
     mainChart.timeScale().subscribeVisibleLogicalRangeChange(handler)
 
     // Apply current range immediately so mini-chart aligns on mount
-    const currentRange = mainChart.timeScale().getVisibleLogicalRange()
-    if (currentRange) {
-      miniChart.timeScale().setVisibleLogicalRange(currentRange)
-    }
+    try {
+      const currentRange = mainChart.timeScale().getVisibleLogicalRange()
+      if (currentRange && chartRef.current) {
+        chartRef.current.timeScale().setVisibleLogicalRange(currentRange)
+      }
+    } catch { /* chart may not be ready yet */ }
 
     return () => {
-      mainChart.timeScale().unsubscribeVisibleLogicalRangeChange(handler)
+      try { mainChart.timeScale().unsubscribeVisibleLogicalRangeChange(handler) } catch {}
     }
   }, [mainChart])
 

@@ -14,22 +14,28 @@ import { EMA_COLORS, EMA_PERIODS } from '../../constants/chart'
 export function EMAOverlay({ chart, bars, visible = true }) {
   const seriesRef = useRef({})  // { 9: series, 48: series, 200: series }
 
+  const disposedRef = useRef(false)
+
   // Create series on mount (when chart is ready)
   useEffect(() => {
     if (!chart) return
+    disposedRef.current = false
 
-    for (const period of EMA_PERIODS) {
-      const series = chart.addSeries(LineSeries, {
-        color:       EMA_COLORS[period],
-        lineWidth:   period === 200 ? 2 : 1,
-        priceLineVisible: false,
-        lastValueVisible: false,
-        crosshairMarkerVisible: false,
-      })
-      seriesRef.current[period] = series
-    }
+    try {
+      for (const period of EMA_PERIODS) {
+        const series = chart.addSeries(LineSeries, {
+          color:       EMA_COLORS[period],
+          lineWidth:   period === 200 ? 2 : 1,
+          priceLineVisible: false,
+          lastValueVisible: false,
+          crosshairMarkerVisible: false,
+        })
+        seriesRef.current[period] = series
+      }
+    } catch { /* chart may be mid-teardown */ }
 
     return () => {
+      disposedRef.current = true
       for (const period of EMA_PERIODS) {
         if (seriesRef.current[period]) {
           try { chart.removeSeries(seriesRef.current[period]) } catch (_) {}
@@ -41,23 +47,27 @@ export function EMAOverlay({ chart, bars, visible = true }) {
 
   // Update data when bars change
   useEffect(() => {
-    if (!bars || bars.length === 0) return
+    if (disposedRef.current || !bars || bars.length === 0) return
 
-    for (const period of EMA_PERIODS) {
-      const series = seriesRef.current[period]
-      if (!series) continue
-
-      const { series: emaData } = ema(bars, period)
-      series.setData(emaData)
-    }
+    try {
+      for (const period of EMA_PERIODS) {
+        const series = seriesRef.current[period]
+        if (!series) continue
+        const { series: emaData } = ema(bars, period)
+        series.setData(emaData)
+      }
+    } catch { /* series may have been removed */ }
   }, [bars])
 
   // Toggle visibility without re-creating series
   useEffect(() => {
-    for (const period of EMA_PERIODS) {
-      const series = seriesRef.current[period]
-      if (series) series.applyOptions({ visible })
-    }
+    if (disposedRef.current) return
+    try {
+      for (const period of EMA_PERIODS) {
+        const series = seriesRef.current[period]
+        if (series) series.applyOptions({ visible })
+      }
+    } catch { /* series may have been removed */ }
   }, [visible])
 
   return null  // No DOM — purely adds to the chart instance
