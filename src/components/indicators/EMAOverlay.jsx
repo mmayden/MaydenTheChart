@@ -25,7 +25,7 @@ export function EMAOverlay({ chart, bars, visible = true }) {
       for (const period of EMA_PERIODS) {
         const series = chart.addSeries(LineSeries, {
           color:       EMA_COLORS[period],
-          lineWidth:   period === 200 ? 2 : 1,
+          lineWidth:   2,
           priceLineVisible: false,
           lastValueVisible: false,
           crosshairMarkerVisible: false,

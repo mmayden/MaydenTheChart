@@ -135,13 +135,13 @@ export function CrosshairLegend({ chart, bars, theme: _theme = 'dark' }) {
         pointerEvents:   'none',
         opacity:         0,
         fontFamily:      'ui-monospace, "Cascadia Code", "Fira Code", Menlo, monospace',
-        fontSize:        10,
-        lineHeight:      1,
+        fontSize:        11,
+        lineHeight:      1.2,
         letterSpacing:   '0.02em',
         color:           'var(--text-primary, #d1d5db)',
-        backgroundColor: 'rgba(10, 10, 10, 0.85)',
-        padding:         '4px 8px',
-        borderRadius:    3,
+        backgroundColor: 'rgba(11, 16, 24, 0.88)',
+        padding:         '5px 10px',
+        borderRadius:    4,
         whiteSpace:      'nowrap',
       }}
     />

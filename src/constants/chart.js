@@ -21,15 +21,15 @@ export const ODC_COLOR        = '#94a3b8'  // slate — open of day candle (dist
 export const ORB_COLOR        = '#6366f1'  // indigo — ORB zone
 
 // ─── Volume colors (candle-direction: green up / red down) ───────────────────
-export const VOLUME_UP_COLOR   = '#22c55e55'   // green semi-transparent — close >= open
-export const VOLUME_DOWN_COLOR = '#ef444455'   // red   semi-transparent — close < open
+export const VOLUME_UP_COLOR   = '#22c55e99'   // green 60% — close >= open
+export const VOLUME_DOWN_COLOR = '#ef444499'   // red   60% — close < open
 
 // ─── RVOL highlight colors (volume bars when RVOL is enabled) ────────────────
 export const RVOL_AMBER = '#f59e0bcc'  // amber semi-transparent — ≥1.5x avg volume
 export const RVOL_HOT   = '#ef4444cc'  // red semi-transparent   — ≥2.0x avg volume
 
 // ─── Chart background / grid ──────────────────────────────────────────────────
-export const CHART_BG_COLOR   = '#0a0a0a'
+export const CHART_BG_COLOR   = '#0b1018'       // dark navy — richer than pure black
 export const GRID_COLOR       = '#141a23'       // subtle grid — barely visible
 export const CROSSHAIR_COLOR  = '#4b5563'
 

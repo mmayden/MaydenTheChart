@@ -62,7 +62,7 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #0a0a0a;
+  background-color: #0b1018;
   color: #f3f4f6;
   overscroll-behavior: none; /* prevent iOS rubber-band bounce interfering with chart */
   -webkit-tap-highlight-color: transparent; /* remove tap flash on iOS/Android */
@@ -88,7 +88,7 @@ body,
 /* ── Theme variables ─────────────────────────────────────────────────────── */
 
 [data-theme="dark"] {
-  --bg-base:      #0a0a0a;
+  --bg-base:      #0b1018;
   --bg-surface:   #0d1117;
   --border:       #1f2937;
   --border-mid:   #374151;
@@ -114,7 +114,7 @@ body,
   --settings-glow:  rgba(34,211,238,0.25);
   --btn-primary:  #2563eb;
   --btn-primary-hover: #3b82f6;
-  --input-bg:     #0a0a0a;
+  --input-bg:     #0b1018;
   --focus-ring:   #3b82f6;
 }
 
