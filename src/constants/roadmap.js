@@ -845,3 +845,34 @@ export const PHASES = [
     ]
   }
 ];
+
+/**
+ * Beginner Path — curated subset of phases for new traders.
+ *
+ * Rationale (inspired by roadmap.sh's curated paths):
+ *   P1  Foundation & Mindset       — starting point, why traders fail, expectations
+ *   P2  Market Infrastructure      — how markets work, order types, brokers
+ *   P3  Reading Price & Volume     — core chart literacy every trader needs
+ *   P4  Market Structure           — trends, S/R, supply/demand, BOS/CHoCH
+ *   P5  Technical Analysis: Classical — EMAs, RSI, MACD, Bollinger, basic patterns
+ *   P10 Risk Management            — position sizing, stop losses, R:R, drawdowns
+ *   P11 Trading Psychology         — emotional cycle, biases, discipline, journaling
+ *
+ * Excluded from beginner path:
+ *   P6  Advanced TA (Wyckoff, Elliott Wave, ICT/SMC, Harmonics) — intermediate
+ *   P7  Order Flow & Microstructure (Level 2, Footprint, Tape) — advanced tooling
+ *   P8  Fundamental Analysis: Equities — useful but not beginner-critical
+ *   P9  Fundamental Analysis: Macro — intermediate
+ *   P12 Trading Styles Deep Dive — specialization
+ *   P13 Markets Deep Dive — specialization
+ *   P14 Options Trading — advanced
+ *   P15 Strategy Development & Systems — intermediate/advanced
+ *   P16 Mastery & Professional — advanced
+ */
+export const BEGINNER_PHASE_IDS = new Set(['p1', 'p2', 'p3', 'p4', 'p5', 'p10', 'p11']);
+
+/** Beginner-filtered phases, preserving display order. */
+export const BEGINNER_PHASES = PHASES.filter((p) => BEGINNER_PHASE_IDS.has(p.id));
+
+/** Total node count across beginner phases. */
+export const BEGINNER_NODE_COUNT = BEGINNER_PHASES.reduce((s, p) => s + p.nodes.length, 0);

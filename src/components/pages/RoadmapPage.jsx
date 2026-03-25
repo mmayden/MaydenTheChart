@@ -7,12 +7,11 @@
  */
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
-import { PHASES } from '../../constants/roadmap'
+import { PHASES, BEGINNER_PHASE_IDS, BEGINNER_NODE_COUNT } from '../../constants/roadmap'
 import { useIsMobile } from '../../hooks/useMediaQuery'
 
 const STORAGE_KEY = 'cheechart-roadmap-done'
 const BEGINNER_KEY = 'cheechart-roadmap-beginner'
-const BEGINNER_PHASES = new Set(['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'])
 
 function loadDone() {
   try {
@@ -259,7 +258,7 @@ export function RoadmapPage() {
 
   // Filter phases by search + beginner mode
   const filteredPhases = useMemo(() => {
-    let phases = beginnerOnly ? PHASES.filter((p) => BEGINNER_PHASES.has(p.id)) : PHASES
+    let phases = beginnerOnly ? PHASES.filter((p) => BEGINNER_PHASE_IDS.has(p.id)) : PHASES
     if (!search.trim()) return phases
     const q = search.trim().toLowerCase()
     return phases.map((phase) => ({
@@ -335,13 +334,14 @@ export function RoadmapPage() {
               <span className="text-accent">The Full Path</span>
             </h1>
             <p className="text-sm max-w-lg mx-auto leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              16 phases. 86 topics. Every concept, tool, and discipline you need — from market
-              fundamentals to professional-grade execution. Click any node to explore in depth.
+              {beginnerOnly
+                ? 'A curated path through the essentials — chart literacy, key indicators, risk management, and trading psychology. Master these before going deeper.'
+                : '16 phases. 86 topics. Every concept, tool, and discipline you need — from market fundamentals to professional-grade execution. Click any node to explore in depth.'}
             </p>
             <div className="flex justify-center gap-8 mt-5">
               {[
-                { num: beginnerOnly ? '8' : '16', lbl: 'Phases' },
-                { num: beginnerOnly ? String(PHASES.filter((p) => BEGINNER_PHASES.has(p.id)).reduce((s, p) => s + p.nodes.length, 0)) : '86', lbl: 'Topics' },
+                { num: beginnerOnly ? String(BEGINNER_PHASE_IDS.size) : '16', lbl: 'Phases' },
+                { num: beginnerOnly ? String(BEGINNER_NODE_COUNT) : '86', lbl: 'Topics' },
                 { num: '500+', lbl: 'Concepts' },
               ].map(({ num, lbl }) => (
                 <div key={lbl} className="text-center">
@@ -363,7 +363,7 @@ export function RoadmapPage() {
                   backgroundColor: beginnerOnly ? 'var(--accent)' : 'color-mix(in srgb, var(--accent) 8%, transparent)',
                 }}
               >
-                {beginnerOnly ? 'Showing Beginner Path (1–8)' : 'Show Beginner Path'}
+                {beginnerOnly ? 'Showing Beginner Path' : 'Show Beginner Path'}
               </button>
             </div>
           </div>

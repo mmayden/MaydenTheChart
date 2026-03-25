@@ -117,8 +117,8 @@ and its own standalone CSS (`roadmap.css`) with a fixed dark color scheme. It do
 inherit the main app's theme system (dark/terminal/lumpia) — the roadmap always renders
 with its own colors regardless of chart app settings. Shares only self-hosted fonts.
 Linked from TopNav "Learn" button. Vercel rewrite routes `/roadmap`
-to `/roadmap.html` before the SPA catch-all. Features: beginner path filter (Phases 1–8
-toggle, persisted), estimated time per phase, "Mastered" badge on 100% phase completion,
+to `/roadmap.html` before the SPA catch-all. Features: curated beginner path filter
+(P1–P5 + P10 Risk Management + P11 Psychology — persisted), estimated time per phase, "Mastered" badge on 100% phase completion,
 legal disclaimer footer. Content peer-reviewed for accuracy (95%+ verified).
 
 **Right panel system:** `activePanel` in useChartStore controls which panel is shown.
@@ -341,7 +341,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Roadmap JS entry: `src/roadmap-main.jsx` — minimal shell (back link, no stores/query/theme sync)
 - Roadmap CSS: `src/roadmap.css` — standalone stylesheet with fixed dark color scheme (not shared with main app)
 - Roadmap component: `src/components/pages/RoadmapPage.jsx` — 16-phase interactive learning tracker with progress persistence, beginner filter, mastered badges
-- Roadmap data (86 topics): `src/constants/roadmap.js` — phases, nodes, concepts, resources, tips, estimated times per phase
+- Roadmap data (86 topics): `src/constants/roadmap.js` — phases, nodes, concepts, resources, tips, estimated times per phase, `BEGINNER_PHASE_IDS` / `BEGINNER_PHASES` / `BEGINNER_NODE_COUNT` exports
 
 ### UI Components
 - Preset selector UI: `src/components/ui/PresetSelector.jsx`
@@ -387,7 +387,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Shared validation patterns (SYMBOL_RE): `src/constants/patterns.js`
 - Default preset definitions: `src/constants/presets.js`
 - Accent color presets (per-theme): `src/constants/accents.js`
-- Trading roadmap data (16 phases, 86 topics, est. times): `src/constants/roadmap.js`
+- Trading roadmap data (16 phases, 86 topics, est. times, beginner path config): `src/constants/roadmap.js`
 
 ### Tooling
 - ESLint config (flat): `eslint.config.js`

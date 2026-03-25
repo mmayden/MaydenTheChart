@@ -61,6 +61,12 @@
 
 ## ✅ Completed Phases — Archive
 
+### Roadmap — Curated Beginner Path (2026-03-25)
+- **Beginner path redesigned:** Replaced naive "first 8 phases" filter with a curated selection: P1–P5 (foundations through classical TA) + P10 (Risk Management) + P11 (Trading Psychology). Inspired by roadmap.sh's curated path approach.
+- **Rationale:** Old path included advanced topics (Wyckoff, Elliott Wave, Order Flow, Footprint Charts) while excluding essentials (position sizing, stop losses, emotional discipline). New path prioritizes what keeps beginners from blowing up.
+- **Modular constants:** Beginner config (`BEGINNER_PHASE_IDS`, `BEGINNER_PHASES`, `BEGINNER_NODE_COUNT`) exported from `src/constants/roadmap.js` — single source of truth. RoadmapPage imports instead of hardcoding.
+- **Dynamic hero:** Stats and description text adapt to beginner/full mode. No more hardcoded "8" or inline `.filter().reduce()`.
+
 ### Chart Stability — Preset Switch Smoothness (2026-03-25)
 - **Batched preset application:** `applyPreset()` now uses a single `useChartStore.setState()` call instead of two separate `setIndicators()` + `setTimeframe()` calls. Eliminates multi-wave re-render cascade.
 - **LevelOverlay rewrite:** ODC LineSeries now created once on mount (like EMA/VWAP/Bollinger) and updated imperatively via `setData()`. Was tearing down and rebuilding all series on every bar change.
