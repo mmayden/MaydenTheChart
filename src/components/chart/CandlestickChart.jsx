@@ -165,7 +165,7 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
     })
 
     chart.priceScale('volume').applyOptions({
-      scaleMargins: { top: 0.75, bottom: 0 },
+      scaleMargins: { top: 0.80, bottom: 0 },
     })
 
     chartRef.current  = chart
@@ -289,7 +289,7 @@ export const CandlestickChart = forwardRef(function CandlestickChart(
     <div className="relative w-full h-full">
       <div ref={containerRef} className="w-full h-full" />
       {/* Volume section label — sits above the volume bars (bottom ~18% of chart) */}
-      <div className="absolute left-2 bottom-[26%] text-[9px] font-mono pointer-events-none select-none" style={{ color: 'var(--text-muted)', opacity: 0.5 }}>
+      <div className="absolute left-2 bottom-[21%] text-[9px] font-mono pointer-events-none select-none" style={{ color: 'var(--text-muted)', opacity: 0.5 }}>
         VOL
       </div>
       {children}
