@@ -34,8 +34,8 @@
 - 🔲 No localStorage schema migration system — adding new fields to journal/presets silently drops old entries' data
 
 ### Low Priority
-- 🔲 API request IDs use `Math.random()` — switch to `crypto.randomUUID()` for better entropy
-- 🔲 No explicit fetch timeout on API proxy calls — could hang until Vercel's 30s hard limit
+- ✅ API request IDs use `Math.random()` — switched to `crypto.randomUUID()` (2026-03-24)
+- ✅ No explicit fetch timeout on API proxy calls — added `AbortSignal.timeout(10_000)` (2026-03-24)
 - 🔲 RVOL_AMBER/RVOL_HOT hardcoded in CandlestickChart — should be in `constants/chart.js`
 - 🔲 `setTheme()` mutates DOM inside store action — ideally a `useEffect` in App.jsx
 
@@ -61,11 +61,28 @@
 
 ## ✅ Completed Phases — Archive
 
+### Chart Stability — Preset Switch Crash Fix (2026-03-24)
+- Fixed overlay effect bodies (EMA, VWAP, Bollinger, Level) — wrapped all `addSeries()`/`setData()` in try/catch + `disposedRef` guard
+- Fixed RSI/MACD mini chart crosshair handler stale reference race — handlers now read `chartRef.current` (live ref) instead of stale closure capture
+- Fixed CandlestickChart prepend null guard — added `?.` optional chaining on `chartRef.current` in scroll-back + fitContent paths
+- Root cause: preset switching changes indicators + timeframe simultaneously, effects fire during chart teardown, uncaught errors crash the app
+
+### Security Hardening (2026-03-24)
+- CSP hardened: added `base-uri 'self'`, `form-action 'self'`, `object-src 'none'`, `upgrade-insecure-requests`
+- Added `Cross-Origin-Opener-Policy: same-origin` + `Cross-Origin-Resource-Policy: same-origin` (Spectre mitigations)
+- Expanded `Permissions-Policy` to 14 disabled APIs (inc. `interest-cohort` for FLoC/Topics opt-out)
+- Added `X-XSS-Protection: 0` (modern best practice — disable legacy XSS filter, rely on CSP)
+- Fixed Vercel header routing: `/(.*)`  → `/:path*` (catch-all now matches root `/`)
+- API endpoints: `AbortSignal.timeout(10_000)` on all upstream fetches, `crypto.randomUUID()` for request IDs
+- CI pipeline: added `npm audit --audit-level=high` + `lockfile-lint` steps
+- Dependabot: automated weekly PRs for npm deps + GitHub Actions versions
+- Timezone fix: `toETTime()` normalizes ICU hour 24 → 0 for cross-platform midnight handling
+
 ### Trading Roadmap Page + Enhancements (2026-03-24)
 - Standalone page at `/roadmap` — separate Vite entry point (`roadmap.html` + `src/roadmap-main.jsx`)
 - Full-page interactive learning tracker: 16 phases, 86 topics, 500+ concepts
-- Independent of chart app — no stores, no TanStack Query, no chart code loaded
-- Shares CSS theme system (3 themes + accent colors) and font preloads
+- Fully independent of chart app — no stores, no TanStack Query, no chart code, own CSS (`roadmap.css`)
+- Own fixed dark color scheme — does NOT inherit main app's theme system (dark/terminal/lumpia)
 - Progress tracking via localStorage (`cheechart-roadmap-done`) with checkboxes and progress bar
 - Detail panel: desktop side panel (380px) / mobile bottom sheet overlay
 - Search across topics, concepts, and resources

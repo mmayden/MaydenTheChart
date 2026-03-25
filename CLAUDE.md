@@ -395,11 +395,15 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Open Graph meta tags required in `index.html` for social sharing previews
 - Error tracking via Sentry free tier (5K errors/month, session replay)
 
-## Known issues (from 2026-03-18 deep assessment)
+## Known issues (from 2026-03-18 deep assessment, updated 2026-03-24)
 
 ### High — RESOLVED
 - ~~`BottomSheet` CSS missing `safe-area-inset-bottom`~~ — fixed: `padding-bottom: env(safe-area-inset-bottom)` added
 - ~~`usePullToRefresh.js` dependency array~~ — fixed: replaced state deps with refs, effect now stable
+- ~~Preset switching crashes~~ — fixed (2026-03-24): overlay effects wrapped in try/catch + `disposedRef`, mini chart crosshair handlers read live ref, CandlestickChart prepend null guard added
+- ~~API request IDs use `Math.random()`~~ — fixed (2026-03-24): switched to `crypto.randomUUID()`
+- ~~No explicit fetch timeout on API proxy calls~~ — fixed (2026-03-24): `AbortSignal.timeout(10_000)` on all upstream fetches
+- ~~Security headers not reaching root path~~ — fixed (2026-03-24): `/(.*)`  → `/:path*` in vercel.json
 
 ### Medium — address when touching related code
 - `CandlestickChart.jsx`: `relativeVolume(bars)` not wrapped in `useMemo` — recalculates every render
