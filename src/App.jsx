@@ -20,7 +20,6 @@ import { useLiveFeed } from './hooks/useLiveFeed'
 import { useInfiniteHistory } from './hooks/useInfiniteHistory'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import { useAlertChecker } from './hooks/useAlertChecker'
-import { useSwipeGesture } from './hooks/useSwipeGesture'
 import { usePullToRefresh } from './hooks/usePullToRefresh'
 import { useURLState } from './hooks/useURLState'
 import { useChartStore } from './store/useChartStore'
@@ -114,10 +113,6 @@ export default function App() {
   // Pull-to-refresh on mobile
   const { pullProgress, isRefreshing } = usePullToRefresh({ onRefresh: refetch })
 
-  // Swipe gestures — open/close sidebar on touch devices
-  const openSidebar  = useCallback(() => useChartStore.getState().setSidebarOpen(true), [])
-  const closeSidebar = useCallback(() => useChartStore.getState().setSidebarOpen(false), [])
-  useSwipeGesture({ onSwipeRight: openSidebar, onSwipeLeft: closeSidebar })
 
   // Orientation change — nudge chart to remeasure after rotation
   useEffect(() => {
