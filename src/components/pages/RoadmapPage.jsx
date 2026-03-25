@@ -86,7 +86,7 @@ function NodeCard({ node, phase, isDone, isActive, onToggleDone, onSelect }) {
           style={{ color: 'var(--text-primary)' }}>
           {node.title}
         </div>
-        <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+        <div className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
           {node.sub}
         </div>
         <div className="flex items-center gap-2 mt-2">
@@ -289,33 +289,6 @@ export function RoadmapPage() {
 
   return (
     <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
-      {/* Progress header */}
-      <div
-        className="flex items-center gap-3 px-5 py-2.5 border-b border-theme shrink-0"
-        style={{ backgroundColor: 'var(--bg-base)' }}
-      >
-        <span className="text-[11px] font-mono" style={{ color: 'var(--text-muted)' }}>
-          <span className="text-accent font-medium">{done.size}</span>
-          <span style={{ opacity: 0.5 }}> / </span>
-          {TOTAL_NODES} done
-        </span>
-        <div className="w-28 h-1.5 rounded-full" style={{ backgroundColor: 'var(--bg-hover)' }}>
-          <div
-            className="h-1.5 rounded-full transition-all duration-300"
-            style={{ width: `${pct}%`, background: 'linear-gradient(90deg, var(--accent-dim), var(--accent))' }}
-          />
-        </div>
-        <span className="text-[11px] font-mono font-medium text-accent">{pct}%</span>
-        {done.size > 0 && (
-          <button
-            onClick={resetProgress}
-            className="ml-auto text-[10px] font-mono px-2 py-0.5 rounded border border-theme-mid text-theme-muted hover:text-theme hover:bg-theme-hover transition-colors"
-          >
-            Reset
-          </button>
-        )}
-      </div>
-
       {/* Main layout */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Roadmap content */}
@@ -323,76 +296,134 @@ export function RoadmapPage() {
           className={`flex-1 overflow-y-auto ${isMobile ? 'px-3 py-4' : 'px-6 py-6'}`}
           style={{ maxWidth: panelOpen && !isMobile ? 'calc(100% - 380px)' : '100%' }}
         >
-          {/* Hero */}
-          <div className="text-center mb-8">
-            <span
-              className="inline-block text-[11px] font-mono uppercase tracking-widest px-3 py-1 rounded-full border mb-4"
-              style={{ color: 'var(--accent)', borderColor: 'var(--accent-dim)', backgroundColor: 'color-mix(in srgb, var(--accent) 6%, transparent)' }}
-            >
-              Complete Deep-Dive Roadmap
-            </span>
-            <h1 className={`font-semibold tracking-tight leading-tight mb-3 ${isMobile ? 'text-2xl' : 'text-4xl'}`}>
-              Trading Mastery<br />
-              <span className="text-accent">The Full Path</span>
-            </h1>
-            <p className="text-sm max-w-lg mx-auto leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              {beginnerOnly
-                ? 'A curated path through the essentials — chart literacy, key indicators, risk management, and trading psychology. Master these before going deeper.'
-                : '16 phases. 86 topics. Every concept, tool, and discipline you need — from market fundamentals to professional-grade execution. Click any node to explore in depth.'}
-            </p>
-            <div className="flex justify-center gap-8 mt-5">
-              {[
-                { num: beginnerOnly ? String(BEGINNER_PHASE_IDS.size) : '16', lbl: 'Phases' },
-                { num: beginnerOnly ? String(BEGINNER_NODE_COUNT) : '86', lbl: 'Topics' },
-                { num: '500+', lbl: 'Concepts' },
-              ].map(({ num, lbl }) => (
-                <div key={lbl} className="text-center">
-                  <div className="text-xl font-mono font-medium" style={{ color: 'var(--text-primary)' }}>{num}</div>
-                  <div className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{lbl}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Beginner path toggle */}
-            <div className="flex justify-center mt-4">
-              <button
-                type="button"
-                onClick={toggleBeginner}
-                className="text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 rounded-full border transition-colors"
+          {/* Hero banner */}
+          <div
+            className={`-mx-6 -mt-6 ${isMobile ? '-mx-3 -mt-4' : ''} mb-6 border-b relative overflow-hidden`}
+            style={{ borderColor: 'var(--border)' }}
+          >
+            {/* Mesh gradient background */}
+            <div className="absolute inset-0 pointer-events-none hero-glow" />
+            <div className={`relative text-center ${isMobile ? 'px-4 pt-8 pb-6' : 'px-8 pt-12 pb-8'}`}>
+              <span
+                className="inline-block text-[10px] font-mono uppercase tracking-[0.2em] px-4 py-1.5 rounded-full border mb-5"
                 style={{
-                  color: beginnerOnly ? 'var(--bg-surface)' : 'var(--accent)',
-                  borderColor: 'var(--accent-dim)',
-                  backgroundColor: beginnerOnly ? 'var(--accent)' : 'color-mix(in srgb, var(--accent) 8%, transparent)',
+                  color: '#00d4aa',
+                  borderColor: 'rgba(0, 212, 170, 0.25)',
+                  backgroundColor: 'rgba(0, 212, 170, 0.06)',
+                  boxShadow: '0 0 24px rgba(0, 212, 170, 0.1)',
                 }}
               >
-                {beginnerOnly ? 'Showing Beginner Path' : 'Show Beginner Path'}
-              </button>
-            </div>
-          </div>
+                Complete Deep-Dive Roadmap
+              </span>
+              <h1 className={`font-bold tracking-tight leading-none mb-4 ${isMobile ? 'text-3xl' : 'text-5xl'}`}>
+                <span style={{ color: '#fff' }}>Trading Mastery</span>
+                <br />
+                <span
+                  style={{
+                    background: 'linear-gradient(135deg, #00d4aa 0%, #ff8c32 50%, #ff6b8a 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }}
+                >
+                  The Full Path
+                </span>
+              </h1>
+              <p className={`max-w-lg mx-auto leading-relaxed ${isMobile ? 'text-sm' : 'text-[15px]'}`} style={{ color: 'var(--text-secondary)' }}>
+                {beginnerOnly
+                  ? 'A curated path through the essentials — chart literacy, key indicators, risk management, and trading psychology. Master these before going deeper.'
+                  : '16 phases. 86 topics. Every concept, tool, and discipline you need — from market fundamentals to professional-grade execution. Click any node to explore in depth.'}
+              </p>
 
-          {/* Search */}
-          <div className="relative mb-6 max-w-xl mx-auto">
-            <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
-              width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              strokeWidth="2" strokeLinecap="round" style={{ color: 'var(--text-muted)' }}
-            >
-              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search topics, concepts, resources..."
-              className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-theme text-sm outline-none transition-colors focus:border-accent bg-input"
-              style={{ color: 'var(--text-primary)' }}
-            />
+              {/* Stats */}
+              <div className="flex justify-center gap-10 mt-7">
+                {[
+                  { num: beginnerOnly ? String(BEGINNER_PHASE_IDS.size) : '16', lbl: 'Phases', clr: '#00d4aa' },
+                  { num: beginnerOnly ? String(BEGINNER_NODE_COUNT) : '86', lbl: 'Topics', clr: '#ff8c32' },
+                  { num: '500+', lbl: 'Concepts', clr: '#ff6b8a' },
+                ].map(({ num, lbl, clr }) => (
+                  <div key={lbl} className="text-center">
+                    <div className="text-2xl font-mono font-bold" style={{ color: clr }}>{num}</div>
+                    <div className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: 'var(--text-secondary)' }}>{lbl}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Progress */}
+              <div className="flex items-center justify-center gap-3 mt-6">
+                <span className="text-[11px] font-mono" style={{ color: 'var(--text-secondary)' }}>
+                  <span style={{ color: '#00d4aa' }} className="font-medium">{done.size}</span>
+                  <span style={{ opacity: 0.4 }}> / </span>
+                  {TOTAL_NODES}
+                </span>
+                <div className="w-36 h-1.5 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}>
+                  <div
+                    className="h-1.5 rounded-full transition-all duration-500"
+                    style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #00d4aa, #ff8c32, #ff6b8a)' }}
+                  />
+                </div>
+                <span className="text-[11px] font-mono font-medium" style={{ color: '#00d4aa' }}>{pct}%</span>
+                {done.size > 0 && (
+                  <button
+                    onClick={resetProgress}
+                    className="text-[10px] font-mono px-2 py-0.5 rounded border transition-colors"
+                    style={{ borderColor: 'var(--border-mid)', color: 'var(--text-secondary)' }}
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+
+              {/* Beginner path toggle */}
+              <div className="flex justify-center mt-5">
+                <button
+                  type="button"
+                  onClick={toggleBeginner}
+                  className="text-[11px] font-mono uppercase tracking-wider px-4 py-2 rounded-full border transition-all"
+                  style={{
+                    color: beginnerOnly ? '#0c0915' : '#00d4aa',
+                    borderColor: beginnerOnly ? '#00d4aa' : 'rgba(0, 212, 170, 0.3)',
+                    backgroundColor: beginnerOnly ? '#00d4aa' : 'rgba(0, 212, 170, 0.06)',
+                    boxShadow: beginnerOnly ? '0 0 20px rgba(0, 212, 170, 0.35)' : 'none',
+                    fontWeight: beginnerOnly ? 600 : 400,
+                  }}
+                >
+                  {beginnerOnly ? 'Showing Beginner Path' : 'Show Beginner Path'}
+                </button>
+              </div>
+
+              {/* Search */}
+              <div className="relative mt-6 max-w-xl mx-auto">
+                <svg
+                  className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
+                  width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  strokeWidth="2" strokeLinecap="round" style={{ color: 'var(--text-muted)' }}
+                >
+                  <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search topics, concepts, resources..."
+                  className="w-full pl-11 pr-4 py-3 rounded-xl text-sm outline-none transition-all"
+                  style={{
+                    color: 'var(--text-primary)',
+                    backgroundColor: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+                  }}
+                  onFocus={(e) => { e.target.style.borderColor = 'rgba(0,212,170,0.4)'; e.target.style.boxShadow = '0 4px 20px rgba(0,212,170,0.1)' }}
+                  onBlur={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.08)'; e.target.style.boxShadow = '0 4px 16px rgba(0,0,0,0.25)' }}
+                />
+              </div>
+            </div>
           </div>
 
           {/* Legend */}
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 mb-6">
             {PHASES.map((p) => (
-              <div key={p.id} className="flex items-center gap-1.5 text-[11px]" style={{ color: 'var(--text-muted)' }}>
+              <div key={p.id} className="flex items-center gap-1.5 text-[11px]" style={{ color: 'var(--text-secondary)' }}>
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
                 {p.label.split('—')[1]?.trim()}
               </div>
@@ -411,7 +442,7 @@ export function RoadmapPage() {
                   {phase.num}
                 </div>
                 <span className="text-[10px] font-mono uppercase tracking-wider whitespace-nowrap"
-                  style={{ color: 'var(--text-muted)' }}>
+                  style={{ color: 'var(--text-secondary)' }}>
                   {phase.label}
                 </span>
                 {phase.est && (

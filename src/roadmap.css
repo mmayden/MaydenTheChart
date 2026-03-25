@@ -52,34 +52,38 @@ body,
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #111111;
+  background: #0c0915;
 }
 ::-webkit-scrollbar-thumb {
-  background: #374151;
+  background: #2a2240;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #4b5563;
+  background: #3d3460;
 }
 
 /* ── Roadmap color scheme (fixed dark — independent from main app) ───── */
 
 :root {
-  --bg-base:      #0a0a0a;
-  --bg-surface:   #0d1117;
-  --border:       #1f2937;
-  --border-base:  #1f2937;
-  --border-mid:   #374151;
-  --text-primary: #f3f4f6;
-  --text-secondary: #d1d5db;
-  --text-muted:   #6b7280;
-  --hover-bg:     #1f2937;
-  --accent:       #60a5fa;
-  --accent-dim:   #172554;
-  --btn-primary:  #2563eb;
-  --btn-primary-hover: #3b82f6;
-  --input-bg:     #0a0a0a;
-  --focus-ring:   #3b82f6;
+  --bg-base:      #0c0915;
+  --bg-surface:   #140f20;
+  --border:       #2a2240;
+  --border-base:  #2a2240;
+  --border-mid:   #3d3460;
+  --text-primary: #f0eef5;
+  --text-secondary: #b8b0cc;
+  --text-muted:   #6e6488;
+  --hover-bg:     #1e1830;
+  --accent:       #00d4aa;
+  --accent-dim:   #0a2a22;
+  --btn-primary:  #00d4aa;
+  --btn-primary-hover: #00e8bb;
+  --input-bg:     #110d1c;
+  --focus-ring:   #00d4aa;
+  --glow-primary: rgba(0, 212, 170, 0.15);
+  --glow-secondary: rgba(255, 140, 50, 0.12);
+  --neon-orange:  #ff8c32;
+  --neon-rose:    #ff6b8a;
 
   --safe-top:    env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -151,12 +155,33 @@ html, body, #root {
   padding-bottom: 6px;
   border-bottom: 1px solid var(--border-base);
 }
+.roadmap-node {
+  background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.015) 100%);
+  border-color: rgba(255,255,255,0.07) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
 .roadmap-node:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px);
+  background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
+  border-color: rgba(255,255,255,0.14) !important;
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255,255,255,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.06);
 }
 .roadmap-node-active {
-  box-shadow: 0 0 0 1px var(--accent), 0 4px 16px rgba(0, 0, 0, 0.3);
+  border-color: var(--accent) !important;
+  box-shadow:
+    0 0 0 1px var(--accent),
+    0 8px 32px rgba(0, 212, 170, 0.2),
+    0 0 60px rgba(0, 212, 170, 0.06);
+}
+.hero-glow {
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 15%, rgba(0, 212, 170, 0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 25%, rgba(255, 140, 50, 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 85%, rgba(255, 107, 138, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 30% 30% at 50% 40%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
 }
 
 /* ── Touch targets ───────────────────────────────────────────────────── */

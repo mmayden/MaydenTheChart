@@ -61,11 +61,13 @@
 
 ## ✅ Completed Phases — Archive
 
-### Roadmap Header Redesign (2026-03-25)
-- Cleaner chevron back button with hover animation + accent color transition
-- "cheechart" branding right-aligned in header for identity
-- Progress bar: taller (`h-1.5`), darker bg (`--bg-base`) for visual separation
-- Active node glow style added in `roadmap.css`
+### Roadmap Visual Overhaul (2026-03-25)
+- **Color scheme:** deep indigo base (`#0c0915`) with teal/orange/rose accents — replaced cold blue/black monotone
+- **Hero:** mesh gradient glow backdrop, gradient text (teal→orange→rose), colorful stats, glass search bar
+- **Cards:** glass gradient bg, 3px hover lift with layered shadows + inset highlight, active teal glow
+- **Header:** `[< Back] | [CHEECHART BETA] ——— Trading Roadmap` with gradient title, responsive `px-4 md:px-8`
+- Progress bar moved from separate row into hero content
+- Standalone color scheme fully independent from main app themes
 
 ### Mobile BottomNav UX Overhaul (2026-03-25)
 - Replaced scrollable timeframe pills + "more" popover with compact timeframe dropdown + direct panel buttons

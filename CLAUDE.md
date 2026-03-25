@@ -113,9 +113,10 @@ URL state sync via query params only (?s=QQQ&tf=5m&p=full&panel=backtest).
 
 **Multi-page build:** Vite builds two HTML entry points (`index.html` + `roadmap.html`).
 The roadmap page is fully independent — no chart code, no TanStack Query, no stores,
-and its own standalone CSS (`roadmap.css`) with a fixed dark color scheme. It does NOT
-inherit the main app's theme system (dark/terminal/lumpia) — the roadmap always renders
-with its own colors regardless of chart app settings. Shares only self-hosted fonts.
+and its own standalone CSS (`roadmap.css`) with a vibrant dark color scheme (deep indigo
+base, teal/orange/rose accents, mesh gradient hero). It does NOT inherit the main app's
+theme system (dark/terminal/lumpia) — the roadmap always renders with its own colors
+regardless of chart app settings. Shares only self-hosted fonts.
 Linked from TopNav "Learn" button. Vercel rewrite routes `/roadmap`
 to `/roadmap.html` before the SPA catch-all. Features: curated beginner path filter
 (P1–P5 + P10 Risk Management + P11 Psychology — persisted), estimated time per phase, "Mastered" badge on 100% phase completion,
@@ -339,7 +340,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 ### Standalone Pages (separate Vite entry points)
 - Roadmap HTML entry: `roadmap.html` — `/roadmap` route, own OG/SEO meta tags
 - Roadmap JS entry: `src/roadmap-main.jsx` — minimal shell (back link, no stores/query/theme sync)
-- Roadmap CSS: `src/roadmap.css` — standalone stylesheet with fixed dark color scheme (not shared with main app)
+- Roadmap CSS: `src/roadmap.css` — standalone stylesheet with vibrant dark color scheme (deep indigo, teal/orange/rose accents — not shared with main app)
 - Roadmap component: `src/components/pages/RoadmapPage.jsx` — 16-phase interactive learning tracker with progress persistence, beginner filter, mastered badges
 - Roadmap data (86 topics): `src/constants/roadmap.js` — phases, nodes, concepts, resources, tips, estimated times per phase, `BEGINNER_PHASE_IDS` / `BEGINNER_PHASES` / `BEGINNER_NODE_COUNT` exports
 
