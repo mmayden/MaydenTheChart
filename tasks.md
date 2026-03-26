@@ -24,10 +24,12 @@
 ### Medium Priority
 - 🔲 No mobile component tests — BottomNav, BottomSheet, useMediaQuery, usePullToRefresh have zero test coverage
 - 🔲 No localStorage schema migration system — adding new fields to journal/presets silently drops old entries' data
-- 🔲 `setTheme()` mutates DOM inside store action — ideally a `useEffect` in App.jsx
 - 🔲 WatchlistPanel manages localStorage directly instead of a Zustand store (pattern divergence)
-- 🔲 SettingsModal uses raw inline styles throughout instead of CSS variables / Tailwind
-- 🔲 RoadmapPage: `div[role=checkbox]` missing `tabIndex` + keyboard handler for accessibility
+- ✅ `setTheme()` DOM mutation moved to `useEffect` in App.jsx (2026-03-26)
+- ✅ SettingsModal refactored — inline styles replaced with CSS classes + Tailwind utilities (2026-03-26)
+- ✅ RoadmapPage: `div[role=checkbox]` now has `tabIndex={0}` + keyboard handler (2026-03-26)
+- ✅ Axios timeout (10s) added to dataProvider.js fetchBars/fetchSnapshot (2026-03-26)
+- ✅ `lumpia` theme ID renamed to `lumpio` across CSS, constants, tests, docs (2026-03-26)
 
 ---
 
@@ -58,7 +60,7 @@
 - **useInfiniteHistory:** Removed `bars` from `useCallback` deps (was causing chart subscription teardown/resubscribe on every live tick). Replaced permanent `isFetchingRef` lock with `hasMoreRef` that resets on symbol/timeframe change.
 - **useLiveFeed:** Removed unused `wsStatus`/`isMarketOpen` store subscriptions that caused unnecessary App re-renders (return value was discarded).
 - **timezone.js:** Module-level `DateTimeFormat` singletons (was re-instantiating on every call). Added shared `getTodayKey()` util, deduplicated across 4 hooks + StatusBar.
-- **Dead code removal:** `lumpia-*` localStorage migration (7 references), `createAlpacaSocket` alias, `getProviderName()`, unused `getStats()`/`getRecentEntries()` from journal store (+ fixed array mutation bug in `getRecentEntries`).
+- **Dead code removal:** `lumpio-*` localStorage migration (7 references), `createAlpacaSocket` alias, `getProviderName()`, unused `getStats()`/`getRecentEntries()` from journal store (+ fixed array mutation bug in `getRecentEntries`).
 - **BottomNav:** Extracted 4 copy-pasted panel buttons to a `PANEL_BUTTONS` data array + `.map()`. Removed direct `queryClient.invalidateQueries` (wrong layer — store handles this).
 - **CSS:** Removed stale roadmap rules from `index.css` (conflicted with `roadmap.css`). Added missing `--bg-hover` to `roadmap.css`. Removed unused `@theme` indicator color tokens (`--color-ema-*`, `--color-vwap`, `--color-level`, `--color-orb`, `--color-terminal-*`). Moved toast keyframes from inline `<style>` to `index.css`, removed dead `toast-fade-out`.
 - **confluence.js:** Fixed phantom score on neutral input — removed `dominantPct * 0.3` bonus that gave 15 points to genuinely neutral setups.
@@ -122,7 +124,7 @@
 - Standalone page at `/roadmap` — separate Vite entry point (`roadmap.html` + `src/roadmap-main.jsx`)
 - Full-page interactive learning tracker: 16 phases, 86 topics, 500+ concepts
 - Fully independent of chart app — no stores, no TanStack Query, no chart code, own CSS (`roadmap.css`)
-- Own fixed dark color scheme — does NOT inherit main app's theme system (dark/terminal/lumpia)
+- Own fixed dark color scheme — does NOT inherit main app's theme system (dark/terminal/lumpio)
 - Progress tracking via localStorage (`lumpio-roadmap-done`) with checkboxes and progress bar
 - Detail panel: desktop side panel (380px) / mobile bottom sheet overlay
 - Search across topics, concepts, and resources

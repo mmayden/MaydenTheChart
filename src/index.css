@@ -136,7 +136,7 @@ body,
   --focus-ring:   #50d050;
 }
 
-[data-theme="lumpia"] {
+[data-theme="lumpio"] {
   --bg-base:      #080808;
   --bg-surface:   #0E0C0A;
   --border:       #2A1C10;
@@ -608,6 +608,113 @@ body,
   /* Disable confluence pulse */
   .confluence-pulse {
     animation: none;
+  }
+}
+
+/* ── Settings modal utilities ────────────────────────────────────────────── */
+
+.settings-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+}
+
+.settings-card {
+  width: 680px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+  font-family: monospace;
+}
+
+.settings-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 20px;
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: color 0.15s;
+}
+.settings-close-btn:hover {
+  color: var(--text-primary);
+}
+
+.settings-tab-btn {
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  font-family: monospace;
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+}
+.settings-tab-btn[data-active="true"] {
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+}
+
+.settings-section-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.settings-shortcut-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+}
+
+.settings-kbd {
+  font-size: 11px;
+  font-family: monospace;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--border);
+  color: var(--text-primary);
+  border: 1px solid var(--border-mid, var(--border));
+  min-width: 24px;
+  text-align: center;
+}
+
+.settings-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-close-btn,
+  .settings-tab-btn {
+    transition: none;
   }
 }
 

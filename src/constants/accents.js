@@ -28,7 +28,7 @@ export const ACCENT_PRESETS = {
     { id: 'rose',   color: '#d07080', dim: '#280810', btn: '#903848', btnHover: '#b04858', ring: '#d07080' },
     { id: 'blue',   color: '#6090d0', dim: '#081028', btn: '#305088', btnHover: '#4068a8', ring: '#6090d0' },
   ],
-  lumpia: [
+  lumpio: [
     { id: 'ember',  color: '#C85818', dim: '#481808', btn: '#a04010', btnHover: '#C85818', ring: '#C85818' },
     { id: 'gold',   color: '#d0a030', dim: '#382808', btn: '#a07818', btnHover: '#c89828', ring: '#d0a030' },
     { id: 'sage',   color: '#80b868', dim: '#182810', btn: '#508038', btnHover: '#68a050', ring: '#80b868' },
@@ -40,7 +40,7 @@ export const ACCENT_PRESETS = {
 
 /**
  * Build a lookup map from the ACCENT_PRESETS arrays for fast access by theme+id.
- * Returns { dark: { blue: {...}, purple: {...} }, terminal: {...}, lumpia: {...} }
+ * Returns { dark: { blue: {...}, purple: {...} }, terminal: {...}, lumpio: {...} }
  */
 export function buildAccentLookup() {
   const lookup = {}

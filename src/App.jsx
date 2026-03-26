@@ -90,6 +90,16 @@ export default function App() {
   useURLState()
   const toast = useToast()
 
+  // Clear accent CSS overrides when theme changes (each theme has its own defaults)
+  useEffect(() => {
+    const root = document.documentElement
+    root.style.removeProperty('--accent')
+    root.style.removeProperty('--accent-dim')
+    root.style.removeProperty('--btn-primary')
+    root.style.removeProperty('--btn-primary-hover')
+    root.style.removeProperty('--focus-ring')
+  }, [theme])
+
   // Apply persisted preset on mount
   useEffect(() => {
     const { activePresetId, applyPreset } = usePresetsStore.getState()

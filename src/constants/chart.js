@@ -51,7 +51,7 @@ export const RVOL_THRESHOLD    = 1.5
 export const CANDLE_COLORS = {
   dark:     { up: '#22c55e', down: '#ef4444' },
   terminal: { up: '#22c55e', down: '#ef4444' },
-  lumpia:   { up: '#48B068', down: '#D44020' },
+  lumpio:   { up: '#48B068', down: '#D44020' },
 }
 
 // ─── RSI mini chart colors ───────────────────────────────────────────────────

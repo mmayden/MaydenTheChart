@@ -12,6 +12,7 @@ import { useChartStore } from '../../store/useChartStore'
 import { ACCENT_PRESETS } from '../../constants/accents'
 
 // ── Theme schemes ───────────────────────────────────────────────────────────
+// Preview colors are hardcoded hex values — they show what each theme looks like
 
 const SCHEMES = [
   {
@@ -28,7 +29,7 @@ const SCHEMES = [
     },
   },
   {
-    id: 'lumpia',
+    id: 'lumpio',
     name: 'Lumpio',
     description: 'Dark espresso & gold — rich, warm, earthy',
     preview: {
@@ -92,29 +93,26 @@ function SchemeCard({ scheme, active, onSelect }) {
   return (
     <button
       onClick={() => onSelect(scheme.id)}
+      className="w-full text-left outline-none cursor-pointer"
       style={{
         background: p.bg,
         border: `2px solid ${active ? p.accent : p.border}`,
         borderRadius: 10,
-        padding: '16px',
-        cursor: 'pointer',
-        outline: 'none',
-        width: '100%',
-        textAlign: 'left',
+        padding: 16,
         transition: 'border-color 0.15s, box-shadow 0.15s',
         boxShadow: active ? `0 0 0 3px ${p.accent}44` : 'none',
       }}
     >
-      {/* Mini UI preview */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 12, height: 52 }}>
-        <div style={{ width: 28, borderRadius: 4, background: p.surface, border: `1px solid ${p.border}`, flexShrink: 0 }} />
-        <div style={{ flex: 1, borderRadius: 4, border: `1px solid ${p.border}`, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ height: 12, background: p.surface, borderBottom: `1px solid ${p.border}`, display: 'flex', alignItems: 'center', paddingLeft: 6, gap: 3 }}>
+      {/* Mini UI preview — uses hardcoded theme preview hex values */}
+      <div className="flex gap-1.5 mb-3" style={{ height: 52 }}>
+        <div className="shrink-0" style={{ width: 28, borderRadius: 4, background: p.surface, border: `1px solid ${p.border}` }} />
+        <div className="flex-1 flex flex-col overflow-hidden" style={{ borderRadius: 4, border: `1px solid ${p.border}` }}>
+          <div className="flex items-center gap-0.5" style={{ height: 12, background: p.surface, borderBottom: `1px solid ${p.border}`, paddingLeft: 6 }}>
             <div style={{ width: 16, height: 4, borderRadius: 2, background: p.accent }} />
             <div style={{ width: 10, height: 4, borderRadius: 2, background: p.muted }} />
           </div>
-          <div style={{ flex: 1, background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 20 }}>
+          <div className="flex-1 flex items-center justify-center" style={{ background: '#0a0a0a' }}>
+            <div className="flex items-end gap-0.5" style={{ height: 20 }}>
               {[14, 18, 12, 22, 16, 20, 10, 24, 18].map((h, i) => (
                 <div key={i} style={{ width: 3, height: h, borderRadius: 1, background: i % 3 === 0 ? '#ef4444' : '#22c55e', opacity: 0.8 }} />
               ))}
@@ -124,7 +122,7 @@ function SchemeCard({ scheme, active, onSelect }) {
       </div>
 
       {/* Labels */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className="flex justify-between items-start">
         <div>
           <div style={{ fontFamily: "'Boogaloo', cursive", fontSize: 16, color: p.accent, marginBottom: 2 }}>
             {scheme.name}
@@ -133,11 +131,10 @@ function SchemeCard({ scheme, active, onSelect }) {
             {scheme.description}
           </div>
         </div>
-        <div style={{
-          width: 18, height: 18, borderRadius: '50%', flexShrink: 0, marginTop: 2,
+        <div className="shrink-0 flex items-center justify-center" style={{
+          width: 18, height: 18, borderRadius: '50%', marginTop: 2,
           background: active ? p.accent : 'transparent',
           border: `2px solid ${active ? p.accent : p.muted}`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           {active && (
             <svg width="9" height="9" viewBox="0 0 10 8" fill="none">
@@ -181,12 +178,7 @@ export function SettingsModal({ onClose }) {
     /* Backdrop */
     <motion.div
       onClick={onClose}
-      style={{
-        position: 'fixed', inset: 0, zIndex: 1000,
-        background: 'rgba(0,0,0,0.65)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        backdropFilter: 'blur(3px)',
-      }}
+      className="settings-backdrop"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -199,64 +191,28 @@ export function SettingsModal({ onClose }) {
         aria-label="Settings"
         onClick={(e) => e.stopPropagation()}
         data-theme={theme}
-        style={{
-          width: 680,
-          maxWidth: 'calc(100vw - 32px)',
-          maxHeight: 'calc(100vh - 48px)',
-          overflowY: 'auto',
-          background: 'var(--bg-base)',
-          color: 'var(--text-primary)',
-          borderRadius: 14,
-          border: '1px solid var(--border)',
-          boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
-          fontFamily: 'monospace',
-        }}
+        className="settings-card"
         initial={{ scale: 0.95, opacity: 0, y: 12 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0, y: 12 }}
         transition={{ duration: motionDuration, ease: [0.4, 0, 0.2, 1] }}
       >
         {/* Header */}
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '20px 24px 0',
-        }}>
-          <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: '0.04em' }}>Settings</div>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: 'var(--text-muted)', fontSize: 20, lineHeight: 1,
-              padding: '4px 6px', borderRadius: 6,
-              transition: 'color 0.15s',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-primary)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
-          >
-            ×
+        <div className="flex items-center justify-between px-6 pt-5">
+          <div className="text-[17px] font-bold tracking-wide">Settings</div>
+          <button onClick={onClose} className="settings-close-btn">
+            &times;
           </button>
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: 0, padding: '12px 24px 0', borderBottom: '1px solid var(--border)' }}>
+        <div className="flex gap-0 px-6 pt-3 border-b border-theme">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              style={{
-                padding: '8px 16px',
-                fontSize: 12,
-                fontWeight: 600,
-                letterSpacing: '0.04em',
-                background: 'none',
-                border: 'none',
-                borderBottom: activeTab === tab.id ? '2px solid var(--accent)' : '2px solid transparent',
-                color: activeTab === tab.id ? 'var(--accent)' : 'var(--text-muted)',
-                cursor: 'pointer',
-                transition: 'color 0.15s, border-color 0.15s',
-                fontFamily: 'monospace',
-                marginBottom: -1,
-              }}
+              className="settings-tab-btn"
+              data-active={activeTab === tab.id}
             >
               {tab.label}
             </button>
@@ -264,15 +220,15 @@ export function SettingsModal({ onClose }) {
         </div>
 
         {/* Body */}
-        <div style={{ padding: '24px' }}>
+        <div className="p-6">
 
           {/* Appearance tab */}
           {activeTab === 'appearance' && (
             <div>
-              <div style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 14 }}>
+              <div className="settings-section-label mb-3.5">
                 Color Scheme
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+              <div className="grid grid-cols-3 gap-3">
                 {SCHEMES.map((s) => (
                   <SchemeCard
                     key={s.id}
@@ -284,11 +240,11 @@ export function SettingsModal({ onClose }) {
               </div>
 
               {/* Accent color picker */}
-              <div style={{ marginTop: 24 }}>
-                <div style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 10 }}>
+              <div className="mt-6">
+                <div className="settings-section-label mb-2.5">
                   Accent Color
                 </div>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <div className="flex gap-2 flex-wrap">
                   {accentPresets.map((preset) => {
                     const isActive = accentId === preset.id || (!accentId && preset.id === accentPresets[0].id)
                     return (
@@ -296,9 +252,10 @@ export function SettingsModal({ onClose }) {
                         key={preset.id}
                         onClick={() => setAccentColor(preset.id, theme)}
                         title={preset.id}
+                        className="border-none cursor-pointer rounded-full"
                         style={{
-                          width: 32, height: 32, borderRadius: '50%',
-                          background: preset.color, border: 'none', cursor: 'pointer',
+                          width: 32, height: 32,
+                          background: preset.color,
                           outline: isActive ? `2px solid ${preset.color}` : '2px solid transparent',
                           outlineOffset: 3,
                           transition: 'outline-color 0.15s, transform 0.15s',
@@ -311,17 +268,11 @@ export function SettingsModal({ onClose }) {
               </div>
 
               {/* Sound alerts toggle */}
-              <div style={{ marginTop: 24 }}>
-                <div style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 10 }}>
+              <div className="mt-6">
+                <div className="settings-section-label mb-2.5">
                   Alerts
                 </div>
-                <label style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  padding: '10px 12px', borderRadius: 8,
-                  background: 'var(--bg-surface)',
-                  border: '1px solid var(--border)',
-                  cursor: 'pointer',
-                }}>
+                <label className="settings-toggle-row">
                   <input
                     type="checkbox"
                     checked={soundAlerts}
@@ -329,8 +280,8 @@ export function SettingsModal({ onClose }) {
                     style={{ accentColor: 'var(--accent)' }}
                   />
                   <div>
-                    <div style={{ fontSize: 12, color: 'var(--text-primary)' }}>Sound alerts</div>
-                    <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>Play a subtle ping when alerts trigger</div>
+                    <div className="text-xs text-theme">Sound alerts</div>
+                    <div className="text-[10px] text-theme-muted mt-0.5">Play a subtle ping when alerts trigger</div>
                   </div>
                 </label>
               </div>
@@ -339,33 +290,19 @@ export function SettingsModal({ onClose }) {
 
           {/* Shortcuts tab */}
           {activeTab === 'shortcuts' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            <div className="flex flex-col gap-6">
               {SHORTCUTS.map((group) => (
                 <div key={group.category}>
-                  <div style={{
-                    fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase',
-                    color: 'var(--text-muted)', marginBottom: 10,
-                  }}>
+                  <div className="settings-section-label mb-2.5">
                     {group.category}
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div className="flex flex-col gap-1.5">
                     {group.items.map((item, i) => (
-                      <div key={i} style={{
-                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                        padding: '8px 12px', borderRadius: 8,
-                        background: 'var(--bg-surface)',
-                        border: '1px solid var(--border)',
-                      }}>
-                        <span style={{ fontSize: 12, color: 'var(--text-primary)' }}>{item.label}</span>
-                        <div style={{ display: 'flex', gap: 4 }}>
+                      <div key={i} className="settings-shortcut-row">
+                        <span className="text-xs text-theme">{item.label}</span>
+                        <div className="flex gap-1">
                           {item.keys.map((key, j) => (
-                            <kbd key={j} style={{
-                              fontSize: 11, fontFamily: 'monospace',
-                              padding: '2px 8px', borderRadius: 4,
-                              background: 'var(--border)', color: 'var(--text-primary)',
-                              border: '1px solid var(--border-mid, var(--border))',
-                              minWidth: 24, textAlign: 'center',
-                            }}>
+                            <kbd key={j} className="settings-kbd">
                               {key}
                             </kbd>
                           ))}

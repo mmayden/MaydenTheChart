@@ -69,6 +69,8 @@ function NodeCard({ node, phase, isDone, isActive, onToggleDone, onSelect }) {
           backgroundColor: isDone ? phase.check : 'transparent',
         }}
         onClick={(e) => { e.stopPropagation(); onToggleDone(node.id) }}
+        onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); onToggleDone(node.id) } }}
+        tabIndex={0}
         role="checkbox"
         aria-checked={isDone}
         aria-label={`Mark "${node.title}" as ${isDone ? 'incomplete' : 'complete'}`}

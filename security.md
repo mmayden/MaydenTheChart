@@ -114,7 +114,7 @@ Wired into `usePresetsStore`, `useJournalStore`, `WatchlistPanel`, `SymbolInput`
 ### localStorage Key Convention
 All keys use the `lumpio-` prefix: `lumpio-theme`, `lumpio-accent`,
 `lumpio-symbol`, `lumpio-sound-alerts`, `lumpio-welcome-dismissed`.
-Legacy `lumpia-*` keys are read on startup for migration, then cleaned up on write.
+Legacy `lumpio-*` keys are read on startup for migration, then cleaned up on write.
 
 ### ErrorBoundary
 `src/components/ui/ErrorBoundary.jsx` wraps the entire app:

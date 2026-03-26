@@ -119,7 +119,7 @@ URL state sync via query params only (?s=QQQ&tf=5m&p=full&panel=backtest).
 The roadmap page is fully independent — no chart code, no TanStack Query, no stores,
 and its own standalone CSS (`roadmap.css`) with a vibrant dark color scheme (deep indigo
 base, teal/orange/rose accents, mesh gradient hero). It does NOT inherit the main app's
-theme system (dark/terminal/lumpia) — the roadmap always renders with its own colors
+theme system (dark/terminal/lumpio) — the roadmap always renders with its own colors
 regardless of chart app settings. Shares only self-hosted fonts.
 Linked from TopNav "Learn" button. Vercel rewrite routes `/roadmap`
 to `/roadmap.html` before the SPA catch-all. Features: curated beginner path filter
@@ -428,13 +428,10 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - Open Graph meta tags required in `index.html` for social sharing previews
 - Error tracking via Sentry free tier (5K errors/month, session replay)
 
-## Known issues (updated 2026-03-25)
+## Known issues (updated 2026-03-26)
 
 ### Medium — address when touching related code
 - Zero test coverage on mobile components (BottomNav, BottomSheet, useMediaQuery, usePullToRefresh)
 - No localStorage schema migration system — new fields on journal/presets silently lost on old data
-- `setTheme()` mutates DOM inside store action — ideally a `useEffect` in App.jsx
 - WatchlistPanel manages localStorage directly instead of a Zustand store (pattern divergence)
-- SettingsModal uses raw inline styles throughout instead of CSS variables / Tailwind
-- RoadmapPage: `div[role=checkbox]` missing `tabIndex` + keyboard handler for accessibility
 - Duplicate indicator computation: confluence in App.jsx recomputes EMA×3/VWAP/RSI/MACD that overlays also compute independently

@@ -43,7 +43,7 @@ export async function fetchBars(symbol, timeframe, start, end, limit = 1000) {
   const providerTimeframe = alpacaGetTimeframe(timeframe)
   const params = { symbol, timeframe: providerTimeframe, start, end, limit }
   try {
-    const { data } = await axios.get('/api/bars', { params })
+    const { data } = await axios.get('/api/bars', { params, timeout: 10_000 })
     return alpacaNormalizeBars(data.bars ?? [])
   } catch (err) {
     log.error('dataProvider', `fetchBars failed for ${symbol} ${timeframe}`, err)
@@ -62,6 +62,7 @@ export async function fetchSnapshot(symbols) {
   try {
     const { data } = await axios.get('/api/snapshot', {
       params: { symbols: symbols.join(',') },
+      timeout: 10_000,
     })
     return data.snapshots ?? {}
   } catch (err) {

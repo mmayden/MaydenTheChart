@@ -40,15 +40,7 @@ export const useChartStore = create((set) => ({
   theme: (() => { try { return localStorage.getItem('lumpio-theme') ?? 'dark' } catch { return 'dark' } })(),
   setTheme: (theme) => {
     try { localStorage.setItem('lumpio-theme', theme) } catch { /* storage unavailable */ }
-    // Clear accent overrides — each theme has its own default accent
-    try {
-      const root = document.documentElement
-      root.style.removeProperty('--accent')
-      root.style.removeProperty('--accent-dim')
-      root.style.removeProperty('--btn-primary')
-      root.style.removeProperty('--btn-primary-hover')
-      root.style.removeProperty('--focus-ring')
-    } catch { /* no DOM in test env */ }
+    // Clear persisted accent — CSS property cleanup handled by useEffect in App.jsx
     try { localStorage.removeItem('lumpio-accent') } catch { /* storage unavailable */ }
     set({ theme, accentId: null })
   },

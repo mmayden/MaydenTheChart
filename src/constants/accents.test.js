@@ -3,7 +3,7 @@ import { ACCENT_PRESETS, buildAccentLookup, ACCENT_LOOKUP } from './accents'
 
 describe('ACCENT_PRESETS', () => {
   it('has entries for all three themes', () => {
-    expect(Object.keys(ACCENT_PRESETS)).toEqual(expect.arrayContaining(['dark', 'terminal', 'lumpia']))
+    expect(Object.keys(ACCENT_PRESETS)).toEqual(expect.arrayContaining(['dark', 'terminal', 'lumpio']))
   })
 
   it('each theme has 6 accent presets', () => {
@@ -50,7 +50,7 @@ describe('buildAccentLookup', () => {
     const lookup = buildAccentLookup()
     expect(lookup.dark).toBeDefined()
     expect(lookup.terminal).toBeDefined()
-    expect(lookup.lumpia).toBeDefined()
+    expect(lookup.lumpio).toBeDefined()
   })
 
   it('maps preset fields to correct lookup keys', () => {
