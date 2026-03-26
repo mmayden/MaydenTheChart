@@ -2,7 +2,7 @@
  * SettingsModal — Full settings panel opened by the gear icon.
  *
  * Tabs:
- *   Appearance  — Color scheme selection (Default / Cheechart / Terminal)
+ *   Appearance  — Color scheme selection (Default / Lumpio / Terminal)
  *   Shortcuts   — Keyboard shortcut reference
  */
 
@@ -29,7 +29,7 @@ const SCHEMES = [
   },
   {
     id: 'lumpia',
-    name: 'Cheechart',
+    name: 'Lumpio',
     description: 'Dark espresso & gold — rich, warm, earthy',
     preview: {
       bg:      '#080808',

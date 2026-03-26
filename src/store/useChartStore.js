@@ -24,7 +24,7 @@ function _readURLSymbol() {
     const s = new URLSearchParams(window.location.search).get('s')?.toUpperCase()
     if (s && SYMBOL_RE.test(s)) return s
   } catch { /* SSR / test env */ }
-  try { return localStorage.getItem('cheechart-symbol') ?? DEFAULT_SYMBOL } catch { return DEFAULT_SYMBOL }
+  try { return localStorage.getItem('lumpio-symbol') ?? DEFAULT_SYMBOL } catch { return DEFAULT_SYMBOL }
 }
 
 function _readURLTimeframe() {
@@ -37,9 +37,9 @@ function _readURLTimeframe() {
 
 export const useChartStore = create((set) => ({
   // ─── Theme ─────────────────────────────────────────────────────────────────
-  theme: (() => { try { return localStorage.getItem('cheechart-theme') ?? 'dark' } catch { return 'dark' } })(),
+  theme: (() => { try { return localStorage.getItem('lumpio-theme') ?? 'dark' } catch { return 'dark' } })(),
   setTheme: (theme) => {
-    try { localStorage.setItem('cheechart-theme', theme) } catch { /* storage unavailable */ }
+    try { localStorage.setItem('lumpio-theme', theme) } catch { /* storage unavailable */ }
     // Clear accent overrides — each theme has its own default accent
     try {
       const root = document.documentElement
@@ -49,14 +49,14 @@ export const useChartStore = create((set) => ({
       root.style.removeProperty('--btn-primary-hover')
       root.style.removeProperty('--focus-ring')
     } catch { /* no DOM in test env */ }
-    try { localStorage.removeItem('cheechart-accent') } catch { /* storage unavailable */ }
+    try { localStorage.removeItem('lumpio-accent') } catch { /* storage unavailable */ }
     set({ theme, accentId: null })
   },
 
   // ─── Accent color ─────────────────────────────────────────────────────────
-  accentId: (() => { try { return localStorage.getItem('cheechart-accent') ?? null } catch { return null } })(),
+  accentId: (() => { try { return localStorage.getItem('lumpio-accent') ?? null } catch { return null } })(),
   setAccentColor: (id, currentTheme) => {
-    try { localStorage.setItem('cheechart-accent', id) } catch { /* storage unavailable */ }
+    try { localStorage.setItem('lumpio-accent', id) } catch { /* storage unavailable */ }
     const colors = ACCENT_LOOKUP[currentTheme]?.[id]
     if (colors) {
       try {
@@ -76,7 +76,7 @@ export const useChartStore = create((set) => ({
   selectedTimeframe: _readURLTimeframe(),
 
   setSymbol: (symbol) => {
-    try { localStorage.setItem('cheechart-symbol', symbol) } catch { /* storage unavailable */ }
+    try { localStorage.setItem('lumpio-symbol', symbol) } catch { /* storage unavailable */ }
     log.breadcrumb('navigation', 'Symbol changed', { symbol })
     set({ selectedSymbol: symbol })
   },
@@ -129,9 +129,9 @@ export const useChartStore = create((set) => ({
   endTour:   () => set({ tourActive: false }),
 
   // ─── Sound alerts ─────────────────────────────────────────────────────────
-  soundAlerts: (() => { try { return localStorage.getItem('cheechart-sound-alerts') !== 'false' } catch { return true } })(),
+  soundAlerts: (() => { try { return localStorage.getItem('lumpio-sound-alerts') !== 'false' } catch { return true } })(),
   setSoundAlerts: (enabled) => {
-    try { localStorage.setItem('cheechart-sound-alerts', String(enabled)) } catch { /* storage unavailable */ }
+    try { localStorage.setItem('lumpio-sound-alerts', String(enabled)) } catch { /* storage unavailable */ }
     set({ soundAlerts: enabled })
   },
 

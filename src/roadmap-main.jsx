@@ -30,7 +30,7 @@ function RoadmapApp() {
           Back
         </a>
         <div className="w-px h-4 mx-3" style={{ backgroundColor: 'var(--border-mid)' }} />
-        <a href="/" className="hover:opacity-80 transition-opacity shrink-0" title="Back to Cheechart">
+        <a href="/" className="hover:opacity-80 transition-opacity shrink-0" title="Back to Lumpio">
           <Logo />
         </a>
         <div className="flex-1" />

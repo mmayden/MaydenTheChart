@@ -32,7 +32,7 @@ export function Sidebar({ atrGauge }) {
     if (isMobile) return
 
     const timer = setTimeout(() => {
-      window.dispatchEvent(new Event('cheechart:layout-resize'))
+      window.dispatchEvent(new Event('lumpio:layout-resize'))
     }, 250)
 
     return () => clearTimeout(timer)

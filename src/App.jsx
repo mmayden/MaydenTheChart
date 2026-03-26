@@ -119,7 +119,7 @@ export default function App() {
     let timer
     function handleOrientation() {
       timer = setTimeout(() => {
-        window.dispatchEvent(new Event('cheechart:layout-resize'))
+        window.dispatchEvent(new Event('lumpio:layout-resize'))
       }, 200)
     }
     window.addEventListener('orientationchange', handleOrientation)
@@ -132,7 +132,7 @@ export default function App() {
   // Refs for snapshot context (avoids stale closure / declaration-order issues)
   const snapshotCtxRef = useRef({ confluence: null, dayType: null })
 
-  // Chart snapshot — listen for cheechart:snapshot custom event
+  // Chart snapshot — listen for lumpio:snapshot custom event
   useEffect(() => {
     async function handleSnapshot() {
       const chartInstance = chartRef.current?.chart?.()
@@ -155,7 +155,7 @@ export default function App() {
           toast.add({ message: 'Snapshot failed', type: 'error' })
           return
         }
-        const method = await copyToClipboard(blob, `cheechart-${sym}-${tf}.png`)
+        const method = await copyToClipboard(blob, `lumpio-${sym}-${tf}.png`)
         toast.add({
           message: method === 'clipboard' ? 'Snapshot copied to clipboard' : 'Snapshot downloaded',
           type: 'success',
@@ -164,8 +164,8 @@ export default function App() {
         toast.add({ message: 'Snapshot failed', type: 'error' })
       }
     }
-    window.addEventListener('cheechart:snapshot', handleSnapshot)
-    return () => window.removeEventListener('cheechart:snapshot', handleSnapshot)
+    window.addEventListener('lumpio:snapshot', handleSnapshot)
+    return () => window.removeEventListener('lumpio:snapshot', handleSnapshot)
   }, [toast])
 
   const tfConfig = TIMEFRAME_CONFIG[selectedTimeframe]

@@ -2,7 +2,7 @@
  * useURLState — Syncs chart state with URL search params.
  *
  * Enables shareable/bookmarkable chart views:
- *   cheechart.space?s=QQQ&tf=5m&p=full&panel=backtest
+ *   lumpio.space?s=QQQ&tf=5m&p=full&panel=backtest
  *
  * On mount: reads URL params and applies to stores.
  * On state change: updates URL params (replaceState, no navigation).

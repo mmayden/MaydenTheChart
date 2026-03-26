@@ -1,5 +1,5 @@
 /**
- * Cheechart logo — bold, rounded, hand-lettered feel.
+ * Lumpio logo — bold, rounded, hand-lettered feel.
  * Uses "Boogaloo" (loaded in index.html).
  */
 export default function Logo() {
@@ -19,7 +19,7 @@ export default function Logo() {
         userSelect: 'none',
       }}
     >
-      CHEECHART
+      LUMPIO
       <span
         style={{
           fontFamily: "'Inter', sans-serif",

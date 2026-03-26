@@ -1,6 +1,6 @@
 {
-  "name": "Cheechart — Day Trading Terminal",
-  "short_name": "Cheechart",
+  "name": "Lumpio — Day Trading Terminal",
+  "short_name": "Lumpio",
   "description": "Real-time charting terminal for day traders. Indicators, backtesting, alerts, and multi-timeframe analysis.",
   "start_url": "/",
   "display": "standalone",

@@ -1,4 +1,4 @@
-# Task List — Cheechart
+# Task List — Lumpio
 
 > Living task board. Update status as work progresses.
 > 🔲 not started | 🔄 in progress | ✅ done | ❌ blocked
@@ -62,7 +62,7 @@
 - **BottomNav:** Extracted 4 copy-pasted panel buttons to a `PANEL_BUTTONS` data array + `.map()`. Removed direct `queryClient.invalidateQueries` (wrong layer — store handles this).
 - **CSS:** Removed stale roadmap rules from `index.css` (conflicted with `roadmap.css`). Added missing `--bg-hover` to `roadmap.css`. Removed unused `@theme` indicator color tokens (`--color-ema-*`, `--color-vwap`, `--color-level`, `--color-orb`, `--color-terminal-*`). Moved toast keyframes from inline `<style>` to `index.css`, removed dead `toast-fade-out`.
 - **confluence.js:** Fixed phantom score on neutral input — removed `dominantPct * 0.3` bonus that gave 15 points to genuinely neutral setups.
-- **index.html:** Fixed `<title>` from "Beta Cheechart" to "Cheechart — Day Trading Terminal" (matches OG tags, Google indexing).
+- **index.html:** Fixed `<title>` from "Beta Lumpio" to "Lumpio — Day Trading Terminal" (matches OG tags, Google indexing).
 - **App.jsx:** Removed identical-branch ternary, removed unused `theme` prop from CrosshairLegend.
 - **292 tests passing, 0 lint errors, build successful.**
 
@@ -70,7 +70,7 @@
 - **Color scheme:** deep indigo base (`#0c0915`) with teal/orange/rose accents — replaced cold blue/black monotone
 - **Hero:** mesh gradient glow backdrop, gradient text (teal→orange→rose), colorful stats, glass search bar
 - **Cards:** glass gradient bg, 3px hover lift with layered shadows + inset highlight, active teal glow
-- **Header:** `[< Back] | [CHEECHART BETA] ——— Trading Roadmap` with gradient title, responsive `px-4 md:px-8`
+- **Header:** `[< Back] | [LUMPIO BETA] ——— Trading Roadmap` with gradient title, responsive `px-4 md:px-8`
 - Progress bar moved from separate row into hero content
 - Standalone color scheme fully independent from main app themes
 
@@ -123,7 +123,7 @@
 - Full-page interactive learning tracker: 16 phases, 86 topics, 500+ concepts
 - Fully independent of chart app — no stores, no TanStack Query, no chart code, own CSS (`roadmap.css`)
 - Own fixed dark color scheme — does NOT inherit main app's theme system (dark/terminal/lumpia)
-- Progress tracking via localStorage (`cheechart-roadmap-done`) with checkboxes and progress bar
+- Progress tracking via localStorage (`lumpio-roadmap-done`) with checkboxes and progress bar
 - Detail panel: desktop side panel (380px) / mobile bottom sheet overlay
 - Search across topics, concepts, and resources
 - Linked from TopNav "Learn" button
@@ -141,7 +141,7 @@
 - **M1:** Safe areas (`env(safe-area-inset-*)`), `100dvh` with fallback, `useMediaQuery`/`useIsMobile`/`useIsLandscape` hooks, `viewport-fit=cover`
 - **M2:** BottomNav (mobile-only): timeframe dropdown button + all 4 panel buttons (no "more" menu) + sidebar hamburger. TopNav slimmed to `h-9` with compact PriceDisplay. StatusBar mobile-optimized (dot+label only)
 - **M3:** BottomSheet component (drag handle, snap points, velocity-based dismiss). RightPanel uses bottom sheet on mobile. Chart sub-header stacks into 2 rows on mobile. ConfluenceBar dropdown repositioned for mobile. Mini chart height 70px on mobile (was 90px)
-- **M4:** Responsive font scaling (`clamp()`). Landscape mode: `landscape-hide`/`landscape-compact` utilities, mini charts hidden, status bar hidden. Chart `contain: layout style`. Orientation change fires `cheechart:layout-resize`
+- **M4:** Responsive font scaling (`clamp()`). Landscape mode: `landscape-hide`/`landscape-compact` utilities, mini charts hidden, status bar hidden. Chart `contain: layout style`. Orientation change fires `lumpio:layout-resize`
 - **M5:** Pull-to-refresh hook (`usePullToRefresh`). Haptic feedback (`navigator.vibrate`) on alert triggers. PWA manifest: `orientation: any`, `categories`, shortcuts for QQQ/SPY/NVDA
 
 > Collapsed summaries. See `project.md` session log for full details.
@@ -190,11 +190,11 @@
 - CrosshairLegend: 11px font, 88% opaque bg, roomier padding
 
 ### Phase 13A — Traction Readiness (2026-03-17)
-- Enhanced chart snapshots: watermark includes confluence score + day type (`NVDA 5m · Confluence 85 Bull · Trend Day — Bullish · cheechart.space`)
+- Enhanced chart snapshots: watermark includes confluence score + day type (`NVDA 5m · Confluence 85 Bull · Trend Day — Bullish · lumpio.space`)
 - First-visit welcome banner: dismissible, localStorage-gated ("Free charting — unlimited indicators, no signup, no ads")
 - Stripe donate link: heart icon in StatusBar with external link
 - OG image: branded 1200x630 PNG with candlestick chart + confluence badge, `summary_large_image` Twitter card
-- Codebase cleanup: removed 3 dead shim files, standardized localStorage keys to `cheechart-*` prefix with migration
+- Codebase cleanup: removed 3 dead shim files, standardized localStorage keys to `lumpio-*` prefix with migration
 
 ### Phase 13B — First Impression Polish (2026-03-16)
 - 9 hardcoded color violations fixed (AlertsPanel, MACDMiniChart, RSIMiniChart, SROverlay, ErrorBoundary, CandlestickChart, ToastContainer, PresetSelector, IndicatorTabView, CrosshairLegend)
@@ -249,7 +249,7 @@
 
 ### Phases 5–7 — Live Data + Deploy + Multi-Symbol (2026-03-14)
 - Live WebSocket feed (market-hours gating, bar aggregation, auto-reconnect)
-- Vercel deployment (serverless proxy, cheechart.space, SSL)
+- Vercel deployment (serverless proxy, lumpio.space, SSL)
 - Multi-symbol support (autocomplete ~80 tickers, Alpaca validation)
 
 ### Phases 1–4 — Core Chart + Indicators + Levels (2026-03-13)

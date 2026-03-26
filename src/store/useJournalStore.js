@@ -8,7 +8,7 @@
 import { create } from 'zustand'
 import { validateJournalEntry } from '../utils/validate'
 
-const STORAGE_KEY = 'cheechart-journal'
+const STORAGE_KEY = 'lumpio-journal'
 
 function loadEntries() {
   try {

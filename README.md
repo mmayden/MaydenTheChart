@@ -1,8 +1,8 @@
-# Cheechart
+# Lumpio
 
 Day trading chart terminal with built-in signal synthesis, backtesting, and trade journaling. Real-time US equity data via Alpaca Markets.
 
-**Live:** [cheechart.space](https://cheechart.space)
+**Live:** [lumpio.space](https://lumpio.space)
 
 ---
 
@@ -134,7 +134,7 @@ src/
 
 Auto-deploys on push via Vercel. Set env vars in Vercel dashboard → Project Settings → Environment Variables.
 
-Custom domain: `cheechart.space`
+Custom domain: `lumpio.space`
 
 ```bash
 npm run build && npm run preview   # Local production test

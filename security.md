@@ -1,4 +1,4 @@
-# Security Standards — Cheechart
+# Security Standards — Lumpio
 
 > Current as of 2026-03-25. Security is non-negotiable.
 
@@ -112,8 +112,8 @@ Implemented in `src/utils/validate.js` (29 unit tests).
 Wired into `usePresetsStore`, `useJournalStore`, `WatchlistPanel`, `SymbolInput`.
 
 ### localStorage Key Convention
-All keys use the `cheechart-` prefix: `cheechart-theme`, `cheechart-accent`,
-`cheechart-symbol`, `cheechart-sound-alerts`, `cheechart-welcome-dismissed`.
+All keys use the `lumpio-` prefix: `lumpio-theme`, `lumpio-accent`,
+`lumpio-symbol`, `lumpio-sound-alerts`, `lumpio-welcome-dismissed`.
 Legacy `lumpia-*` keys are read on startup for migration, then cleaned up on write.
 
 ### ErrorBoundary

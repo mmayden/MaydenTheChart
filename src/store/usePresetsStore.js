@@ -13,8 +13,8 @@ import { DEFAULT_PRESETS, DEFAULT_PRESET_ID } from '../constants/presets'
 import { useChartStore } from './useChartStore'
 import { validatePreset } from '../utils/validate'
 
-const STORAGE_KEY = 'cheechart-presets'
-const ACTIVE_KEY  = 'cheechart-active-preset'
+const STORAGE_KEY = 'lumpio-presets'
+const ACTIVE_KEY  = 'lumpio-active-preset'
 
 /** Load user presets from localStorage, merged with defaults. */
 function loadPresets() {

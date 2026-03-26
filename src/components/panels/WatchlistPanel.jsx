@@ -13,7 +13,7 @@ import { useWatchlistQuotes } from '../../hooks/useWatchlistQuotes'
 import { validateWatchlist } from '../../utils/validate'
 import { SYMBOL_RE } from '../../constants/patterns'
 
-const STORAGE_KEY = 'cheechart-watchlist'
+const STORAGE_KEY = 'lumpio-watchlist'
 const DEFAULT_WATCHLIST = ['QQQ', 'SPY', 'AAPL', 'NVDA', 'TSLA']
 
 function loadWatchlist() {

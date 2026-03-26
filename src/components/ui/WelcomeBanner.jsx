@@ -7,7 +7,7 @@
 
 import { useState } from 'react'
 
-const LS_KEY = 'cheechart-welcome-dismissed'
+const LS_KEY = 'lumpio-welcome-dismissed'
 
 function isDismissed() {
   try { return localStorage.getItem(LS_KEY) === '1' } catch { return false }
@@ -29,7 +29,7 @@ export function WelcomeBanner() {
       role="banner"
     >
       <span className="text-theme">
-        <span className="text-accent font-semibold">Cheechart</span>
+        <span className="text-accent font-semibold">Lumpio</span>
         {' — Free charting with unlimited indicators, no signup, no ads.'}
       </span>
       <button

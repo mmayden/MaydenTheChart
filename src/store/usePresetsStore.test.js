@@ -79,7 +79,7 @@ describe('usePresetsStore', () => {
 
     it('persists activePresetId to localStorage', () => {
       usePresetsStore.getState().applyPreset('clean')
-      expect(localStorage.setItem).toHaveBeenCalledWith('cheechart-active-preset', 'clean')
+      expect(localStorage.setItem).toHaveBeenCalledWith('lumpio-active-preset', 'clean')
     })
 
     it('does nothing for non-existent preset', () => {
@@ -114,7 +114,7 @@ describe('usePresetsStore', () => {
     it('persists to localStorage', () => {
       usePresetsStore.getState().saveCurrentAsPreset('Persisted')
       expect(localStorage.setItem).toHaveBeenCalledWith(
-        'cheechart-presets',
+        'lumpio-presets',
         expect.any(String)
       )
     })

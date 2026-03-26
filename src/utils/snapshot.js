@@ -28,7 +28,7 @@ export function captureSnapshot(canvas, { symbol = '', timeframe = '', confluenc
     parts.push(`Confluence ${confluenceScore} ${biasLabel}`)
   }
   if (dayType) parts.push(dayType)
-  parts.push('cheechart.space')
+  parts.push('lumpio.space')
 
   // Draw watermark in bottom-right corner
   const padding = 12
@@ -54,7 +54,7 @@ export function captureSnapshot(canvas, { symbol = '', timeframe = '', confluenc
  * @param {string} filename — fallback download filename
  * @returns {Promise<'clipboard'|'download'>} — which method was used
  */
-export async function copyToClipboard(blob, filename = 'cheechart-snapshot.png') {
+export async function copyToClipboard(blob, filename = 'lumpio-snapshot.png') {
   if (blob && navigator.clipboard?.write && typeof ClipboardItem !== 'undefined') {
     try {
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
@@ -74,7 +74,7 @@ export async function copyToClipboard(blob, filename = 'cheechart-snapshot.png')
  * @param {Blob} blob
  * @param {string} filename
  */
-export function downloadSnapshot(blob, filename = 'cheechart-snapshot.png') {
+export function downloadSnapshot(blob, filename = 'lumpio-snapshot.png') {
   if (!blob) return
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')

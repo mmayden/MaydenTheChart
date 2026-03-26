@@ -1,4 +1,4 @@
-# Cheechart — Claude Session Instructions
+# Lumpio — Claude Session Instructions
 
 ## Start of every session
 Read these files in order before doing anything else:
@@ -65,7 +65,7 @@ The live chart and the backtester share identical math. Never duplicate indicato
 - ErrorBoundary shows raw error messages only in `import.meta.env.DEV`
 - Service worker `CACHE_NAME` is auto-versioned at build time (Vite plugin in `vite.config.js`)
 - Bearer token in `ws-auth.js` is NOT a real secret (ships in client bundle) — rate limiting is the real gate
-- All localStorage keys use `cheechart-` prefix (`cheechart-theme`, `cheechart-accent`, `cheechart-symbol`, `cheechart-roadmap-done`, `cheechart-roadmap-beginner`, etc.)
+- All localStorage keys use `lumpio-` prefix (`lumpio-theme`, `lumpio-accent`, `lumpio-symbol`, `lumpio-roadmap-done`, `lumpio-roadmap-beginner`, etc.)
 - CSP includes `base-uri 'self'`, `form-action 'self'`, `object-src 'none'`, `upgrade-insecure-requests`
 - Cross-origin isolation: `Cross-Origin-Opener-Policy: same-origin` + `Cross-Origin-Resource-Policy: same-origin`
 - Dependabot auto-updates npm + GitHub Actions deps weekly (`.github/dependabot.yml`)
@@ -189,7 +189,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
   affect flex layout. Motion is only for content inside persistent containers.
 - All animations respect `prefers-reduced-motion` via `useReducedMotion()` hook
 - CSS-only: nav hover keyframes, skeleton shimmer, settings gear spin+glow, mini chart labels (`.mini-chart-label`)
-- **Sidebar resize:** Emits `cheechart:layout-resize` event after transition;
+- **Sidebar resize:** Emits `lumpio:layout-resize` event after transition;
   all chart instances call `chart.resize()` to match new container size.
 - **Mini chart lifecycle:** RSI/MACD mini charts are always mounted (never
   conditionally rendered). Toggling uses CSS `height: 0` with transition instead
@@ -263,7 +263,7 @@ via inline styles on `<html>`. Resets when theme changes. Persisted to `localSto
 - **Viewport height:** `.h-screen-safe` uses `100dvh` with `100vh` fallback.
 - **Landscape:** `@media (orientation: landscape) and (max-height: 500px)` —
   `.landscape-hide` (status bar), `.landscape-compact` (sub-header). Mini charts hidden
-  in mobile landscape. Orientation change fires `cheechart:layout-resize`.
+  in mobile landscape. Orientation change fires `lumpio:layout-resize`.
 - **Responsive fonts:** CSS vars `--text-xs`/`--text-sm`/`--text-base` using `clamp()`.
 - **Performance:** `.chart-contain` (`contain: layout style`) on chart wrapper.
   `.bottom-sheet` has `contain: layout style`. All animations use transform/opacity only.

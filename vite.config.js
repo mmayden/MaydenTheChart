@@ -20,7 +20,7 @@ function serviceWorkerVersion() {
         .update(swSource + Date.now())
         .digest('hex')
         .slice(0, 8)
-      const swOut = swSource.replace('__BUILD_HASH__', `cheechart-${hash}`)
+      const swOut = swSource.replace('__BUILD_HASH__', `lumpio-${hash}`)
       writeFileSync(resolve(import.meta.dirname, 'dist/sw.js'), swOut)
     },
   }

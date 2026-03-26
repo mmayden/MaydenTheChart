@@ -46,7 +46,7 @@ export function useKeyboardShortcuts() {
       // ── Chart snapshot (Cmd+Shift+S / Ctrl+Shift+S) — works even in inputs ──
       if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 's') {
         e.preventDefault()
-        window.dispatchEvent(new CustomEvent('cheechart:snapshot'))
+        window.dispatchEvent(new CustomEvent('lumpio:snapshot'))
         return
       }
 

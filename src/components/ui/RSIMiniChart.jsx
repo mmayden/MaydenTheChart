@@ -48,8 +48,8 @@ export function RSIMiniChart({ bars, mainChart }) {
       if (!chart || !container) return
       chart.resize(container.clientWidth, container.clientHeight, true)
     }
-    window.addEventListener('cheechart:layout-resize', handleLayoutResize)
-    return () => window.removeEventListener('cheechart:layout-resize', handleLayoutResize)
+    window.addEventListener('lumpio:layout-resize', handleLayoutResize)
+    return () => window.removeEventListener('lumpio:layout-resize', handleLayoutResize)
   }, [])
 
   // Sync crosshair from main chart → this mini chart

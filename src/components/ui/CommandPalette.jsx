@@ -75,7 +75,7 @@ function buildCommands() {
   // Actions
   commands.push(
     { id: 'action:settings',  label: 'Open Settings',   category: 'Action', action: () => setSettingsOpen(true) },
-    { id: 'action:snapshot',  label: 'Chart Snapshot',   category: 'Action', action: () => window.dispatchEvent(new CustomEvent('cheechart:snapshot')) },
+    { id: 'action:snapshot',  label: 'Chart Snapshot',   category: 'Action', action: () => window.dispatchEvent(new CustomEvent('lumpio:snapshot')) },
   )
 
   return commands

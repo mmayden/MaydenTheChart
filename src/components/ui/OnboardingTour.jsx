@@ -8,7 +8,7 @@
  *   4. Cmd+K            — "Power-user navigation"
  *
  * Uses `data-tour` attributes on target elements + getBoundingClientRect()
- * positioning. Saves `cheechart-onboarding-done` to localStorage on
+ * positioning. Saves `lumpio-onboarding-done` to localStorage on
  * completion or skip. Desktop only — mobile gets a welcome toast instead.
  */
 
@@ -16,7 +16,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useChartStore } from '../../store/useChartStore'
 import { useToast } from '../../store/useToastStore'
 
-const STORAGE_KEY = 'cheechart-onboarding-done'
+const STORAGE_KEY = 'lumpio-onboarding-done'
 
 const STEPS = [
   {
@@ -68,7 +68,7 @@ export function OnboardingTour() {
     // Mobile — show a welcome toast instead of the tour
     if (window.innerWidth < 768) {
       localStorage.setItem(STORAGE_KEY, '1')
-      toast.add({ message: 'Welcome to Cheechart! Use the top bar to explore panels and tools.', type: 'info', duration: 6000 })
+      toast.add({ message: 'Welcome to Lumpio! Use the top bar to explore panels and tools.', type: 'info', duration: 6000 })
       return
     }
 

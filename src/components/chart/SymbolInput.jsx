@@ -25,7 +25,7 @@ const SYMBOL_FONT = {
   color: 'var(--symbol-color)',
 }
 
-const USAGE_KEY = 'cheechart-symbol-usage'
+const USAGE_KEY = 'lumpio-symbol-usage'
 const MAX_SUGGESTIONS = 8
 
 /** Read usage counts from localStorage. */

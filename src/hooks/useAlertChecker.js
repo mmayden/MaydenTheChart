@@ -96,7 +96,7 @@ export function useAlertChecker(bars, timeframe) {
       if (!hit) return
       markTriggered(alert.id)
       fireNotification(
-        'Cheechart — Price Alert',
+        'Lumpio — Price Alert',
         `${selectedSymbol} ${alert.condition === 'above' ? 'crossed above' : 'crossed below'} $${alert.price.toFixed(2)} · now $${currentPrice.toFixed(2)}`
       )
     })
@@ -114,7 +114,7 @@ export function useAlertChecker(bars, timeframe) {
         markTriggered(alert.id)
         const dot = streak.direction === 'green' ? '🟢' : '🔴'
         fireNotification(
-          'Cheechart — Candle Streak',
+          'Lumpio — Candle Streak',
           `${streak.count} consecutive ${streak.direction} candles on ${timeframe ?? ''} ${dot}`
         )
       }

@@ -110,13 +110,13 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" 
   <polyline points="${emaPoints}" fill="none" stroke="${ACCENT}" stroke-width="2" stroke-opacity="0.6" stroke-linejoin="round"/>
 
   <!-- Title -->
-  <text x="${W / 2}" y="60" text-anchor="middle" font-family="monospace" font-size="42" font-weight="bold" fill="${TEXT}">Cheechart</text>
+  <text x="${W / 2}" y="60" text-anchor="middle" font-family="monospace" font-size="42" font-weight="bold" fill="${TEXT}">Lumpio</text>
 
   <!-- Tagline -->
   <text x="${W / 2}" y="100" text-anchor="middle" font-family="monospace" font-size="18" fill="${MUTED}">Free charting — unlimited indicators, no signup, no ads</text>
 
   <!-- Bottom URL -->
-  <text x="${W / 2}" y="${H - 40}" text-anchor="middle" font-family="monospace" font-size="16" fill="${ACCENT}">cheechart.space</text>
+  <text x="${W / 2}" y="${H - 40}" text-anchor="middle" font-family="monospace" font-size="16" fill="${ACCENT}">lumpio.space</text>
 
   <!-- Confluence badge -->
   <rect x="${W / 2 - 100}" y="${H - 80}" width="200" height="28" rx="14" fill="${BULL}" fill-opacity="0.15" stroke="${BULL}" stroke-opacity="0.3"/>

@@ -67,13 +67,13 @@
   <polyline points="112.5,386.15384615384613 177.5,346.7692307692308 242.5,376.3076923076923 307.5,425.53846153846155 372.5,396 437.5,336.9230769230769 502.5,277.84615384615387 567.5,248.30769230769232 632.5,268 697.5,228.6153846153846 762.5,258.1538461538462 827.5,297.53846153846155 892.5,272.9230769230769 957.5,208.92307692307693 1022.5,179.38461538461536 1087.5,149.84615384615387" fill="none" stroke="#60a5fa" stroke-width="2" stroke-opacity="0.6" stroke-linejoin="round"/>
 
   <!-- Title -->
-  <text x="600" y="60" text-anchor="middle" font-family="monospace" font-size="42" font-weight="bold" fill="#f3f4f6">Cheechart</text>
+  <text x="600" y="60" text-anchor="middle" font-family="monospace" font-size="42" font-weight="bold" fill="#f3f4f6">Lumpio</text>
 
   <!-- Tagline -->
   <text x="600" y="100" text-anchor="middle" font-family="monospace" font-size="18" fill="#6b7280">Free charting — unlimited indicators, no signup, no ads</text>
 
   <!-- Bottom URL -->
-  <text x="600" y="590" text-anchor="middle" font-family="monospace" font-size="16" fill="#60a5fa">cheechart.space</text>
+  <text x="600" y="590" text-anchor="middle" font-family="monospace" font-size="16" fill="#60a5fa">lumpio.space</text>
 
   <!-- Confluence badge -->
   <rect x="500" y="550" width="200" height="28" rx="14" fill="#22c55e" fill-opacity="0.15" stroke="#22c55e" stroke-opacity="0.3"/>

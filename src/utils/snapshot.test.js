@@ -32,7 +32,7 @@ describe('captureSnapshot', () => {
     expect(text).toContain('5m')
     expect(text).toContain('Confluence 82 Bull')
     expect(text).toContain('Trend Day')
-    expect(text).toContain('cheechart.space')
+    expect(text).toContain('lumpio.space')
   })
 
   it('returns null if canvas context unavailable', async () => {

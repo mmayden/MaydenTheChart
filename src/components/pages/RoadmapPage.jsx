@@ -10,8 +10,8 @@ import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { PHASES, BEGINNER_PHASE_IDS, BEGINNER_NODE_COUNT } from '../../constants/roadmap'
 import { useIsMobile } from '../../hooks/useMediaQuery'
 
-const STORAGE_KEY = 'cheechart-roadmap-done'
-const BEGINNER_KEY = 'cheechart-roadmap-beginner'
+const STORAGE_KEY = 'lumpio-roadmap-done'
+const BEGINNER_KEY = 'lumpio-roadmap-beginner'
 
 function loadDone() {
   try {
