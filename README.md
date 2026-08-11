@@ -1,4 +1,4 @@
-# Lumpio
+# [lumpio.space] (https://lumpio.space/?p=full)
 
 Day trading chart terminal with built-in signal synthesis, backtesting, and trade journaling. Real-time US equity data via Alpaca Markets.
 
