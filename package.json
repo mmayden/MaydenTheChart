@@ -42,7 +42,7 @@
     "lint-staged": "^16.4.0",
     "postcss": "^8.4.0",
     "sharp": "^0.34.5",
-    "tailwindcss": "^4.2.1",
+    "tailwindcss": "^4.2.2",
     "vite": "^8.0.0",
     "vitest": "^3.0.0"
   }
