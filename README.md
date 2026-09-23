@@ -1,8 +1,8 @@
-# [lumpio.space] (https://lumpio.space/?p=full)
+ABANDONED
 
 Day trading chart terminal with built-in signal synthesis, backtesting, and trade journaling. Real-time US equity data via Alpaca Markets.
 
-**Live:** [lumpio.space](https://lumpio.space)
+OFFLINE
 
 ---
 
